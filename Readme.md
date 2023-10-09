@@ -14,7 +14,7 @@ This dotfiles uses stow to create symlinks.
  - `ssh` my ssh config 
  - `starship` for the promt configuration 
  - `tmux` my tmux config 
- - `zsh` Is my whole zsh config, it is breaken up into files. Uses `antidote` as a plugin manager. It expects that you have a `$HOME/.config/zsh/config.d/secrets.zsh`, which is not included in this repo for security reasons 
+ - `zsh` Is my whole zsh config, it is breaken up into files. Uses `antidote` as a plugin manager. It expects that you have a `$HOME/.secrets/secrets.zsh`, which is not included in this repo for security reasons 
 
 
 # Linking 
