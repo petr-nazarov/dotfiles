@@ -1,0 +1,21 @@
+name: liga
+root: ~/Projects/Personal
+startup_window:  lessons
+windows:
+  - btop: btop
+  - lessons:
+      root: ~/Projects/Personal/Liga/lessons/monorepo
+      layout: main-horizontal
+      panes:
+        - editor:
+            - fnm use default
+            - lvim
+        - term:
+  - homework:
+      root: ~/Projects/Personal/Liga/homework
+      layout: main-horizontal
+      panes:
+        - editor:
+            - fnm use default
+            - lvim
+        - term:

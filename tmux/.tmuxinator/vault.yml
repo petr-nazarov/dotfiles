@@ -1,0 +1,13 @@
+name: vault 
+root: ~/Projects/Personal/Vault
+startup_window: vault
+windows:
+  - vault: 
+     layout: main-horizontal
+     panes:
+       - editor:
+         - lvim
+       - term:
+         - fnm use default
+
+      

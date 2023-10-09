@@ -1,0 +1,7 @@
+
+
+
+
+ --color
+git config pager.diff
+git config pager.show

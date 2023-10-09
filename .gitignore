@@ -1,0 +1,4 @@
+display/.config/awesome/awesome-wm-widgets
+display/.config/awesome/net_widgets
+nvim/.config/nvim/plugin/packer_compiled.lua
+*.log

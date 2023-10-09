@@ -1,0 +1,11 @@
+name: dotfiles 
+root: ~/dotfiles
+startup_window: dotfiles
+windows:
+- dotfiles: 
+   layout: main-horizontal
+   panes:
+     - editor:
+       - lvim
+     - term:
+       - fnm use default

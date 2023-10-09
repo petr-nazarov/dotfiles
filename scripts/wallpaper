@@ -1,0 +1,61 @@
+#!/bin/bash
+
+
+
+function usage () {
+    echo "Usage: $(basename $0 ) [-f PATH]" 2>&1
+    echo "Select wallpaper"
+    echo "    -f [path to folder]"
+    echo "    -r select a random image from PATH"
+}
+
+
+sourceDir=""
+random=false
+function parse () {
+  while getopts "f:r" flag
+  do
+       case $flag in
+           f)
+             sourseDir=$OPTARG
+             ;;
+           r)
+             random=true
+             ;;
+           ?)
+             echo "Invalid option: -${OPTARG}."
+             echo
+             usage
+             exit 1
+             ;;
+       esac
+  done
+
+  echo "sourseDir = $sourseDir"
+  echo "random = $random"
+}
+
+function validate () {
+  if [[ "$sourseDir" = "" ]]
+  then
+    echo "-f is a required option" 2>&1 
+    exit 1
+  fi
+}
+
+
+main() {
+  parse $@
+  validate
+  if [[ "$random" = true ]]
+  then
+    echo "Not implemented"
+      
+    exit 1
+  fi
+  local file=$( ls "$sourseDir" -w 1 | rofi -dmenu )
+  echo "selected file $sourseDir/$file"
+  feh --bg-fill "$sourseDir/$file"
+}
+
+main $@

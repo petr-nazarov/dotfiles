@@ -1,0 +1,26 @@
+[user]
+	name = Petr Nazarov
+	email = mrzueck@gmail.com
+[alias]
+    co = checkout
+    cob = checkout -b
+    cm = !git add -A && git commit -m
+    cmm = !git add -A && git commit
+    p  =  push
+    pp = !git push -u origin HEAD 
+    s = status
+    pl = pull origin
+    update =  !git fetch origin master:master && git merge master
+    finish = !git checkout master && git branch -d $1
+    wip = !git add . && git commit -m "WIP" --no-verify
+#[core]
+  #pager = git diff --name-only --relative --diff-filter=d | xargs bat --diff
+ #   pager = diff-so-fancy | less --tabs=4 -RFX
+#[interactive] 
+ #   diffFilter = diff-so-fancy --patch
+[pull]
+    rebase = false
+[includeIf "gitdir:~/Projects/Yoobic"]
+    path = ~/yoobic.giconfig
+[init]
+	defaultBranch = main

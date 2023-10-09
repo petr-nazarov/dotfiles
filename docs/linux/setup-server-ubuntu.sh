@@ -1,0 +1,125 @@
+PLATFORM=arch #arch | deb
+
+mkdir ~/apps
+# Create user 
+useradd -m nazarov \
+passwd nazarov \ 
+apt-get install sudo -y \
+usermod -aG sudo nazarov \
+
+
+# First class packages
+sudo apt install -y wget make gcc git vim  gcc build-essential unzip  libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin   autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev  libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find
+
+
+## zsh 
+sudo apt-get install -y zsh
+sudo chsh -s $(which zsh) \
+chsh -s $(which zsh) \
+git clone https://github.com/mattmc3/antidote.git /usr/share/zsh-antidote \
+cd ~/apps/ \
+curl -sS https://starship.rs/install.sh | sh \
+
+
+# Install languages
+
+## Python
+sudo apt-get install -y python3-pip
+
+## Ruby
+cd ~/
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+exec $SHELL
+rbenv install 3.2.2
+rbenv global 3.2.2
+
+## node
+curl -fsSL https://fnm.vercel.app/install | bash
+fnm install v18.16.0
+fnm use v18.16.0
+npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
+
+
+## Go
+install golang
+## Rust 
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+
+## lf
+git clone https://github.com/gokcehan/lf.git ~/apps/lf && cd ~/apps/lf
+go build
+env CGO_ENABLED=0 go install -ldflags="-s -w" github.com/gokcehan/lf@latest
+cp lf ~/apps/bin
+
+sudo apt-get install asciidoctor libmagic-dev
+go install github.com/doronbehar/pistol/cmd/pistol@latest
+
+## exa
+cargo install exa
+
+
+## lazygit
+cd ~/apps
+curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.34/lazygit_0.34_Linux_x86_64.tar.gz --output lazygit.tar.gz
+tar -zxf lazygit.tar.gz
+sudo mv lazygit ~/apps/bin
+
+## tmux
+sudo apt install tmux
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+## tmuxinator
+gem install tmuxinator
+
+
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+
+
+## docker
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker 
+zsh
+
+
+## mongosh
+curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg \
+   --dearmor
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+
+# pulumi and google cloud
+curl -fsSL https://get.pulumi.com | sh
+sudo apt-get install -y apt-transport-https ca-certificates gnupg
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - 
+echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list 
+sudo apt update  
+sudo apt install -y google-cloud-sdk
+
+# Doppler
+curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
+
+
+## Firewall
+sudo apt install ufw
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow http
+sudo ufw allow https
+sudo ufw enable
+

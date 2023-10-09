@@ -1,0 +1,5 @@
+[user]
+	name = Petr Nazarov
+	email = pnazarov@yoobic.com
+[core]
+    sshCommand = "ssh -i ~/.ssh/yoobic"
