@@ -3,7 +3,65 @@
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
 local homeDir = os.getenv("HOME")
-
+lvim.lsp.automatic_configuration.skipped_servers = {
+  "angularls",
+  "ansiblels",
+  "antlersls",
+  "azure_pipelines_ls",
+  "ccls",
+  "cssmodules_ls",
+  "custom_elements_ls",
+  "denols",
+  "docker_compose_language_service",
+  "elp",
+  "ember",
+  "emmet_language_server",
+  "emmet_ls",
+  "eslint",
+  "eslintls",
+  "glint",
+  "golangci_lint_ls",
+  "gradle_ls",
+  "graphql",
+  "java_language_server",
+  "jedi_language_server",
+  "ltex",
+  "mdx_analyzer",
+  "neocmake",
+  "ocamlls",
+  "omnisharp",
+  "phpactor",
+  "psalm",
+  "pylsp",
+  "pylyzer",
+  "pyre",
+  "quick_lint_js",
+  "reason_ls",
+  "rnix",
+  "rome",
+  "rubocop",
+  "ruby_ls",
+  "ruff_lsp",
+  "scry",
+  "solang",
+  "solc",
+  "solidity_ls",
+  "solidity_ls_nomicfoundation",
+  "sorbet",
+  "sourcekit",
+  "sourcery",
+  "spectral",
+  "sqlls",
+  "sqls",
+  "standardrb",
+  "stylelint_lsp",
+  "svlangserver",
+  "tflint",
+  "unocss",
+  "verible",
+  "vtsls",
+  "vuels",
+}
 lvim.plugins = {
   -- Core 
   "nvim-lua/plenary.nvim",
@@ -42,6 +100,10 @@ lvim.plugins = {
       require("copilot_cmp").setup()
     end
   },
+  {
+    "tyru/open-browser-github.vim", 
+    dependencies = { "tyru/open-browser.vim" },
+  },
   -- Debug 
   "nvim-telescope/telescope-dap.nvim",
   {
@@ -55,6 +117,44 @@ lvim.plugins = {
     end
   },
   "mfussenegger/nvim-dap-python",
+ --  {
+	-- 	"neovim/nvim-lspconfig",
+	-- 	opts = {
+	-- 		--- other options
+	-- 		servers = {
+	-- 			tsserver = {
+	-- 				on_attach = function(client)
+	-- 					-- this is important, otherwise tsserver will format ts/js
+	-- 					-- files which we *really* don't want.
+	-- 					client.server_capabilities.documentFormattingProvider = false
+	-- 				end,
+	-- 			},
+	-- 			biome = {},
+	-- 			-- other language servers
+	-- 		},
+	-- 	},
+	-- },
+ --  {
+	-- 	"jose-elias-alvarez/null-ls.nvim",
+	-- 	opts = function(_, opts)
+	-- 		local nls = require("null-ls").builtins
+	-- 		opts.sources = vim.list_extend(opts.sources or {}, {
+	-- 			nls.formatting.biome,
+
+	-- 			-- or if you like to live dangerously like me:
+	-- 			nls.formatting.biome.with({
+	-- 				args = {
+	-- 					'check',
+	-- 					'--apply-unsafe',
+	-- 					'--formatter-enabled=true',
+	-- 					'--organize-imports-enabled=true',
+	-- 					'--skip-errors',
+	-- 					'$FILENAME',
+	-- 				},
+	-- 			}),
+	-- 		})
+	-- 	end,
+	-- },
   -- {
   --   "microsoft/vscode-js-debug",
   --  -- build =  'if [ ! -f "out/src/vsDebugServer.js" ]; then  npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out; fi'
@@ -102,7 +202,12 @@ lvim.builtin.which_key.mappings["O"] = {
   g = {
     "<cmd> FzfLua git_status <CR>",
     "Changed files"
+  },
+  G = {
+    "<cmd> OpenGithubFile <CR>",
+    "Open on github"
   }
+
 }
 lvim.builtin.which_key.mappings["t"] = {
   name = "Toggle",
@@ -225,17 +330,17 @@ lvim.builtin.which_key.mappings["d"] = {
 
 -- Null LS 
 
-local null_ls = require("null-ls")
+-- local null_ls = require("null-ls")
 
-null_ls.setup({
-  sources = {
-    null_ls.builtins.formatting.stylua,
-    null_ls.builtins.formatting.eslint,
-    null_ls.builtins.formatting.prettier,
-    null_ls.builtins.diagnostics.eslint,
-    null_ls.builtins.completion.spell,
-  },
-})
+-- null_ls.setup({
+--   sources = {
+--     null_ls.builtins.formatting.stylua,
+--     null_ls.builtins.formatting.eslint,
+--     null_ls.builtins.formatting.prettier,
+--     null_ls.builtins.diagnostics.eslint,
+--     null_ls.builtins.completion.spell,
+--   },
+-- })
 -- DAP 
 
 --require("dapui").setup()
@@ -274,4 +379,3 @@ for _, language in ipairs({ "typescript", "javascript" }) do
 		},
 	}
 end
-
