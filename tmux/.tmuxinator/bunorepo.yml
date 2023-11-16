@@ -1,0 +1,13 @@
+name: liga
+root: ~/Projects/Personal
+startup_window:  lessons
+windows:
+  - btop: btop
+  - lessons:
+      root: ~/Projects/Personal/bunorepo
+      layout: main-horizontal
+      panes:
+        - editor:
+            - fnm use default
+            - lvim
+        - term:

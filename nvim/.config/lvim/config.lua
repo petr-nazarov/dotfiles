@@ -68,6 +68,7 @@ lvim.plugins = {
   "akinsho/toggleterm.nvim",
   "christoomey/vim-tmux-navigator",
   -- Navigation 
+  "jrop/mongo.nvim",
   {
     "lmburns/lf.nvim",
     config = function ()
@@ -181,10 +182,24 @@ lvim.builtin.which_key.mappings["h"] = {
   "<cmd> FzfLua buffers <CR>",
   "Recent"
 }
+lvim.builtin.which_key.mappings["p"] = {
+    "<cmd>FzfLua commands<CR>",
+    "Command pallete"
+}
 lvim.builtin.which_key.mappings["o"] = {
     "<cmd>FzfLua git_files<CR>",
     "Git wached files"
 }
+-- lvim.builtin.which_key.mappings["M"] = {
+--   name = "Mongo",
+--   c = { 
+--     name = "connect",
+--     d = {
+--       "", 
+--       "Dev"
+--     }
+--   }
+-- }
 lvim.builtin.which_key.mappings["O"] = {
   name = "Open",
   o = {
