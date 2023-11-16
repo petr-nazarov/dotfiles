@@ -7,17 +7,24 @@
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["wlr/taskbar"],
-    "modules-right": ["pulseaudio", "custom/mem", "backlight", "battery", "clock", "tray"],
+    "modules-right": ["pulseaudio", "keyboard-state", "custom/mem", "temperature", "backlight", "battery", "clock", "tray"],
 
 
     //***************************
     //*  Modules configuration  *
     //***************************
 "hyprland/workspaces": {
-	"format": "{name}{icon}|",
+	"format": "{name} {icon} |",
 	"format-icons": {
 		"1": "",
 		"2": "",
+    "3": " ",
+    "4": " ",
+    "5": " ",
+    "6": " ",
+    "7": " ",
+    "8": " ",
+    "9": " ",
 		"10": "",
 		"11": "",
 		//"active": "",
@@ -92,7 +99,7 @@
     },
 
     "custom/mem": {
-        "format": "{} ",
+        "format": "{} 󰍛",
         "interval": 3,
         "exec": "free -h | awk '/Mem:/{printf $3}'",
         "tooltip": false,
