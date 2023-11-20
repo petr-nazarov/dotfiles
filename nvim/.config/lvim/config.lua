@@ -3,6 +3,7 @@
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
 local homeDir = os.getenv("HOME")
+vim.api.nvim_command('set spell')
 lvim.lsp.automatic_configuration.skipped_servers = {
   "angularls",
   "ansiblels",
