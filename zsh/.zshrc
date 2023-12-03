@@ -55,3 +55,10 @@ unset __conda_setup
 # fnm
 export PATH="/home/nazaov/.local/share/fnm:$PATH"
 eval "`fnm env`"
+
+# bun completions
+[ -s "/home/nazarov/.bun/_bun" ] && source "/home/nazarov/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

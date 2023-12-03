@@ -37,8 +37,9 @@ rbenv global 3.2.2
 curl -fsSL https://fnm.vercel.app/install | bash
 fnm install v18.16.0
 fnm use v18.16.0
-npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
-
+npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim @biomejs/biome
+## bun
+curl -fsSL https://bun.sh/install | bash 
 
 ## Rust 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
