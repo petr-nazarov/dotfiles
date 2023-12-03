@@ -21,3 +21,6 @@ git clone https://github.com/ronniedroid/getnf.git ~/apps/getnf
 cd ~/apps/getnf 
 ./install.sh
 getnf
+
+# emoji 
+yay -S noto-fonts-emoji
