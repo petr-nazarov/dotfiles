@@ -9,7 +9,7 @@ usermod -aG sudo nazarov \
 
 
 # First class packages
-sudo apt install -y wget make gcc git vim  gcc build-essential unzip  libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin   autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev  libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find
+sudo apt install -y wget make gcc git vim  gcc build-essential unzip  libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin   autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev  libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find stow
 
 
 ## zsh 
