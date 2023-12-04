@@ -22,6 +22,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Go
 export PATH="$HOME/go/bin:$PATH"
 export GOBIN="$HOME/go/bin"
+export PATH=$PATH:/usr/local/go/bin
 
 # GNU sed
 export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"

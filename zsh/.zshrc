@@ -62,3 +62,7 @@ eval "`fnm env`"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# fnm
+export PATH="/home/nazarov/.local/share/fnm:$PATH"
+eval "`fnm env`"
