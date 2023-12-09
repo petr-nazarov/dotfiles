@@ -63,6 +63,10 @@ eval "`fnm env`"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+# fnm
+export PATH="/home/nazarov/.local/share/fnm:$PATH"
+eval "`fnm env`"
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/nazarov/apps/google-cloud-sdk/path.zsh.inc' ]; then . '/home/nazarov/apps/google-cloud-sdk/path.zsh.inc'; fi
 
