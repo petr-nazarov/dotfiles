@@ -4,65 +4,12 @@
 -- Discord: https://discord.com/invite/Xb9B4Ny
 local homeDir = os.getenv("HOME")
 vim.api.nvim_command('set spell')
-lvim.lsp.automatic_configuration.skipped_servers = {
-  "angularls",
-  "ansiblels",
-  "antlersls",
-  "azure_pipelines_ls",
-  "ccls",
-  "cssmodules_ls",
-  "custom_elements_ls",
-  "denols",
-  "docker_compose_language_service",
-  "elp",
-  "ember",
-  "emmet_language_server",
-  "emmet_ls",
-  "eslint",
-  "eslintls",
-  "glint",
-  "golangci_lint_ls",
-  "gradle_ls",
-  "graphql",
-  "java_language_server",
-  "jedi_language_server",
-  "ltex",
-  "mdx_analyzer",
-  "neocmake",
-  "ocamlls",
-  "omnisharp",
-  "phpactor",
-  "psalm",
-  "pylsp",
-  "pylyzer",
-  "pyre",
-  "quick_lint_js",
-  "reason_ls",
-  "rnix",
-  "rome",
-  "rubocop",
-  "ruby_ls",
-  "ruff_lsp",
-  "scry",
-  "solang",
-  "solc",
-  "solidity_ls",
-  "solidity_ls_nomicfoundation",
-  "sorbet",
-  "sourcekit",
-  "sourcery",
-  "spectral",
-  "sqlls",
-  "sqls",
-  "standardrb",
-  "stylelint_lsp",
-  "svlangserver",
-  "tflint",
-  "unocss",
-  "verible",
-  "vtsls",
-  "vuels",
-}
+vim.opt.foldcolumn = '1' -- '0' is not bad
+vim.opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
+vim.opt.foldmethod           = "expr"
+vim.opt.foldexpr             = "nvim_treesitter#foldexpr()"
 lvim.plugins = {
   -- Core 
   "nvim-lua/plenary.nvim",

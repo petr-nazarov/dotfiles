@@ -24,7 +24,11 @@ curl -sS https://starship.rs/install.sh | sh \
 # Install languages
 
 ## Python
-sudo apt-get install -y python3-pip
+cd ~/apps
+sudo apt-get install libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
+curl -O https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh
+bash ./Anaconda3-2020.05-Linux-x86_64.sh
+
 
 ## Ruby
 cd ~/
@@ -45,6 +49,10 @@ curl -fsSL https://bun.sh/install | bash
 
 ## Go
 install golang
+cd ~/apps/
+wget https://golang.org/dl/go1.17.5.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.17.5.linux-amd64.tar.gz
+
 ## Rust 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
