@@ -310,7 +310,7 @@ lvim.builtin.which_key.mappings["d"] = {
 -- require("mxsdev/nvim-dap-vscode-js").setup({
 -- 	adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" }, -- which adapters to register in nvim-dap
 -- })
-for _, language in ipairs({ "typescript", "javascript" }) do
+for _, language in ipairs({ "typescript", "javascript", "vue" }) do
 	local yarnPathHandle = io.popen("which yarn")
 	local yarnPathWithSpace = yarnPathHandle:read("*a")
 	yarnPathHandle:close()
@@ -339,6 +339,12 @@ for _, language in ipairs({ "typescript", "javascript" }) do
 			console = "integratedTerminal",
 			port = 9229,
 			-- protocol = inspector,
-		},
+		},{
+      type = "pwa-chrome",
+      request= "launch",
+      name = "client: chrome",
+      url = "http://localhost:4000",
+      webRoot =  "${workspaceFolder}"
+    }
 	}
 end

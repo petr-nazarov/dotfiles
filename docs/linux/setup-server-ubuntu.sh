@@ -66,8 +66,8 @@ cp lf ~/apps/bin
 sudo apt-get install asciidoctor libmagic-dev
 go install github.com/doronbehar/pistol/cmd/pistol@latest
 
-## exa
-cargo install exa
+## eza
+cargo install eza
 
 
 ## lazygit

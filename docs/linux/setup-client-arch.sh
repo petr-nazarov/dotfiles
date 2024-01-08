@@ -6,7 +6,7 @@ mkdir ~/apps
 yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh 
 
 # Second class packages
-yay -S --noconfirm zsh fd ripgrep exa bat fzf xclip procs btop diff-so-fancy lf pistol-git neovim layzygit
+yay -S --noconfirm zsh fd ripgrep eza bat fzf xclip procs btop diff-so-fancy lf pistol-git neovim layzygit
 
 # Ntfs support
 yay -S --noconfirm fuse fuse 

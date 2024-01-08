@@ -57,6 +57,8 @@ export PATH="/home/nazarov/.local/share/fnm:$PATH"
 eval "`fnm env`"
 
 
+
+
 #apps
 export PATH="$HOME/neovim/bin:$PATH"
 export PATH="$PATH:$HOME/apps/bin"

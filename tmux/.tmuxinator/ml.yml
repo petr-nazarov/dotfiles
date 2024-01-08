@@ -8,8 +8,8 @@ windows:
       layout: main-horizontal
       panes:
         - editor:
-            - conda activate ml_cource
+            - conda activate ml
             - fnm use default
             - lvim
         - term:
-            - conda activate ml_cource
+            - conda activate ml

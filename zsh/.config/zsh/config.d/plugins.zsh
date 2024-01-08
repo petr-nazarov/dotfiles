@@ -13,6 +13,7 @@ export PATH="/home/nazarov/.local/share/fnm:$PATH"
 eval "$(fnm env --use-on-cd)"
 
 
+
 # Starship
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(starship init zsh)"
