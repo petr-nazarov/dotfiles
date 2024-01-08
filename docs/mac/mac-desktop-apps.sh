@@ -1,7 +1,6 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install brave-browser transmission scroll-reverser stow kitty gcc antidote
-brew install lf eza bat fzf rg fd xclip procs btop authy flameshot studio-3t neovim lazygit fzf ripgrep
-
+brew install gcc antidote stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep
+brew install brave-browser transmission scroll-reverser  kitty  authy flameshot studio-3t  
 brew install --cask raycast
 brew install rbenv ruby-build
 rbenv install 3.2.2
