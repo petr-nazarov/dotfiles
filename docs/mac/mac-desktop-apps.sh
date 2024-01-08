@@ -1,6 +1,6 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install brave-browser transmission scroll-reverser stow kitty gcc antidote
-brew install lf eza bat fzf rg fd xclip procs btop authy flameshot studio-3t neovim lazygit
+brew install lf eza bat fzf rg fd xclip procs btop authy flameshot studio-3t neovim lazygit fzf ripgrep
 
 brew install --cask raycast
 brew install rbenv ruby-build
@@ -12,6 +12,8 @@ curl -fsSL https://fnm.vercel.app/install | bash
 fnm install v18.16.0
 fnm use v18.16.0
 npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
+
+git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
 
 
 

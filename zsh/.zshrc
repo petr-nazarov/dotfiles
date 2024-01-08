@@ -55,3 +55,7 @@ if [ -f '/home/nazarov/apps/google-cloud-sdk/path.zsh.inc' ]; then . '/home/naza
 if [ -f '/home/nazarov/apps/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/nazarov/apps/google-cloud-sdk/completion.zsh.inc'; fi
 
 
+
+# fnm
+export PATH="/Users/nazarov/Library/Application Support/fnm:$PATH"
+eval "`fnm env`"

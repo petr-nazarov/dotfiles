@@ -5,7 +5,12 @@
 #antigen init ~/.antigenrc
 
 #Atidote
-source '/usr/share/zsh-antidote/antidote.zsh'
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  source ${ZDOTDIR:-~}/.antidote/antidote.zsh
+else 
+  source '/usr/share/zsh-antidote/antidote.zsh'
+fi
 antidote load
 
 # fnm
