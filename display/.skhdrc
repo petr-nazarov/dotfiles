@@ -44,8 +44,6 @@ cmd - 9 : yabai -m space --focus 9
 cmd - 0 : yabai -m space --focus 10
 cmd - tab : yabai -m space --focus 10
 cmd - 0x0A : yabai -m space --focus 11 # 0x0A is the hex value for the § key
-cmd - t : yabai -m space --focus 13
-cmd - m : yabai -m space --focus 14
 
 # move focused window to next/prev workspace
 cmd + shift - 1 : yabai -m window --space 1
