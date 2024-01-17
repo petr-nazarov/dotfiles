@@ -61,6 +61,7 @@ yabai -m rule --add title='Settings$' manage=off
 
 ## Float authly
 yabai -m rule --add app='^Authy Desktop$' manage=off
+yabai -m rule --add app='choose' manage=off
 
 
 
