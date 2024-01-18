@@ -245,11 +245,10 @@ local null_ls = require("null-ls")
 
 local sources = {
   null_ls.builtins.formatting.stylua,
-  null_ls.builtins.formatting.prettier,
   null_ls.builtins.completion.spell,
 }
 -- Add biome source if biome.json is present
-local biome_config_path = vim.fn.stdpath("config") .. "/biome.json"
+local biome_config_path = vim.fn.getcwd() .. "/biome.json"
 if vim.fn.filereadable(biome_config_path) == 1 then
   table.insert(sources, null_ls.builtins.formatting.biome)
 end
@@ -261,9 +260,12 @@ if vim.fn.filereadable(eslint_config_path) == 1 then
   table.insert(sources, null_ls.builtins.diagnostics.eslint)
 end
 
-    -- null_ls.builtins.formatting.eslint,
-    -- null_ls.builtins.diagnostics.eslint,
-    -- null_ls.builtins.formatting.biome, 
+-- Add prettier source if .prettierrc is present
+local prettier_config_path = vim.fn.getcwd() .. "/.prettierrc"
+if vim.fn.filereadable(prettier_config_path) == 1 then
+  table.insert(sources, null_ls.builtins.formatting.prettier)
+end
+
 
 null_ls.setup({
   sources = sources,
