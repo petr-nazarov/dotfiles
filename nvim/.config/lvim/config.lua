@@ -66,49 +66,6 @@ lvim.plugins = {
     end
   },
   "mfussenegger/nvim-dap-python",
- --  {
-	-- 	"neovim/nvim-lspconfig",
-	-- 	opts = {
-	-- 		--- other options
-	-- 		servers = {
-	-- 			tsserver = {
-	-- 				on_attach = function(client)
-	-- 					-- this is important, otherwise tsserver will format ts/js
-	-- 					-- files which we *really* don't want.
-	-- 					client.server_capabilities.documentFormattingProvider = false
-	-- 				end,
-	-- 			},
-	-- 			biome = {},
-	-- 			-- other language servers
-	-- 		},
-	-- 	},
-	-- },
- --  {
-	-- 	"jose-elias-alvarez/null-ls.nvim",
-	-- 	opts = function(_, opts)
-	-- 		local nls = require("null-ls").builtins
-	-- 		opts.sources = vim.list_extend(opts.sources or {}, {
-	-- 			nls.formatting.biome,
-
-	-- 			-- or if you like to live dangerously like me:
-	-- 			nls.formatting.biome.with({
-	-- 				args = {
-	-- 					'check',
-	-- 					'--apply-unsafe',
-	-- 					'--formatter-enabled=true',
-	-- 					'--organize-imports-enabled=true',
-	-- 					'--skip-errors',
-	-- 					'$FILENAME',
-	-- 				},
-	-- 			}),
-	-- 		})
-	-- 	end,
-	-- },
-  -- {
-  --   "microsoft/vscode-js-debug",
-  --  -- build =  'if [ ! -f "out/src/vsDebugServer.js" ]; then  npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out; fi'
-  -- }
-
 }
 
 -- Keybindings 
@@ -138,16 +95,6 @@ lvim.builtin.which_key.mappings["o"] = {
     "<cmd>FzfLua git_files<CR>",
     "Git wached files"
 }
--- lvim.builtin.which_key.mappings["M"] = {
---   name = "Mongo",
---   c = { 
---     name = "connect",
---     d = {
---       "", 
---       "Dev"
---     }
---   }
--- }
 lvim.builtin.which_key.mappings["O"] = {
   name = "Open",
   o = {
@@ -293,17 +240,17 @@ lvim.builtin.which_key.mappings["d"] = {
 
 -- Null LS 
 
--- local null_ls = require("null-ls")
+local null_ls = require("null-ls")
 
--- null_ls.setup({
---   sources = {
---     null_ls.builtins.formatting.stylua,
---     null_ls.builtins.formatting.eslint,
---     null_ls.builtins.formatting.prettier,
---     null_ls.builtins.diagnostics.eslint,
---     null_ls.builtins.completion.spell,
---   },
--- })
+null_ls.setup({
+  sources = {
+    null_ls.builtins.formatting.stylua,
+    null_ls.builtins.formatting.eslint,
+    null_ls.builtins.formatting.prettier,
+    null_ls.builtins.diagnostics.eslint,
+    null_ls.builtins.completion.spell,
+  },
+})
 -- DAP 
 
 --require("dapui").setup()
