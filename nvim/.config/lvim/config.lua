@@ -2,6 +2,18 @@
 -- Video Tutorials: https://www.youtube.com/watch?v=sFA9kX-Ud_c&list=PLhoH5vyxr6QqGu0i7tt_XoVK9v-KvZ3m6
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
+
+-- Structure 
+---- Options
+---- Plugins
+------ Core
+------ Compleation
+------ Language specific
+------ Debug
+---- Keybindings
+---- Setups
+
+-- Options
 local homeDir = os.getenv("HOME")
 vim.api.nvim_command('set spell')
 vim.opt.foldcolumn = '1' -- '0' is not bad
@@ -10,20 +22,13 @@ vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 vim.opt.foldmethod           = "expr"
 vim.opt.foldexpr             = "nvim_treesitter#foldexpr()"
+-- Plugins
 lvim.plugins = {
   -- Core 
   "nvimtools/none-ls.nvim",
   "nvim-lua/plenary.nvim",
   "akinsho/toggleterm.nvim",
   "christoomey/vim-tmux-navigator",
-  -- Navigation 
-  "jrop/mongo.nvim",
-  {
-    "lmburns/lf.nvim",
-    config = function ()
-      require("lf").setup({})
-    end
-  },
   {
     "ibhagwan/fzf-lua",
    -- requires = { "kyazdani42/nvim-web-devicons" },
@@ -35,7 +40,11 @@ lvim.plugins = {
       })
     end
   },
-  -- Complition
+  {
+    "tyru/open-browser-github.vim", 
+    dependencies = { "tyru/open-browser.vim" },
+  },
+  -- Compleation
   {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
@@ -49,10 +58,6 @@ lvim.plugins = {
     config = function ()
       require("copilot_cmp").setup()
     end
-  },
-  {
-    "tyru/open-browser-github.vim", 
-    dependencies = { "tyru/open-browser.vim" },
   },
   -- Debug 
   "nvim-telescope/telescope-dap.nvim",
@@ -239,6 +244,7 @@ lvim.builtin.which_key.mappings["d"] = {
   U = { "<cmd>lua require'dapui'.toggle({reset = true})<cr>", "Toggle UI" },
 }
 
+-- Setups
 -- Null LS 
 
 local null_ls = require("null-ls")
