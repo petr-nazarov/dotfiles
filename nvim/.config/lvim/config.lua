@@ -39,6 +39,11 @@ lvim.plugins = {
         }
       })
     end
+  },{
+    "lmburns/lf.nvim",
+    config = function ()
+      require("lf").setup({})
+    end
   },
   {
     "tyru/open-browser-github.vim", 
