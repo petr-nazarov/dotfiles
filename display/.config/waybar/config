@@ -73,7 +73,8 @@
     "clock": {
         // "timezone": "America/New_York",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format": "{:%a, %d %m, %H:%M }"
+        "format": "{:%a, %d %m, %H:%M }",
+        "on-click": "swaync-client -t -sw"
     },
 
     "pulseaudio": {

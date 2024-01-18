@@ -44,8 +44,6 @@ cmd - 9 : yabai -m space --focus 9
 cmd - 0 : yabai -m space --focus 10
 cmd - tab : yabai -m space --focus 10
 cmd - 0x0A : yabai -m space --focus 11 # 0x0A is the hex value for the § key
-cmd - t : yabai -m space --focus 13
-cmd - m : yabai -m space --focus 14
 
 # move focused window to next/prev workspace
 cmd + shift - 1 : yabai -m window --space 1
@@ -78,7 +76,8 @@ cmd + shift - 0 : yabai -m space --balance
 cmd + shift - q : yabai -m window --close
 
 cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
-
+cmd - e: /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser $(cat ~/.secrets/bookmarks.txt | choose | awk '{ print $NF }')
+cmd + shift - e :cat ~/.secrets/bookmarks.txt | choose | awk '{ print $NF }' | pbcopy
 
 # # enter fullscreen mode for the focused container
 # cmd - f : yabai -m window --toggle zoom-fullscreen

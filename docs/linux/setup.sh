@@ -1,15 +1,17 @@
-PLATFORM=arch #arch | deb
 
 mkdir ~/apps
-# Create user 
+
+# Create user if needed 
 useradd -m nazarov \
 passwd nazarov \ 
 apt-get install sudo -y \
 usermod -aG sudo nazarov \
 
-
-# First class packages
-sudo apt install -y wget make gcc git vim  gcc build-essential unzip  libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin   autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev  libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find stow
+# Install firs class packages 
+## For debian 
+sudo apt install -y wget make gcc git vim gcc build-essential unzip libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin  autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev  libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find stow
+## For arch
+yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse
 
 
 ## zsh 
@@ -28,6 +30,8 @@ cd ~/apps
 sudo apt-get install libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
 curl -O https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh
 bash ./Anaconda3-2020.05-Linux-x86_64.sh
+conda config --set changeps1 False
+source ~/.zshrc
 
 
 ## Ruby
@@ -46,7 +50,6 @@ npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter n
 ## bun
 curl -fsSL https://bun.sh/install | bash 
 
-
 ## Go
 install golang
 cd ~/apps/
@@ -56,32 +59,24 @@ sudo tar -C /usr/local -xzf go1.17.5.linux-amd64.tar.gz
 ## Rust 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
+# Install terminal programs 
+## Debian 
+sudo apt install -y fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layzygit asciidoctor libmagic-dev
+## Arch 
+yay -S --noconfirm fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layzygit asciidoctor libmagic-dev
 
-## lf
-git clone https://github.com/gokcehan/lf.git ~/apps/lf && cd ~/apps/lf
-go build
-env CGO_ENABLED=0 go install -ldflags="-s -w" github.com/gokcehan/lf@latest
-cp lf ~/apps/bin
-
-sudo apt-get install asciidoctor libmagic-dev
-go install github.com/doronbehar/pistol/cmd/pistol@latest
+# pistol
+sudo apt-get install go install github.com/doronbehar/pistol/cmd/pistol@latest
 
 ## eza
 cargo install eza
 
 
-## lazygit
-cd ~/apps
-curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.34/lazygit_0.34_Linux_x86_64.tar.gz --output lazygit.tar.gz
-tar -zxf lazygit.tar.gz
-sudo mv lazygit ~/apps/bin
 
-## tmux
+## tmux and tmuxinator
 sudo apt install tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-## tmuxinator
 gem install tmuxinator
-
 
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
@@ -102,15 +97,6 @@ sudo usermod -aG docker $USER
 newgrp docker 
 zsh
 
-
-## mongosh
-curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
-   sudo gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg \
-   --dearmor
-echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-
-sudo apt-get update
-sudo apt-get install -y mongodb-org
 
 # pulumi and google cloud
 curl -fsSL https://get.pulumi.com | sh
