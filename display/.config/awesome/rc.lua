@@ -590,6 +590,7 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 
 awful.spawn.with_shell("clipmenud");
 awful.spawn.with_shell("compton")
+awful.spawn.with_shell("setxkbmap -option caps:escape")
 
 awful.spawn.with_shell("google-drive-ocamlfuse ~/myGoogleDrive")
 awful.spawn.with_shell("blueman-applet")
