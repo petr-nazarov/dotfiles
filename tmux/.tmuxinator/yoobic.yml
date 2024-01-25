@@ -2,7 +2,15 @@ name: yoobic
 root: ~/Projects/Yoobic
 startup_window: loopback
 windows:
-  - btop: btop
+  - mongo: 
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/mongotui
+      panes: 
+        - editor:
+          - fnm use default
+        - term:
+          - fnm use default
+
   - Projects: 
   - loopback:
       layout: main-horizontal

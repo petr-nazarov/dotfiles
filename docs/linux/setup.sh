@@ -106,6 +106,8 @@ echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /e
 sudo apt update  
 sudo apt install -y google-cloud-sdk
 
+# heroku 
+curl https://cli-assets.heroku.com/install.sh | sh
 # Doppler
 curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
 

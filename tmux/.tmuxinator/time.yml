@@ -1,15 +1,12 @@
-name: time
+name: time  
 root: ~/Projects/Personal/timeinatior
-startup_window: loopback
 windows:
-  - btop: btop
-  - monorepo:
-      layout: main-vertical
-      root: ~/Projects/Personal/timeinatior
+  - btop: tmp 
+  - personal-website:
+      root:  ~/Projects/Personal/timeinatior/
+      layout: main-horizontal
       panes:
-        - main:
-        - server:
-        - client:
-          - cd ./apps/client
-        - git:
-          - lazygit
+        - editor: 
+          - fnm use default
+          - lvim
+        - term: 
