@@ -136,10 +136,17 @@ lvim.builtin.which_key.mappings["t"] = {
     "<cmd> Lf<CR>",
     "File manager"
   },
-  e = {
-    "<cmd>ToggleDiag<CR>",
-    "Errors / Diagnostics"
-  }
+}
+lvim.builtin.which_key.mappings["y"] = {
+  name = "Yank",
+  f = {
+    "<cmd>let @+ = expand('%')<CR>",
+    "Yank relative file path"
+  },
+  F = {
+    "<cmd>let @+ = expand('%:p')<CR>",
+    "Yank full file path"
+  },
 }
 
 lvim.builtin.which_key.mappings["f"] = {
