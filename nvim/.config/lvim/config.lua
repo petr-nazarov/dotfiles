@@ -29,6 +29,7 @@ lvim.plugins = {
   "nvim-lua/plenary.nvim",
   "akinsho/toggleterm.nvim",
   "christoomey/vim-tmux-navigator",
+  "voldikss/vim-floaterm",
   {
     "ibhagwan/fzf-lua",
    -- requires = { "kyazdani42/nvim-web-devicons" },
@@ -38,11 +39,6 @@ lvim.plugins = {
           previewer = "bat",
         }
       })
-    end
-  },{
-    "lmburns/lf.nvim",
-    config = function ()
-      require("lf").setup({})
     end
   },
   {
@@ -133,7 +129,7 @@ lvim.builtin.which_key.mappings["O"] = {
 lvim.builtin.which_key.mappings["t"] = {
   name = "Toggle",
   t = {
-    "<cmd> Lf<CR>",
+    "<cmd> FloatermNew --opener=edit yazi <CR>",
     "File manager"
   },
 }

@@ -11,7 +11,7 @@ usermod -aG sudo nazarov \
 ## For debian 
 sudo apt install -y wget make gcc git vim gcc build-essential unzip libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin  autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev  libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find stow
 ## For arch
-yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse
+yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse 
 
 
 ## zsh 
@@ -64,6 +64,13 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 sudo apt install -y fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layzygit asciidoctor libmagic-dev
 ## Arch 
 yay -S --noconfirm fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layzygit asciidoctor libmagic-dev
+
+
+# Yazi 
+## Both
+cargo install --locked yazi-fm
+## Arch 
+yay -S --noconfirm  ffmpegthumbnailer unrar poppler 
 
 # pistol
 sudo apt-get install go install github.com/doronbehar/pistol/cmd/pistol@latest
