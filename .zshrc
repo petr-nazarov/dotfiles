@@ -1,24 +1,24 @@
 
 ### Paths ###
-source $HOME/.config/zsh/config.d/paths.zsh
+source $HOME/.config/zsh/paths.zsh
 
 ### Plugins ###
-source $HOME/.config/zsh/config.d/plugins.zsh
+source $HOME/.config/zsh/plugins.zsh
 
 ### Theme ###
-source $HOME/.config/zsh/config.d/theme.zsh
+source $HOME/.config/zsh/theme.zsh
 
 ### Aliases ###
-source $HOME/.config/zsh/config.d/aliases.zsh
+source $HOME/.config/zsh/aliases.zsh
 
 ### Variables ###
-source $HOME/.config/zsh/config.d/variables.zsh
+source $HOME/.config/zsh/variables.zsh
 
 ### Secrets ###
 source $HOME/.secrets/secrets.zsh
 
 ### Key Binds ###
-source $HOME/.config/zsh/config.d/bind-keys.zsh
+source $HOME/.config/zsh/bind-keys.zsh
 
 
 
