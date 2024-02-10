@@ -8,7 +8,7 @@ alias tt="tmuxinator list | tail -1 | tr ' ' '\n' | grep -v '^[[:space:]]*$' | f
 alias cc="xclip -selection clipboard"
 alias killnode="pkill -f node"
 alias tmux="TERM=screen-256color-bce tmux"
-alias ls="eza -l --git -F --icons --group-directories-first" 
+alias ls="eza -la --git -F --icons --group-directories-first" 
 alias ps="procs"
 alias hh="$HOME/.config/scripts/cheat.sheat.sh"
 alias clip="base64 | xargs -0 printf '\e]52;c;%s\007'"
