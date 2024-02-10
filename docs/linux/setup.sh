@@ -71,6 +71,8 @@ yay -S --noconfirm fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layz
 cargo install --locked yazi-fm
 ## Arch 
 yay -S --noconfirm  ffmpegthumbnailer unrar poppler 
+## Debian
+sudo apt install -y ffmpegthumbnailer unrar poppler 
 
 # pistol
 sudo apt-get install go install github.com/doronbehar/pistol/cmd/pistol@latest
