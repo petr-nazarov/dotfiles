@@ -1,4 +1,6 @@
 docs
-Readme.md 
-sync
+.git 
+.gitignore
+README.md
+sync.sh 
 update.sh
