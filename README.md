@@ -8,7 +8,7 @@ This dotfiles uses stow to create symlinks.
  - `docs` contain instructions to set up the installations and drivers 
  - `git` my git configuration 
  - `kitty` is my terminal emulator 
- - `lf` my terminal file manager 
+ - `yazi` my terminal file manager 
  - `nvim` my old config for neovim. New one is in lvim 
  - `scripts` are just some of my bash scripts
  - `ssh` my ssh config 
@@ -18,6 +18,6 @@ This dotfiles uses stow to create symlinks.
 
 
 # Linking 
-To link all the configs run `./sync`
+To link all the configs run `./sync.sh`
  
 
