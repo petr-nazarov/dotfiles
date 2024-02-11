@@ -90,6 +90,10 @@ lvim.lsp.buffer_mappings.normal_mode["gr"] = {
   "<cmd>FzfLua lsp_references <CR>",
   "Go references"
 }
+lvim.builtin.which_key.mappings["Q"] = {
+  "<cmd>:qa <CR>",
+  "Recent"
+}
 lvim.builtin.which_key.mappings["h"] = {
   "<cmd> FzfLua buffers <CR>",
   "Recent"
