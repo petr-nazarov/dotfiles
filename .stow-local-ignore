@@ -4,3 +4,4 @@ docs
 README.md
 sync.sh 
 update.sh
+nix-rebuild.sh

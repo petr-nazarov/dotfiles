@@ -1,6 +1,10 @@
 # My dotfiles 
 This dotfiles uses stow to create symlinks. 
 
+# Nix rebuild
+```
+```
+
 # Included configurations 
  - `bat` as a replacement for `cat`
  - `btop` as a replacement for htop 
