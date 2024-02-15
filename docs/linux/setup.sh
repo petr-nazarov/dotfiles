@@ -18,7 +18,7 @@ yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse
 sudo apt-get install -y zsh
 sudo chsh -s $(which zsh) \
 chsh -s $(which zsh) \
-git clone https://github.com/mattmc3/antidote.git /usr/share/zsh-antidote \
+git clone https://github.com/mattmc3/antidote.git /apps/zsh-antidote \
 cd ~/apps/ \
 curl -sS https://starship.rs/install.sh | sh \
 
