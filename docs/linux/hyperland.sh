@@ -1,4 +1,4 @@
-yay -S --noconfirm swww polkit-kde-agent sdbus-cpp-git hyprland swaync xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
+yay -S --noconfirm swww polkit-kde-agent  hyprland swaync xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
   pipewire wireplumber  qt6-wayland rofi-lbonn-wayland-git cliphist sww grim slurp grimblast iniparser waybar 
 # Waybar 
 # cd ~/apps 
