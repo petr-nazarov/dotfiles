@@ -4,7 +4,3 @@ yay -S --noconfirm swww polkit-kde-agent sdbus-cpp-git hyprland swaync  \
 yay -S --noconfirm pipewire wireplumber xdg-desktop-portal-hyprland-wlr grim slurp 
 ## yes install wlr, the hyperland configuration does not work
 
-## 
-# If needed 
-systemctl start --user xdg-desktop-portal-hyprland
-
