@@ -11,7 +11,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/Users/nazarov/Library/Application Support/fnm:$PATH"
   ~/.config/yabai/.yabairc 
 else 
-  source '/usr/share/zsh-antidote/antidote.zsh'
+  source "$HOME/apps/zsh-antidote/antidote.zsh"
   export PATH="/home/nazarov/.local/share/fnm:$PATH"
 fi
 eval "$(fnm env --use-on-cd)"
