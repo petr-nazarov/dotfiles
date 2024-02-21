@@ -10,6 +10,44 @@ return {
             "File manager",
           },
         },
+        ["<leader>e"] = {
+          name = "diagnostics",
+
+          n = {
+            "<cmd>lua vim.diagnostic.goto_next()<CR>",
+            "Next",
+          },
+          p = {
+            "<cmd>lua vim.diagnostic.goto_prev()<CR>",
+            "Previous",
+          },
+          i = {
+            "<cmd>lua vim.diagnostic.open_float()<CR>",
+            "Inspect",
+          },
+          l = {
+            "<cmd>FzfLua diagnostics_workspace <CR>",
+            "List",
+          },
+          f = {
+            "<cmd>lua vim.lsp.buf.code_action()<CR>",
+            "Fix / code action",
+          },
+          e = {
+            "<cmd>lua vim.diagnostic.enable()<CR>",
+            "Enable",
+          },
+          d = {
+            "<cmd>lua vim.diagnostic.disable()<CR>",
+            "Disable",
+          },
+        },
+        ["<leader>g"] = {
+          name = "+git",
+          j = { "<cmd>lua require 'gitsigns'.next_hunk({navigation_message = false})<cr>", "Next Hunk" },
+          k = { "<cmd>lua require 'gitsigns'.prev_hunk({navigation_message = false})<cr>", "Prev Hunk" },
+          b = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", "Blame" },
+        },
         ["<leader>y"] = {
           name = "+yank",
           f = {
