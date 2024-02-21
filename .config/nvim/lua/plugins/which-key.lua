@@ -42,6 +42,11 @@ return {
             "Disable",
           },
         },
+
+        ["<leader>f"] = {
+          name = "+file",
+          f = { "<cmd> lua vim.lsp.buf.format { async = true } <cr>", "Format file" },
+        },
         ["<leader>g"] = {
           name = "+git",
           j = { "<cmd>lua require 'gitsigns'.next_hunk({navigation_message = false})<cr>", "Next Hunk" },

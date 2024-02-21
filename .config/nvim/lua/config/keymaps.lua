@@ -11,4 +11,4 @@ vim.keymap.del("n", "<leader>wd")
 vim.keymap.del("n", "<leader>w-")
 vim.keymap.del("n", "<leader>w|")
 
-vim.keymap.set("n", "<leader>ff", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", { desc = "Format file" })
+vim.keymap.del("n", "<leader>ff")
