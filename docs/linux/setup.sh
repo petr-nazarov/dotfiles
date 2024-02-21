@@ -11,14 +11,14 @@ usermod -aG sudo nazarov \
 ## For debian 
 sudo apt install -y wget make gcc git vim gcc build-essential unzip libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin  autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev  libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find stow
 ## For arch
-yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse
+yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse 
 
 
 ## zsh 
 sudo apt-get install -y zsh
 sudo chsh -s $(which zsh) \
 chsh -s $(which zsh) \
-git clone https://github.com/mattmc3/antidote.git /usr/share/zsh-antidote \
+git clone https://github.com/mattmc3/antidote.git ~/apps/zsh-antidote \
 cd ~/apps/ \
 curl -sS https://starship.rs/install.sh | sh \
 
@@ -65,6 +65,15 @@ sudo apt install -y fd ripgrep bat fzf xclip procs btop lf pistol-git neovim lay
 ## Arch 
 yay -S --noconfirm fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layzygit asciidoctor libmagic-dev
 
+
+# Yazi 
+## Both
+cargo install --locked yazi-fm
+## Arch 
+yay -S --noconfirm  ffmpegthumbnailer unrar poppler 
+## Debian
+sudo apt install -y ffmpegthumbnailer unrar poppler 
+
 # pistol
 sudo apt-get install go install github.com/doronbehar/pistol/cmd/pistol@latest
 
@@ -106,6 +115,8 @@ echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /e
 sudo apt update  
 sudo apt install -y google-cloud-sdk
 
+# heroku 
+curl https://cli-assets.heroku.com/install.sh | sh
 # Doppler
 curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
 

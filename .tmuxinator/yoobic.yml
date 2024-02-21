@@ -1,0 +1,46 @@
+name: yoobic
+root: ~/Projects/Yoobic
+startup_window: loopback
+windows:
+  - mongo: 
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/mongotui
+      panes: 
+        - editor:
+          - fnm use default
+        - term:
+          - fnm use default
+
+  - Projects: 
+  - loopback:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-loopback
+      panes:
+        - main:
+          - fnm use default
+          # - lvim
+        - run: 
+  - backend:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-backend
+      panes:
+        - main:
+          - fnm use default
+          # - lvim
+        - run:
+  - iac:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-iac
+      panes:
+        - main:
+          - fnm use default
+          # - lvim
+        - tests:
+          - cd test
+  - actions:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-github-actions
+      panes:
+        - main:
+          - fnm use default
+          # - lvim

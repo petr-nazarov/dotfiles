@@ -1,0 +1,6 @@
+docs
+.git 
+.gitignore
+README.md
+sync.sh 
+update.sh
