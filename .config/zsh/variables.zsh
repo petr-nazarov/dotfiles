@@ -3,8 +3,8 @@ export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 export SHELL=zsh
-export EDITOR=lvim
-export BROWSER=vivaldi
+export EDITOR=vim
+export BROWSER=brave
 
 # FZF
 ## Setting fd as the default source for fzf
