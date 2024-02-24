@@ -87,6 +87,11 @@
     ".tmux.conf".source = ~/dotfiles/.tmux.conf;
     ".tmuxinator".source = ~/dotfiles/.tmuxinator;
     ".config/" = { source = ~/dotfiles/.config; recursive=true; };
+    "Projects/Personal/.keep".text = "";
+    "Projects/Yoobic/.keep".text = "";
+    "Downloads/Work/.keep".text = "";
+    "Downloads/Scetch/.keep".text = "";
+    "Screenshots/.keep".text = "";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
