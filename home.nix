@@ -80,6 +80,14 @@
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
+    ".gitconfig".source = ~/dotfiles/.gitconfig;
+    "yoobic.gitconfig".source = ~/dotfiles/yoobic.gitconfig;
+    ".zshrc".source = ~/dotfiles/.zshrc;
+    ".zsh_plugins.txt".source = ~/dotfiles/.zsh_plugins.txt;
+    ".ssh/config".source = ~/dotfiles/.ssh/config;
+    ".tmux.conf".source = ~/dotfiles/.tmux.conf;
+    ".tmuxinator".source = ~/dotfiles/.tmuxinator;
+    ".config/" = { source = ~/dotfiles/.config; recursive=true; };
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
