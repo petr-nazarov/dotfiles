@@ -1,19 +1,9 @@
-#Atidote
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  source ${ZDOTDIR:-~}/.antidote/antidote.zsh
-  export PATH="/Users/nazarov/Library/Application Support/fnm:$PATH"
-  ~/.config/yabai/.yabairc 
-else 
-  source "$HOME/apps/zsh-antidote/antidote.zsh"
-  export PATH="/home/nazarov/.local/share/fnm:$PATH"
-fi
-#eval "$(fnm env --use-on-cd)"
-antidote load
 
 
 # Starship
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(starship init zsh)"
+#antidote load
 
 # yazi 
 function ya() {
