@@ -3,7 +3,7 @@ export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 export SHELL=zsh
-export EDITOR=vim
+export EDITOR=nvim
 export BROWSER=brave
 
 # FZF
