@@ -111,16 +111,6 @@
     ];
   };
 
-  #home-manager.users.nazarov = { pkgs, ... }: {
-  #  home.packages = [ pkgs.atool pkgs.httpie ];
-  #  programs.zsh.antidote = {
-  #    enable = true;
-  #    plugins = [ "colored-man-pages" ];
-  #  };
-    # The state version is required and should stay at the version you
-    # originally installed.
-  #  home.stateVersion = "23.11";
-  #};
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -158,12 +148,6 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
 
-  # system.activationScripts = {stdio.text = 
-  #   ''  
-  #   fnm install --lts
-  #   ## fnm default lts
-  #   '';
-  # };
 
 
   system.stateVersion = "23.11"; # Did you read the comment?

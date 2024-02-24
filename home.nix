@@ -20,7 +20,8 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-
+      # Fonts 
+     (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
       # Command line utilities
       unzip
       unrar
@@ -44,7 +45,7 @@
       python3
       ruby
       go
-      fnm
+      nodejs_20
       bun
       #TUI programs
       tmux
