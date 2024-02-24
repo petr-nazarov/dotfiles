@@ -11,9 +11,16 @@
       <home-manager/nixos> 
     ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  # Bootloader.-- real device
+  #boot.loader.systemd-boot.enable = true;
+  #boot.loader.efi.canTouchEfiVariables = true;
+  # Boot loader virtual box
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.useOSProber = true; 
+  
+  
+
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -97,58 +104,23 @@
       cmake
       gcc
       libgcc 
+      # Essentials
       git
-      # Command line utilities
-      unzip
-      unrar
-      poppler
-      wget
-      zsh
-      antidote
-      starship
-      stow
-      fd
-      ripgrep
-      bat
-      fzf
-      xclip
-      procs
-      eza
-      pulumi-bin
-      heroku
-      google-cloud-sdk
-      # Programming language
-      python3
-      ruby
-      go
-      fnm
-      bun
-      #TUI programs
-      tmux
-      tmuxinator
       vim
-      neovim
-      lunarvim
-      lazygit
-      yazi
-      # GUI programs
-      cinnamon.nemo-with-extensions
-      brave
-      kitty
-      # 
+      wget
     ];
   };
 
-  home-manager.users.nazarov = { pkgs, ... }: {
-    home.packages = [ pkgs.atool pkgs.httpie ];
-    programs.zsh.antidote = {
-      enable = true;
-      plugins = [ "colored-man-pages" ];
-    };
+  #home-manager.users.nazarov = { pkgs, ... }: {
+  #  home.packages = [ pkgs.atool pkgs.httpie ];
+  #  programs.zsh.antidote = {
+  #    enable = true;
+  #    plugins = [ "colored-man-pages" ];
+  #  };
     # The state version is required and should stay at the version you
     # originally installed.
-    home.stateVersion = "23.11";
-  };
+  #  home.stateVersion = "23.11";
+  #};
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
