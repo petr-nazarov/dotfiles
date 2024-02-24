@@ -18,9 +18,10 @@ export PATH=$PATH:$HOME/.pulumi/bin
 
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
-#python 
-# source $HOME/anaconda3/bin/activate
-
+if [ -d $HOME/anaconda3 ]
+then
+  source $HOME/anaconda3/bin/activate
+fi
 # Go
 export PATH="$HOME/go/bin:$PATH"
 export GOBIN="$HOME/go/bin"

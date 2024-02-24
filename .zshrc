@@ -20,3 +20,4 @@ source $HOME/.secrets/secrets.zsh
 ### Key Binds ###
 source $HOME/.config/zsh/bind-keys.zsh
 
+
