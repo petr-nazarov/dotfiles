@@ -8,7 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       /etc/nixos/hardware-configuration.nix
-      <home-manager/nixos> 
+      #<home-manager/nixos> 
     ];
 
   # Bootloader.-- real device
@@ -88,6 +88,8 @@
 
 
   virtualisation.docker.enable = true;
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   programs.zsh = {
     enable = true;
