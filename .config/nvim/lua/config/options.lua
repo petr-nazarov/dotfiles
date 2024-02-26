@@ -4,3 +4,5 @@
 
 -- Disable LazyVim auto format
 vim.g.autoformat = false
+vim.api.nvim_command("set spell")
+vim.opt.relativenumber = false
