@@ -103,7 +103,7 @@ return {
           {
             type = "pwa-node",
             request = "attach",
-            name = "Attach",
+            name = "Attach 5858",
             protocol = "inspector",
             sourceMaps = true,
             trace = true,
@@ -125,12 +125,26 @@ return {
             -- protocol = inspector,
           },
           {
-            type = "pwa-chrome",
-            request = "launch",
-            name = "client: chrome",
-            url = "http://localhost:4000",
-            webRoot = "${workspaceFolder}",
-          },
+          type = "pwa-node",
+          request = "launch",
+          name = "Launch file",
+          program = "${file}",
+          cwd = "${workspaceFolder}",
+        },
+        {
+          type = "pwa-node",
+          request = "attach",
+          name = "Attach select",
+          processId = require("dap.utils").pick_process,
+          cwd = "${workspaceFolder}",
+        },
+          --{
+            --type = "pwa-chrome",
+            --request = "launch",
+            --name = "client: chrome",
+            --url = "http://localhost:4000",
+            --webRoot = "${workspaceFolder}",
+          --},
         }
       end
 
