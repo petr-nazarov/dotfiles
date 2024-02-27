@@ -8,16 +8,16 @@
   imports =
     [ # Include the results of the hardware scan.
       /etc/nixos/hardware-configuration.nix
-      #<home-manager/nixos> 
+      <home-manager/nixos> 
     ];
 
   # Bootloader.-- real device
-  #boot.loader.systemd-boot.enable = true;
-  #boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
   # Boot loader virtual box
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true; 
+  #boot.loader.grub.enable = true;
+  #boot.loader.grub.device = "/dev/sda";
+  #boot.loader.grub.useOSProber = true; 
   
   
 
@@ -51,11 +51,13 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  #services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  #services.xserver.displayManager.gdm.enable = true;
+  #services.xserver.desktopManager.gnome.enable = true;
+
+  programs.hyprland.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -98,7 +100,7 @@
   users.users.nazarov = {
     isNormalUser = true;
     shell = pkgs.zsh;
-    description = "nazarov";
+    description = "Petr Nazarov";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       # Build essentials

@@ -6,6 +6,11 @@
   # manage.
   home.username = "nazarov";
   home.homeDirectory = "/home/nazarov";
+
+  # wayland.windowManager.hyprland.enable=true;
+  # wayland.windowManager.hyprland.package={
+  #   hardware.opengl.enable = true;
+  #  };
   
 
   # This value determines the Home Manager release that your configuration is
@@ -47,7 +52,7 @@
       go
       nodejs_20
       bun
-      #TUI programs
+      # TUI programs
       tmux
       tmuxinator
       vim
@@ -55,6 +60,14 @@
       lunarvim
       lazygit
       yazi
+      # GUI essentials
+      rofi-wayland
+      waybar
+      swww # wallpaper manager
+      cliphist
+      pipewire wireplumber
+      grim slurp grimblast # Screenshots
+
       # GUI programs
       robo3t
       cinnamon.nemo-with-extensions
