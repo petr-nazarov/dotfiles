@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 {
+
   nixpkgs.config.allowUnfreePredicate = (_: true);
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -26,7 +27,7 @@
   # environment.
   home.packages = with pkgs; [
       # Fonts 
-     (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
+     (nerdfonts.override { fonts = [ "FiraCode" ]; })
       # Command line utilities
       unzip
       unrar
@@ -69,9 +70,9 @@
       grim slurp grimblast # Screenshots
 
       # GUI programs
-      robo3t
       cinnamon.nemo-with-extensions
       kitty
+      robo3t
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -188,6 +189,7 @@
             "URL" = "https://google.com/en";
             "StartPage" = "previous-session";
           };
+        "OfferToSaveLogins" = false;
         "DisplayBookmarksToolbar" = "never";
         "ExtensionSettings" = {
            "{446900e4-71c2-419f-a6a7-df9c091e268b}" =  {
@@ -273,7 +275,7 @@
   #  /etc/profiles/per-user/nazarov/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
-    # EDITOR = "emacs";
+     EDITOR = "nvim";
   };
 
   # Let Home Manager install and manage itself.
