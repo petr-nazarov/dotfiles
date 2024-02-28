@@ -42,10 +42,9 @@ return {
             "Disable",
           },
         },
-
         ["<leader>f"] = {
           name = "+file",
-          f = { "<cmd> lua vim.lsp.buf.format { async = true } <cr>", "Format file" },
+          f = { "<cmd>lua vim.lsp.buf.format { async = true } <cr>", "Format file" },
         },
         ["<leader>g"] = {
           name = "+git",
