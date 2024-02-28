@@ -19,6 +19,4 @@
       <home-manager/nixos> 
     ];
   networking.hostName = "desktop"; # Define your hostname.
-
-
 }

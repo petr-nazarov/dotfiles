@@ -1,6 +1,5 @@
+{ config, pkgs, ... }:
 
-
-  { config, pkgs, ... }:
 {
   # Set your time zone.
   time.timeZone = "Asia/Jerusalem";
