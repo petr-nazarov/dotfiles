@@ -10,6 +10,6 @@ windows:
         - editor:
             - conda activate ml
             - fnm use default
-            - lvim
+            - nvim
         - term:
             - conda activate ml

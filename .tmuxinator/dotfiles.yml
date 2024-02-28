@@ -6,6 +6,6 @@ windows:
    layout: main-horizontal
    panes:
      - editor:
-       - lvim
+       - nvim
      - term:
        - fnm use default
