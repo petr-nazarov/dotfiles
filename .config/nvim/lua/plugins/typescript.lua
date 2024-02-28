@@ -103,7 +103,7 @@ return {
           {
             type = "pwa-node",
             request = "attach",
-            name = "Attach 5858",
+            name = "[1] Attach 5858",
             protocol = "inspector",
             sourceMaps = true,
             trace = true,
@@ -114,7 +114,7 @@ return {
           {
             type = "pwa-node",
             request = "launch",
-            name = "Run jest test on file",
+            name = "[2] Run jest test on file",
             cwd = vim.fn.getcwd(),
             runtimeArgs = { "--inspect-brk", yarnPath, "test", "${relativeFile}" },
             sourceMaps = true,
@@ -127,14 +127,14 @@ return {
           {
           type = "pwa-node",
           request = "launch",
-          name = "Launch file",
+          name = "[3] Launch file",
           program = "${file}",
           cwd = "${workspaceFolder}",
         },
         {
           type = "pwa-node",
           request = "attach",
-          name = "Attach select",
+          name = "[4] Attach select",
           processId = require("dap.utils").pick_process,
           cwd = "${workspaceFolder}",
         },
