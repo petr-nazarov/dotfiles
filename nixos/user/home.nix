@@ -8,6 +8,7 @@
     ./modules/packages.nix
     ./modules/sh.nix
     ./modules/display.nix
+    ./modules/gui-packages.nix
     ./modules/programs/firefox.nix
   ]; 
 }

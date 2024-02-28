@@ -39,19 +39,7 @@
       lunarvim
       lazygit
       yazi
-      # GUI essentials
-      rofi-wayland
-      waybar
-      wl-clipboard
-      swww # wallpaper manager
-      cliphist
-      pipewire wireplumber
-      grim slurp grimblast # Screenshots
 
-      # GUI programs
-      cinnamon.nemo-with-extensions
-      kitty
-      robo3t
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
