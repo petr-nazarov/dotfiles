@@ -24,6 +24,7 @@
           system = "x86_64-linux"; # system arch
           timezone = "Asia/Jerusalem"; # select timezone
           locale = "en_US.UTF-8"; # select locale
+          username = "nazarov"
         };
         systemModules = [
           ./system/configuration.nix
@@ -39,7 +40,6 @@
                 systemSettings = {
                   inherit shared;
                   hostname = "desktop";
-                  username = "nazarov";
                   gui = true;
                 };
             };
@@ -51,7 +51,6 @@
                 systemSettings = {
                   inherit shared;
                   hostname = "dev-server";
-                  username = "nazarov";
                   gui = false;
                 };
             };
@@ -65,7 +64,6 @@
               systemSettings = {
                 inherit shared;
                 hostname = "desktop";
-                username = "nazarov";
                 gui = true;
               };
             };
@@ -77,7 +75,6 @@
               systemSettings = {
                 inherit shared;
                 hostname = "dev-server";
-                username = "nazarov";
                 gui = false;
               };
             };
