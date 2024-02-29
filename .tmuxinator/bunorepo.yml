@@ -9,5 +9,5 @@ windows:
       panes:
         - editor:
             - fnm use default
-            - lvim
+            - nvim
         - term:
