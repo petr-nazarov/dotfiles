@@ -25,6 +25,12 @@
           timezone = "Asia/Jerusalem"; # select timezone
           locale = "en_US.UTF-8"; # select locale
         };
+        systemModules = [
+          ./system/configuration.nix
+        ];
+        homeManagerModules = [
+          ./user/home.nix
+        ];
     in {
         nixosConfigurations = {
           desktop = lib.nixosSystem {
@@ -37,9 +43,7 @@
                   gui = true;
                 };
             };
-            modules = [
-              ./system/configuration.nix
-            ];
+            modules = systemModules;
           };
           dev-server = lib.nixosSystem {
             inherit system;
@@ -51,9 +55,7 @@
                   gui = false;
                 };
             };
-            modules = [
-              ./system/configuration.nix
-            ];
+            modules = systemModules; 
           };
         };
         homeConfigurations = {
@@ -67,9 +69,7 @@
                 gui = true;
               };
             };
-            modules = [
-              ./user/home.nix
-            ];
+            modules = homeManagerModules;
           };
           nazarov-dev-server= home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
@@ -81,9 +81,7 @@
                 gui = false;
               };
             };
-            modules = [
-              ./user/home.nix
-            ];
+            modules = homeManagerModules;
           };
         };
     };
