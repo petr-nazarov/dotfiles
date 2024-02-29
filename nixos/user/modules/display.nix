@@ -8,7 +8,7 @@
       waybar
       wl-clipboard
       swww # wallpaper manager
-      cliphist
+      cliphist xdotool python311Packages.tldextract
       pipewire wireplumber
       grim slurp grimblast # Screenshots
   ];

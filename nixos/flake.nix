@@ -24,7 +24,7 @@
           system = "x86_64-linux"; # system arch
           timezone = "Asia/Jerusalem"; # select timezone
           locale = "en_US.UTF-8"; # select locale
-          username = "nazarov"
+          username = "nazarov";
         };
         systemModules = [
           ./system/configuration.nix

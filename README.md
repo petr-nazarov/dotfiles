@@ -8,7 +8,8 @@ sudo reboot
 nix-shell '<home-manager>' -A install
 ```
 # Nix rebuild
-```
+```sh 
+
 ```
 
 # Included configurations 
