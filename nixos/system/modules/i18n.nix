@@ -5,7 +5,7 @@
   time.timeZone = "Asia/Jerusalem";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_IL";
+  i18n.defaultLocale = "en_US";
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "he_IL.UTF-8";

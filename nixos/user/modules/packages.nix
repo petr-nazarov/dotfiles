@@ -13,7 +13,6 @@
       zsh
       antidote
       starship
-      stow
       fd
       ripgrep
       bat

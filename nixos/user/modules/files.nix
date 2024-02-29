@@ -16,6 +16,8 @@
     "Downloads/Work/.keep".text = "";
     "Downloads/Scetch/.keep".text = "";
     "Screenshots/.keep".text = "";
+    ".secrets" = { source =  builtins.fetchGit{url = "git@github.com:petr-nazarov/.secrets.git"; ref= "master"; }; recursive=true; };
+    "wallpapers" = { source =  builtins.fetchGit{url = "git@github.com:petr-nazarov/wallpapers.git"; ref="master"; }; recursive=true; };
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
