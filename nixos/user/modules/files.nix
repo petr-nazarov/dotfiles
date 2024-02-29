@@ -5,12 +5,12 @@
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
-    ".gitconfig".source = ~/dotfiles/.gitconfig;
-    "yoobic.gitconfig".source = ~/dotfiles/yoobic.gitconfig;
-    ".ssh/config".source = ~/dotfiles/.ssh/config;
-    ".tmux.conf".source = ~/dotfiles/.tmux.conf;
-    ".tmuxinator".source = ~/dotfiles/.tmuxinator;
-    ".config/" = { source = ~/dotfiles/.config; recursive=true; };
+    ".gitconfig".source = /home/nazarov/dotfiles/.gitconfig;
+    "yoobic.gitconfig".source = /home/nazarov/dotfiles/yoobic.gitconfig;
+    ".ssh/config".source = /home/nazarov/dotfiles/.ssh/config;
+    ".tmux.conf".source = /home/nazarov/dotfiles/.tmux.conf;
+    ".tmuxinator".source = /home/nazarov/dotfiles/.tmuxinator;
+    ".config" = { source = /home/nazarov/dotfiles/.config; recursive=true; };
     "Projects/Personal/.keep".text = "";
     "Projects/Yoobic/.keep".text = "";
     "Downloads/Work/.keep".text = "";
