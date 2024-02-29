@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, systemSettings, ... }:
 
 {
   imports =
@@ -14,9 +14,9 @@
       ./modules/i18n.nix
       ./modules/network.nix
       ./modules/packages.nix
+    ] ++ (if (systemSettings.gui) then [
       ./modules/sound.nix
       ./modules/display.nix
-      #<home-manager/nixos> 
-    ];
-  networking.hostName = "desktop"; # Define your hostname.
+    ] else [ ]);
+  networking.hostName = systemSettings.hostname; # Define your hostname.
 }

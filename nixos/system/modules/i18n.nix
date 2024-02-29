@@ -1,11 +1,11 @@
-{ config, pkgs, ... }:
+{ config, pkgs, systemSettings, ... }:
 
 {
   # Set your time zone.
-  time.timeZone = "Asia/Jerusalem";
+  time.timeZone =  systemSettings.shared.timezone;
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_US";
+  i18n.defaultLocale = systemSettings.shared.locale;
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "he_IL.UTF-8";

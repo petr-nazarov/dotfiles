@@ -1,9 +1,9 @@
 
-{ config, pkgs, ... }:
+{ config, pkgs, systemSettings, ... }:
 
 {
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.nazarov = {
+  users.users.${systemSettings.username} = {
     isNormalUser = true;
     shell = pkgs.zsh;
     description = "Petr Nazarov";
