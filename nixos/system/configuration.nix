@@ -7,7 +7,7 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      /etc/nixos/hardware-configuration.nix
+      ./hardware-configuration.nix
       ./modules/boot.nix
       ./modules/core.nix
       ./modules/user.nix
@@ -16,7 +16,7 @@
       ./modules/packages.nix
       ./modules/sound.nix
       ./modules/display.nix
-      <home-manager/nixos> 
+      #<home-manager/nixos> 
     ];
   networking.hostName = "desktop"; # Define your hostname.
 }
