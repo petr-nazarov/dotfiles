@@ -3,12 +3,12 @@
 {
   home.packages = with pkgs; [
       # GUI essentials
-      rofi-wayland
-      fuzzel
+      rofi-wayland fuzzel
       waybar
-      wl-clipboard
+      libnotify swaynotificationcenter
+      networkmanager_dmenu
       swww # wallpaper manager
-      cliphist xdotool python311Packages.tldextract
+      wl-clipboard cliphist xdotool python311Packages.tldextract
       pipewire wireplumber
       grim slurp grimblast # Screenshots
   ];
