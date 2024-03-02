@@ -8,12 +8,12 @@
   imports =
     (if (systemSettings.hostname == "desktop") then [
       ./hardware/desktop-hardware-configuration.nix
+      ./modules/boot.nix
     ] else [])
     ++ (if (systemSettings.hostname == "dev-server") then [
       ./hardware/dev-server-hardware-configuration.nix
     ] else [])
     ++ [ # Include the results of the hardware scan.
-      ./modules/boot.nix
       ./modules/core.nix
       ./modules/user.nix
       ./modules/i18n.nix
