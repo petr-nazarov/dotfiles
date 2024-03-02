@@ -11,6 +11,10 @@
   boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" ];
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableAllFirmware = true; boot.extraModulePackages = [ ];
 
