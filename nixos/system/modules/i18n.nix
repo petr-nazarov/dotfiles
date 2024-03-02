@@ -8,14 +8,16 @@
   i18n.defaultLocale = systemSettings.shared.locale;
 
   i18n.extraLocaleSettings = {
-    LC_ADDRESS = "he_IL.UTF-8";
-    LC_IDENTIFICATION = "he_IL.UTF-8";
-    LC_MEASUREMENT = "he_IL.UTF-8";
-    LC_MONETARY = "he_IL.UTF-8";
-    LC_NAME = "he_IL.UTF-8";
-    LC_NUMERIC = "he_IL.UTF-8";
-    LC_PAPER = "he_IL.UTF-8";
-    LC_TELEPHONE = "he_IL.UTF-8";
-    LC_TIME = "he_IL.UTF-8";
+    LANGUAGE = systemSettings.shared.locale;
+    LC_ALL = systemSettings.shared.locale;
+    LC_ADDRESS = systemSettings.shared.locale;
+    LC_IDENTIFICATION = systemSettings.shared.locale;
+    LC_MEASUREMENT = systemSettings.shared.locale;
+    LC_MONETARY = systemSettings.shared.locale;
+    LC_NAME = systemSettings.shared.locale;
+    LC_NUMERIC = systemSettings.shared.locale;
+    LC_PAPER = systemSettings.shared.locale;
+    LC_TELEPHONE = systemSettings.shared.locale;
+    LC_TIME = systemSettings.shared.locale;
   };
 }

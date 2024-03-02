@@ -6,7 +6,7 @@
       rofi-wayland fuzzel
       waybar
       libnotify swaynotificationcenter
-      networkmanager_dmenu
+      networkmanager_dmenu connman
       swww # wallpaper manager
       wl-clipboard cliphist xdotool python311Packages.tldextract
       pipewire wireplumber

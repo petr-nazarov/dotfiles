@@ -35,7 +35,7 @@ config.set('content.javascript.enabled', True, 'qute://*/*')
 
 c.tabs.favicons.scale = 2.0
 c.tabs.show_switching_delay = 2000
-c.tabs.show = "switching"
+c.tabs.show = "multiple"
 c.tabs.last_close = 'close'
 c.tabs.position = 'left'
 c.tabs.width = '5%'
