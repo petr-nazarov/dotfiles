@@ -3,6 +3,6 @@
 
 {
   services.openssh = {
-    enable = true
+    enable = true;
   };
 }
