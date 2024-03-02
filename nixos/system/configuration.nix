@@ -7,10 +7,10 @@
 {
   imports =
     (if (systemSettings.hostname == "desktop") then [
-      ./desktop/desktop-hardware-configuration.nix
+      ./hardware/desktop-hardware-configuration.nix
     ] else [])
     ++ (if (systemSettings.hostname == "dev-server") then [
-      ./desktop/dev-server-hardware-configuration.nix
+      ./hardware/dev-server-hardware-configuration.nix
     ] else [])
     ++ [ # Include the results of the hardware scan.
       ./modules/boot.nix
