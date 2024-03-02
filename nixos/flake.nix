@@ -23,7 +23,7 @@
         shared = {
           system = "x86_64-linux"; # system arch
           timezone = "Asia/Jerusalem"; # select timezone
-          locale = "en_US.UTF-8"; # select locale
+          locale = "en_GB.UTF-8"; # select locale
           username = "nazarov";
         };
         systemModules = [

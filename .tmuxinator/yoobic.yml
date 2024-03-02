@@ -4,7 +4,7 @@ startup_window: loopback
 windows:
   - mongo: 
       layout: main-horizontal
-      root:  ~/Projects/Yoobic/mongotui
+      root:  ~/Projects/Yoobic/mongotui/apps/client
       panes: 
         - editor:
           - fnm use default

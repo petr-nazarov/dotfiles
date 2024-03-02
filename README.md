@@ -1,5 +1,14 @@
 # My dotfiles 
 This dotfiles uses stow to create symlinks. 
+
+```sh
+git clone  git@github.com:petr-nazarov/dotfiles.git
+```
+
+# Install github cli to login for the first time 
+```sh
+nix-shell -p gitAndTools.gh
+```
 # Nix first install
 ```sh
 sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-23.11.tar.gz home-manager

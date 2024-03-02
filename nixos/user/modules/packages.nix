@@ -30,6 +30,17 @@
       go
       nodejs_20
       bun
+      nodePackages.neovim
+        #nodePackages.yarn
+        #nodePackages.tree-sitter
+        #eslint 
+        #prettier
+        #typescript
+        #yarn
+        #pnpm
+        #@biomejs/biome
+        #@johnnymorganz/stylua-bin
+     
       # TUI programs
       tmux
       tmuxinator

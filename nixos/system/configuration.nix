@@ -6,8 +6,13 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+    (if (systemSettings.hostname == "desktop") then [
+      ./desktop/desktop-hardware-configuration.nix
+    ] else [])
+    ++ (if (systemSettings.hostname == "dev-server") then [
+      ./desktop/dev-server-hardware-configuration.nix
+    ] else [])
+    ++ [ # Include the results of the hardware scan.
       ./modules/boot.nix
       ./modules/core.nix
       ./modules/user.nix
