@@ -19,6 +19,7 @@
         ];
       };
       initExtra = ''
+export TERM="linux"
 ### Paths ###
   source $HOME/.config/zsh/paths.zsh
 
