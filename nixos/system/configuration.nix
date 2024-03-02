@@ -11,6 +11,7 @@
     ] else [])
     ++ (if (systemSettings.hostname == "dev-server") then [
       ./hardware/dev-server-hardware-configuration.nix
+      ./modules/ssh-server.nix
     ] else [])
     ++ [ # Include the results of the hardware scan.
       ./modules/core.nix
