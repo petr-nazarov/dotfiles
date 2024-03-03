@@ -19,7 +19,8 @@
         ];
       };
       initExtra = ''
-export TERM="linux"
+export COLORTERM=truecolor
+
 ### Paths ###
   source $HOME/.config/zsh/paths.zsh
 
