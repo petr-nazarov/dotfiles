@@ -1,8 +1,47 @@
 
 { config, pkgs, ... }:
 {
+
   # The home.packages option allows you to install Nix packages into your
   # environment.
+  programs.tmux = {
+    enable = true;
+    shortcut = "a";
+    
+    plugins = with pkgs; [
+      tmuxPlugins.better-mouse-mode
+      tmuxPlugins.vim-tmux-navigator
+      tmuxPlugins.catppuccin
+    ];
+    extraConfig = ''
+
+      set -g default-terminal "xterm-256color"
+      set -ga terminal-overrides ",*256col*:Tc"
+      set -ga terminal-overrides '*:Ss=\E[%p1%d q:Se=\E[ q'
+      set-environment -g COLORTERM "truecolor"
+
+      # Mouse works as expected
+      set-option -g mouse on
+      # easy-to-remember split pane commands
+      bind | split-window -h -c "#{pane_current_path}"
+      bind - split-window -v -c "#{pane_current_path}"
+      bind c new-window -c "#{pane_current_path}"
+
+      bind -r j resize-pane -D 5
+      bind -r k resize-pane -U 5
+      bind -r l resize-pane -R 5
+      bind -r h resize-pane -L 5
+      bind -r m resize-pane -Z
+
+
+      bind-key -T copy-mode-vi 'v' send -X begin-selection # start selecting text with "v"
+      bind-key -T copy-mode-vi 'y' send -X copy-selection # copy text with "y"
+
+      set-window-option -g mode-keys vi
+      set -g @catppuccin_flavour 'macchiato' # or frappe, macchiato, mocha
+
+    '';
+  };
   home.packages = with pkgs; [
       # Fonts 
      (nerdfonts.override { fonts = [ "FiraCode" ]; })

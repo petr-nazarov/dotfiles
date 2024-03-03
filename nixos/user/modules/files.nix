@@ -8,7 +8,8 @@
     ".gitconfig".source = /home/nazarov/dotfiles/.gitconfig;
     "yoobic.gitconfig".source = /home/nazarov/dotfiles/yoobic.gitconfig;
     ".ssh/config".source = /home/nazarov/dotfiles/.ssh/config;
-    ".tmux.conf".source = /home/nazarov/dotfiles/.tmux.conf;
+    #".tmux.conf".source = /home/nazarov/dotfiles/.tmux.conf;
+    #".tmux/plugins/tmp" = { source =  builtins.fetchGit{url = "https://github.com/tmux-plugins/tpm"; ref="master"; }; recursive=true; };
     ".tmuxinator".source = /home/nazarov/dotfiles/.tmuxinator;
     ".config" = { source = /home/nazarov/dotfiles/.config; recursive=true; };
     "Projects/Personal/.keep".text = "";
