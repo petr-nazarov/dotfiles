@@ -15,10 +15,11 @@
     ];
     extraConfig = ''
 
-      set -g default-terminal "xterm-256color"
-      set -ga terminal-overrides ",*256col*:Tc"
-      set -ga terminal-overrides '*:Ss=\E[%p1%d q:Se=\E[ q'
-      set-environment -g COLORTERM "truecolor"
+      set -g default-terminal "screen-256color"
+      #set -g default-terminal "xterm-256color"
+      #set -ga terminal-overrides ",*256col*:Tc"
+      #set -ga terminal-overrides '*:Ss=\E[%p1%d q:Se=\E[ q'
+      #set-environment -g COLORTERM "truecolor"
 
       # Mouse works as expected
       set-option -g mouse on
@@ -88,8 +89,8 @@
       lunarvim
       lazygit
       yazi
-      bitwarden-cli
-      keyutils
+      btop
+
 
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.

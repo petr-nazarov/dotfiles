@@ -9,7 +9,7 @@
       networkmanager_dmenu connman
       swww # wallpaper manager
       wl-clipboard cliphist xdotool python311Packages.tldextract
-      pipewire wireplumber
+      pipewire wireplumber pavucontrol
       grim slurp grimblast # Screenshots
   ];
   home.pointerCursor = {
