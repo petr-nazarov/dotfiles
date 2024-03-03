@@ -16,6 +16,11 @@ sudo nix-channel --update
 sudo reboot 
 nix-shell '<home-manager>' -A install
 ```
+
+# First ssh key 
+```sh
+kitty +kitten  ssh user@host
+```
 # Nix rebuild
 ```sh 
 
