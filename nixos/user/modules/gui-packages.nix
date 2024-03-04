@@ -7,5 +7,8 @@
       cinnamon.nemo-with-extensions
       kitty
       robo3t
+      vlc 
+      okular
+      qbittorrent
   ];
 }
