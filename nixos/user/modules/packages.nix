@@ -22,7 +22,12 @@
       #set -ga terminal-overrides ",*256col*:Tc"
       #set -ga terminal-overrides '*:Ss=\E[%p1%d q:Se=\E[ q'
       #set-environment -g COLORTERM "truecolor"
-      set-option -ga terminal-overrides ",xterm-256color:Tc"
+      #set-option -ga terminal-overrides ",xterm-256color:Tc"
+
+      set-option -g default-terminal "screen-256color"
+      set-option -sa terminal-features ',linux:RGB'
+
+      set-option -sg escape-time 10
 
       # Mouse works as expected
       set-option -g mouse on
