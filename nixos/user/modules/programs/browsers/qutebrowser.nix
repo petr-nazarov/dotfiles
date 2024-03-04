@@ -44,6 +44,7 @@ c.tabs.last_close = 'close'
 c.tabs.position = 'left'
 c.tabs.width = '5%'
 c.window.transparent = True
+c.downloads.location.director= '~/Downloads'
   '';
 in {
   home.packages = [
