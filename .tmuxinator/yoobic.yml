@@ -7,9 +7,7 @@ windows:
       root:  ~/Projects/Yoobic/mongotui/apps/client
       panes: 
         - editor:
-          - fnm use default
         - term:
-          - fnm use default
 
   - Projects: 
   - loopback:
@@ -17,24 +15,20 @@ windows:
       root:  ~/Projects/Yoobic/yoobic-loopback
       panes:
         - main:
-          - fnm use default
-          # - lvim
         - run: 
+          - nix develop
   - backend:
       layout: main-horizontal
       root:  ~/Projects/Yoobic/yoobic-backend
       panes:
         - main:
-          - fnm use default
-          # - lvim
         - run:
+          - nix develop
   - iac:
       layout: main-horizontal
       root:  ~/Projects/Yoobic/yoobic-iac
       panes:
         - main:
-          - fnm use default
-          # - lvim
         - tests:
           - cd test
   - actions:
@@ -42,5 +36,3 @@ windows:
       root:  ~/Projects/Yoobic/yoobic-github-actions
       panes:
         - main:
-          - fnm use default
-          # - lvim
