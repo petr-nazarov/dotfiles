@@ -13,8 +13,9 @@
 #  /etc/profiles/per-user/nazarov/etc/profile.d/hm-session-vars.sh
 #
     home.sessionVariables = {
+      NIXOS_OZONE_WL = "1";
       EDITOR = "nvim";
-      BROWSER= "firefox";
+      BROWSER= "brave";
     };
 
 }

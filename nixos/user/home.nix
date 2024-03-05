@@ -10,7 +10,8 @@
     ] ++ (if (systemSettings.gui) then [
       ./modules/display.nix
       ./modules/gui-packages.nix
-      ./modules/programs/browsers/firefox.nix
+      ./modules/programs/browsers/chromium.nix
+      #./modules/programs/browsers/firefox.nix
       ./modules/programs/browsers/qutebrowser.nix
     ] else [ ]);
 }
