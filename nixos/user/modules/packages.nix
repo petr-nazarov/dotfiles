@@ -74,9 +74,11 @@
       # Programming language
       jre8
       python3
+      python311Packages.pip
       ruby
       go
       nodejs_20
+      tree-sitter
       bun
       nodePackages.neovim
         #nodePackages.yarn
