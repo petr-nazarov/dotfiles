@@ -11,7 +11,7 @@
       rofi-wayland fuzzel
       waybar
       libnotify swaynotificationcenter
-      networkmanager_dmenu connman
+      networkmanager_dmenu connman cmst  wpa_supplicant openvpn
       swww # wallpaper manager
       wl-clipboard cliphist xdotool python311Packages.tldextract
       pipewire wireplumber pavucontrol

@@ -76,11 +76,11 @@
      "actions": [
        {
          "label": "",
-         "command": "connman"
+         "command": "cmst"
        },
        {
          "label": "",
-         "command": "connman"
+         "command": "cmst"
        }
      ]
     }
