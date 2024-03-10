@@ -5,6 +5,16 @@ This dotfiles uses stow to create symlinks.
 git clone  git@github.com:petr-nazarov/dotfiles.git
 ```
 
+# TODO 
+- [ ] Brave config for nixos 
+  - [ ] Homepage 
+  - [ ] Default search engine 
+  - [ ] tabs on left
+  - keybindings
+
+- [ ] Fix nerdfonts
+- [ ] cmp copilot no enter yes tab
+- [ ] should we even install brograms in home-manager
 # Install github cli to login for the first time 
 ```sh
 nix-shell -p gitAndTools.gh
