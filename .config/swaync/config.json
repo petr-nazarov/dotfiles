@@ -81,7 +81,11 @@
        {
          "label": "",
          "command": "cmst"
-       }
+       },
+       {
+         "label": "󰖀",
+        "command": "pavucontrol"
+      },
      ]
     }
   }
