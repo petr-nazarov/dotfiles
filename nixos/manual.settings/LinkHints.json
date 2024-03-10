@@ -1,0 +1,20 @@
+{
+  "hints.Backspace": null,
+  "hints.Enter": null,
+  "hints.Escape": null,
+  "hints.Tab": null,
+  "hints.alt-Enter": null,
+  "hints.ctrl-p": null,
+  "hints.ctrl-r": null,
+  "hints.shift-Escape": null,
+  "hints.shift-Tab": null,
+  "normal.alt-J": null,
+  "normal.alt-K": null,
+  "normal.alt-L": null,
+  "normal.alt-j": null,
+  "normal.alt-k": null,
+  "normal.alt-l": null,
+  "normal.alt-shift-ArrowUp": null,
+  "normal.ctrl-G": "EnterHintsMode_BackgroundTab",
+  "normal.ctrl-g": "EnterHintsMode_Click"
+}

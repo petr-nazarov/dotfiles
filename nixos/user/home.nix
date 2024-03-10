@@ -2,16 +2,11 @@
 
 {
   imports = [
+    ./modules/sh.nix
     ./modules/core.nix
     ./modules/files.nix
     ./modules/env.nix
-    ./modules/packages.nix
-    ./modules/sh.nix
-    ] ++ (if (systemSettings.gui) then [
-      ./modules/display.nix
-      ./modules/gui-packages.nix
-      ./modules/programs/browsers/chromium.nix
-      #./modules/programs/browsers/firefox.nix
-      ./modules/programs/browsers/qutebrowser.nix
-    ] else [ ]);
+  ] ++ (if systemSettings.gui then 
+    [ ./modules/display.nix ]
+  else []);
 }

@@ -75,11 +75,11 @@
     "buttons-grid": {
      "actions": [
        {
-         "label": "直",
+         "label": "",
          "command": "connman"
        },
        {
-         "label": "",
+         "label": "",
          "command": "connman"
        }
      ]

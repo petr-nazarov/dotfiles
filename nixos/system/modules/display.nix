@@ -1,22 +1,12 @@
 
 { config, pkgs, ... }:
-let 
-  #flake-compat = builtins.fetchTarball {url = "https://github.com/edolstra/flake-compat/archive/master.tar.gz"; sha256="0m9grvfsbwmvgwaxvdzv6cmyvjnlww004gfxjvcl806ndqaxzy4j"; };
 
-  #hyprland-flake = (import flake-compat {
-    #src = builtins.fetchTarball {url = "https://github.com/hyprwm/Hyprland/archive/master.tar.gz"; sha256 = "0mzcxi913kg46pf6j08379az93v2ql48bl6njhhawing8p66mc3b";};
-     
-  #}).defaultNix;
-
-
-in {
+{
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-
   programs.hyprland = {
     enable = true;
-#    package = hyprland-flake.packages.${pkgs.system}.hyprland;
   };
 
   xdg = {

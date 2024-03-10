@@ -8,16 +8,5 @@
     shell = pkgs.zsh;
     description = "Petr Nazarov";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
-    packages = with pkgs; [
-      # Build essentials
-      #make
-      cmake
-      gcc
-      libgcc 
-      # Essentials
-      git
-      vim
-      wget
-    ];
   };
 }

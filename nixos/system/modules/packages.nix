@@ -1,47 +1,81 @@
 
-{ config, pkgs, ... }:
+{ config, pkgs, systemSettings, ... }:
 
 {
-  programs.zsh = {
-    enable = true;
-  };
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-    stdenv.cc.cc.lib
+  imports = [
+    #./packages/zsh.nix
+    ./packages/tmux.nix
   ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  environment.systemPackages = with pkgs; [
+  ];
 
-  # List services that you want to enable:
+  programs.zsh.enable = true;
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+  fonts.packages = with pkgs; [
+    # Fira Code
+    #fira_code
+    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
+  ];
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  users.users.${systemSettings.shared.username}.packages = with pkgs; [
+      # Build essentials
+      #make
+      cmake
+      stdenv.cc.cc.lib
+      gcc
+      libgcc 
+      # Essentials
+      git
+      wget
+      curl
+      # Command line utilities
+      unzip
+      unrar
+      poppler
+      zsh
+      antidote
+      starship
+      fd
+      ripgrep
+      bat
+      fzf
+      xclip
+      procs
+      eza
+      pulumi-bin
+      heroku
+      google-cloud-sdk
+      # Programming language
+      jre8
+      python3
+      python311Packages.pip
+      ruby
+      go
+      nodejs_20
+      tree-sitter
+      bun
+      nodePackages.neovim
+        #nodePackages.yarn
+        #nodePackages.tree-sitter
+        #eslint 
+        #prettier
+        #typescript
+        #yarn
+        #pnpm
+        #@biomejs/biome
+        #@johnnymorganz/stylua-bin
+      # TUI programs
+      tmux
+      tmuxinator
+      vim
+      neovim
+      lunarvim
+      lazygit
+      yazi
+      btop
 
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  ];
 
 
 

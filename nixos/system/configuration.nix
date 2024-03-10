@@ -23,6 +23,7 @@
     ] ++ (if (systemSettings.gui) then [
       ./modules/sound.nix
       ./modules/display.nix
+      ./modules/gui-packages.nix
     ] else [ ]);
   networking.hostName = systemSettings.hostname; # Define your hostname.
 }
