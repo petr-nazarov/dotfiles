@@ -19,7 +19,7 @@
       ./modules/i18n.nix
       ./modules/network.nix
       ./modules/packages.nix
-      ./modules/cron.nix
+      ./modules/timers.nix
     ] ++ (if (systemSettings.gui) then [
       ./modules/sound.nix
       ./modules/display.nix
