@@ -46,6 +46,7 @@
       pulumi-bin
       heroku
       google-cloud-sdk
+      doppler
       # Programming language
       jre8
       python3
@@ -56,7 +57,7 @@
       tree-sitter
       bun
       nodePackages.neovim
-        #nodePackages.yarn
+        nodePackages.yarn
         #nodePackages.tree-sitter
         #eslint 
         #prettier

@@ -6,6 +6,7 @@ git clone  git@github.com:petr-nazarov/dotfiles.git
 ```
 
 # TODO 
+- [ ] Use nix shell for vim debug
 # Install github cli to login for the first time 
 ```sh
 nix-shell -p gitAndTools.gh
