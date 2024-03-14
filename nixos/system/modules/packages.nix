@@ -47,6 +47,7 @@
       heroku
       google-cloud-sdk
       doppler
+      hcloud
       # Programming language
       jre8
       python3
