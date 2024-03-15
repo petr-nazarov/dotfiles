@@ -49,8 +49,6 @@ hcloud server detach-iso $SERVER_NAME
 hcloud server poweron $SERVER_NAME
 
 
-
-
 ```sh
 
 

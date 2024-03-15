@@ -1,8 +1,5 @@
 autoload -Uz compinit
 compinit -i
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # my scripts
 export PATH="$HOME/dotfiles/scripts:$PATH"
@@ -12,13 +9,12 @@ export PATH="$HOME/apps/bin:$PATH"
 export PATH=$PATH:$HOME/.pulumi/bin
 
 #ruby
-export PATH="$HOME/.rbenv/bin:$PATH"
-export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
-eval "$(rbenv init -)"
+# export PATH="$HOME/.rbenv/bin:$PATH"
+# export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+# eval "$(rbenv init -)"
 
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
-#python 
 if [ -d $HOME/anaconda3 ]
 then
   source $HOME/anaconda3/bin/activate
@@ -50,13 +46,13 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 [ -s "/home/nazarov/.bun/_bun" ] && source "/home/nazarov/.bun/_bun"
 
 #nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+#export NVM_DIR="$HOME/.nvm"
+#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+#[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # fnm
-export PATH="/home/nazarov/.local/share/fnm:$PATH"
-eval "`fnm env`"
+#export PATH="/home/nazarov/.local/share/fnm:$PATH"
+#eval "`fnm env`"
 
 
 

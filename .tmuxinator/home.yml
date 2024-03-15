@@ -1,0 +1,12 @@
+name: home
+root: ~/Projects/Personal/
+startup_window: lessons
+windows:
+  - home: 
+      root: ~/
+  - Projects:
+      root: ~/Projects/
+      layout: main-horizontal
+      panes:
+        - editor:
+        - term:

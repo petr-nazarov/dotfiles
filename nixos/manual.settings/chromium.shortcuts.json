@@ -1,0 +1,97 @@
+[
+  {
+    "key": "ctrl+h",
+    "action": "prevtab",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "key": "ctrl+l",
+    "action": "nexttab",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "key": "ctrl+k",
+    "action": "scrollup",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "key": "ctrl+j",
+    "action": "scrolldown",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "key": "ctrl+u",
+    "action": "scrollupmore",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "key": "ctrl+d",
+    "action": "scrolldownmore",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "action": "copyurl",
+    "key": "ctrl+y",
+    "activeInInputs": true,
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  },
+  {
+    "key": "ctrl+shift+h",
+    "action": "movetableft",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  },
+  {
+    "key": "ctrl+shift+l",
+    "action": "movetabright",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  },
+  {
+    "key": "ctrl+p",
+    "action": "back",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  },
+  {
+    "key": "ctrl+n",
+    "action": "forward",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  }
+]
