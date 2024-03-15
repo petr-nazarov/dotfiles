@@ -8,9 +8,11 @@
   imports =
     (if (systemSettings.hostname == "desktop") then [
       ./hardware/desktop-hardware-configuration.nix
+      ./boot/desktop-boot.nix
     ] else [])
     ++ (if (systemSettings.hostname == "dev-server") then [
       ./hardware/dev-server-hardware-configuration.nix
+      ./boot/dev-server-boot.nix
       ./modules/ssh-server.nix
     ] else [])
     ++ [ # Include the results of the hardware scan.

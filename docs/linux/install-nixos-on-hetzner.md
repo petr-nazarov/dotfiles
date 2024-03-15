@@ -6,10 +6,11 @@ export SERVER_NAME=dev-server
 hcloud server attach-iso $SERVER_NAME nixos-minimal-23.11.4030.9f2ee8c91ac4-x86_64-linux.iso
 hcloud server poweron $SERVER_NAME
 # on web interface, use the console and set the nixos user password 
-ssh nixos@dev-server
+ssh nixos@$SERVER_NAME
+```
+```sh
 sudo -i
 
-nix-shell -p vim
 
 parted /dev/sda -- mklabel msdos
 
@@ -24,6 +25,7 @@ mkswap -L swap /dev/sda2
 mount /dev/disk/by-label/nixos /mnt
 swapon /dev/sda2
 
+nix-shell -p vim
 nixos-generate-config --root /mnt 
 vim /mnt/etc/nixos/configuration.nix
 ```
