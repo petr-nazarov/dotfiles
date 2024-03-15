@@ -8,6 +8,5 @@ windows:
        - editor:
          - nvim
        - term:
-         - fnm use default
 
       

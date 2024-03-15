@@ -1,6 +1,7 @@
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 format = """
+$nix_shell\
 $hostname\
 $shlvl\
 $singularity\
@@ -54,7 +55,6 @@ $vlang\
 $vagrant\
 $zig\
 $buf\
-$nix_shell\
 $conda\
 $spack\
 $memory_usage\
