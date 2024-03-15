@@ -33,6 +33,7 @@ vim /mnt/etc/nixos/configuration.nix
 # enable your user to login
 # enable git , vim as system packages
 # enable openssh
+# change the os hostname to $SERVER_NAME
 ``` 
   services.openssh.enable = true;
   networking.firewall.enable = false;
@@ -42,11 +43,45 @@ vim /mnt/etc/nixos/configuration.nix
 nixos-install --no-root-passwd
 nixos-enter --root /mnt -c 'passwd myusername'
 
-reboot 
+exit
 
 hcloud server poweroff $SERVER_NAME
 hcloud server detach-iso $SERVER_NAME
 hcloud server poweron $SERVER_NAME
+
+
+git clone https://github.com/petr-nazarov/dotfiles.git 
+cp /etc/nixos/hardware-configuration.nix dotfiles/nixos/system/hardware/
+cd  dotfiles/nixos/system/hardware/
+rm dev-server-hardware-configuration.nix
+mv hardware-configuration.nix dev-server-hardware-configuration.nix
+git add .
+mkdir ~/.ssh
+cd ~/.ssh
+ssh-keygen -t ed25519 -f personal.github
+cp personal.github.pub id_rsa.pub
+cp personal.github id_rsa
+git remote remove origin
+git remote add origin git@github.com:petr-nazarov/dotfiles.git
+git branch --set-upstream-to=origin/master master
+
+sudo nixos-rebuild switch --flake .#dev-server
+sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-23.11.tar.gz home-manager
+sudo nix-channel --update
+nix-shell '<home-manager>' -A install
+home-manager switch --flake .#nazarov-dev-server --impure
+sudo reboot
+
+
+ssh-copy-id -i dev-server.pub nazarov@dev-server
+
+# Dont forget to fix kitty 
+kitty +kitten  ssh nazarov@dev-server
+
+```
+```sh
+
+
 
 
 ```sh
