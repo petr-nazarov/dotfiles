@@ -24,3 +24,6 @@ alias cs="google-chrome-stable --profile-directory=Default --app-id=lmgleiefhogf
 alias btry="cat /sys/class/power_supply/BAT0/capacity"
 alias cat="bat"
 alias jp="joplin"
+alias hsl="hcloud server list"
+alias hon="hcloud server poweron dev-server"
+alias hoff="hcloud server poweroff dev-server"
