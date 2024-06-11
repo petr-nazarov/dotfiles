@@ -17,6 +17,7 @@
       EDITOR = "nvim";
       BROWSER= "brave";
       NIXPKGS_ALLOW_UNFREE="1";
+      FLAKE="/home/nazarov/dotfiles/nixos";
     };
 
 }

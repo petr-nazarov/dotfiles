@@ -5,12 +5,15 @@ This dotfiles uses stow to create symlinks.
 git clone  git@github.com:petr-nazarov/dotfiles.git
 ```
 
-# TODO 
-- [ ] Use nix shell for vim debug
 # Install github cli to login for the first time 
 ```sh
 nix-shell -p gitAndTools.gh
 ```
+
+# Instructions 
+While in `~/dotfiles/nixos`
+To rebuild system run `nh os swith`
+To homemanager run `nh home swith`
 
 # Nix change chanels:
 ```bash
@@ -47,10 +50,6 @@ nix-shell '<home-manager>' -A install
 ```sh
 kitty +kitten  ssh user@host
 ```
-# Nix rebuild
-```sh 
-
-```
 
 # Included configurations 
  - `bat` as a replacement for `cat`
@@ -67,8 +66,4 @@ kitty +kitten  ssh user@host
  - `tmux` my tmux config 
  - `zsh` Is my whole zsh config, it is breaken up into files. Uses `antidote` as a plugin manager. It expects that you have a `$HOME/.secrets/secrets.zsh`, which is not included in this repo for security reasons 
 
-
-# Linking 
-To link all the configs run `./sync.sh`
- 
 

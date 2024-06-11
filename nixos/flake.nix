@@ -89,7 +89,7 @@
           };
         };
         homeConfigurations = {
-          nazarov-desktop = home-manager.lib.homeManagerConfiguration {
+          "nazarov@desktop" = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             extraSpecialArgs = {
               systemSettings = {
@@ -100,7 +100,7 @@
             };
             modules = homeManagerModules;
           };
-          nazarov-matebook = home-manager.lib.homeManagerConfiguration {
+          "nazarov@matebook" = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             extraSpecialArgs = {
               systemSettings = {
@@ -111,7 +111,7 @@
             };
             modules = homeManagerModules;
           };
-          nazarov-dev-server= home-manager.lib.homeManagerConfiguration {
+          "nazarov@dev-server"= home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             extraSpecialArgs = {
               systemSettings = {

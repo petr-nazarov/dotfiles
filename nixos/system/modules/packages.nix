@@ -16,10 +16,14 @@ in
 
   ];
 
-  environment.systemPackages = with pkgs; [
-  ];
-
   programs.zsh.enable = true;
+
+   programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 4d --keep 3";
+    flake = "/home/nazarov/dotfiles/nixos";
+  };
 
   fonts.packages = with pkgs; [
     # Fira Code
