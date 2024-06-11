@@ -13,6 +13,7 @@
     update =  !git fetch origin master:master && git merge master
     finish = !git checkout master && git branch -d $1
     wip = !git add . && git commit -m "WIP" --no-verify
+    wips = !git wip && git sync 
     sync = !git pull && git push
 [pull]
     rebase = false
