@@ -53,6 +53,7 @@ in
       xclip
       procs
       eza
+      moreutils
 
       # DevOps
       pulumi-bin

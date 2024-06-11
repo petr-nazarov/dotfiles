@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 #cat ~/.secrets/bookmarks.txt | fzfmenu | awk '{ print $NF }' | xargs chromium
 #cat ~/.secrets/bookmarks.txt | fuzzel -d | awk '{ print $NF }' | xargs chromium
-cat ~/.secrets/bookmarks.txt | tofi --prompt-text "Open bookmark: " | awk '{ print $NF }' | xargs chromium
+cat ~/.secrets/bookmarks.txt | tofi --prompt-text "Open bookmark: " | ifne awk '{ print $NF }' | ifne xargs chromium
