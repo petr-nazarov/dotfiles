@@ -14,6 +14,7 @@ nix-shell -p gitAndTools.gh
 While in `~/dotfiles/nixos`
 To rebuild system run `nh os swith`
 To homemanager run `nh home swith`
+To clean unused run `nh clean all --keep 1`
 
 # Nix change chanels:
 ```bash
