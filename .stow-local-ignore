@@ -1,0 +1,8 @@
+docs
+nixos
+.git 
+.gitignore
+README.md
+sync.sh 
+update.sh
+nix-rebuild.sh

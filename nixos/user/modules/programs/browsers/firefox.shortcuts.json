@@ -1,0 +1,46 @@
+[
+  {
+    "key": "ctrl+j",
+    "label": "Next tab",
+    "action": "nexttab",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "key": "ctrl+k",
+    "label": "Previous tab",
+    "action": "prevtab",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ],
+    "activeInInputs": true
+  },
+  {
+    "key": "ctrl+?",
+    "action": "openshortcuts",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  },
+  {
+    "key": "ctrl+shift+j",
+    "action": "movetabright",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  },
+  {
+    "key": "ctrl+shift+k",
+    "action": "movetableft",
+    "sites": "",
+    "sitesArray": [
+      ""
+    ]
+  }
+]

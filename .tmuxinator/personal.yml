@@ -1,0 +1,23 @@
+name: personal 
+root: ~/Projects/Personal
+startup_window: personal-website
+windows:
+  - btop: btop
+  - personal-website:
+      root:  ~/Projects/Personal/personal-website-2
+      layout: main-horizontal
+      panes:
+        - editor: 
+          - fnm use default
+          - lvim
+        - term: 
+  - chad-cv:
+      root:  ~/Projects/Personal/chad-cv
+      layout: main-horizontal
+      panes:
+        - editor: 
+          - fnm use default
+          - lvim
+        - term: 
+
+

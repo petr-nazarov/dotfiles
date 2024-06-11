@@ -1,0 +1,16 @@
+name: afu
+root: ~/Projects/AFU
+startup_window: loopback
+windows:
+  - btop: btop
+  - AFU: 
+  - monorepo:
+      layout: main-vertical
+      root:  ~/Projects/AFU/best.afu.monorepo
+      panes:
+        - main:
+        - server:
+        - client:
+          - cd ./apps/client
+        - git:
+          - lazygit

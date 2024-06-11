@@ -1,0 +1,15 @@
+name: ml
+root: ~/Projects/Personal/Learn/ML
+startup_window: lessons
+windows:
+  - btop: btop
+  - lessons:
+      root: ~/Projects/Personal/Learn/ML
+      layout: main-horizontal
+      panes:
+        - editor:
+            - conda activate ml
+            - fnm use default
+            - nvim
+        - term:
+            - conda activate ml

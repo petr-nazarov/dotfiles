@@ -1,0 +1,38 @@
+name: yoobic
+root: ~/Projects/Yoobic
+startup_window: loopback
+windows:
+  - mongo: 
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/mongotui/apps/client
+      panes: 
+        - editor:
+        - term:
+
+  - Projects: 
+  - loopback:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-loopback
+      panes:
+        - main:
+        - run: 
+          - nix develop --command zsh
+  - backend:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-backend
+      panes:
+        - main:
+        - run:
+          - nix develop --command zsh
+  - iac:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-iac
+      panes:
+        - main:
+        - tests:
+          - cd test
+  - actions:
+      layout: main-horizontal
+      root:  ~/Projects/Yoobic/yoobic-github-actions
+      panes:
+        - main:

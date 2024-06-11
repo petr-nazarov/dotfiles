@@ -1,0 +1,12 @@
+name: time  
+root: ~/Projects/Personal/timeinatior
+windows:
+  - btop: tmp 
+  - personal-website:
+      root:  ~/Projects/Personal/timeinatior/
+      layout: main-horizontal
+      panes:
+        - editor: 
+          - fnm use default
+          - nvim
+        - term: 

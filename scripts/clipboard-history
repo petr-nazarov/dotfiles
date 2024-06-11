@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#cliphist list | fuzzel -d | cliphist decode | wl-copy
+cliphist list | tofi --prompt-text "Clipboard history: "  | cliphist decode | wl-copy
+#cat ~/.secrets/bookmarks.txt | fzfmenu | awk '{ print $NF }' | xargs chromium

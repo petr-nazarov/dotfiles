@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#cat ~/.secrets/bookmarks.txt | fzfmenu | awk '{ print $NF }' | wl-copy
+#cat ~/.secrets/bookmarks.txt | fuzzel -d | awk '{ print $NF }' | wl-copy
+cat ~/.secrets/bookmarks.txt | tofi --prompt-text "Copy bookmark: " | awk '{ print $NF }' | wl-copy

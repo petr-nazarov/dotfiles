@@ -1,0 +1,17 @@
+#!/bin/bash
+
+ENV=$1
+FILE=$2
+if [ -z "$ENV" ]
+then 
+  echo "provide env" 1>&2
+  exit 1
+fi
+
+if [ -z "$FILE" ]
+then 
+  echo "provide file" 1>&2
+  exit 1
+fi
+doppler -p app_yoobic-loopback -c $ENV run --  mongosh --quiet --nodb $FILE
+# | jq -C | less -R

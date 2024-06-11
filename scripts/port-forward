@@ -1,0 +1,4 @@
+#!/bin/sh
+PORT=$1
+
+ssh -L $PORT:127.0.0.1:$PORT -N -f dev-server

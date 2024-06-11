@@ -1,0 +1,28 @@
+[user]
+	name = Petr Nazarov
+	email = petr.tzur.nazarov@gmail.com
+[alias]
+    co = checkout
+    cob = checkout -b
+    cm = !git add -A && git commit -m
+    cmm = !git add -A && git commit
+    p  =  push
+    pp = !git push -u origin HEAD 
+    s = status
+    pl = pull origin
+    update =  !git fetch origin master:master && git merge master
+    finish = !git checkout master && git branch -d $1
+    wip = !git add . && git commit -m "WIP" --no-verify
+    sync = !git pull && git push
+[pull]
+    rebase = false
+[includeIf "gitdir:~/Projects/Yoobic"]
+    path = ~/.secret/ssh/.gitconfig-yoobic
+[init]
+	defaultBranch = main
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
