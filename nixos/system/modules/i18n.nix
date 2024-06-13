@@ -2,25 +2,25 @@
 
 {
   # Set your time zone.
-  time.timeZone =  systemSettings.shared.timezone;
+  time.timezone =  systemsettings.shared.timezone;
 
-  # Enable automatic timezone updates. 
+  # enable automatic timezone updates. 
   services.automatic-timezoned.enable = true;
 
-  # Select internationalisation properties.
-  i18n.defaultLocale = systemSettings.shared.locale;
+  # select internationalisation properties.
+  i18n.defaultlocale = systemsettings.shared.locale;
 
-  i18n.extraLocaleSettings = {
-    LANGUAGE = systemSettings.shared.locale;
-    LC_ALL = systemSettings.shared.locale;
-    LC_ADDRESS = systemSettings.shared.locale;
-    LC_IDENTIFICATION = systemSettings.shared.locale;
-    LC_MEASUREMENT = systemSettings.shared.locale;
-    LC_MONETARY = systemSettings.shared.locale;
-    LC_NAME = systemSettings.shared.locale;
-    LC_NUMERIC = systemSettings.shared.locale;
-    LC_PAPER = systemSettings.shared.locale;
-    LC_TELEPHONE = systemSettings.shared.locale;
-    LC_TIME = systemSettings.shared.locale;
+  i18n.extralocalesettings = {
+    language = systemsettings.shared.locale;
+    lc_all = systemsettings.shared.locale;
+    lc_address = systemsettings.shared.locale;
+    lc_identification = systemsettings.shared.locale;
+    lc_measurement = systemsettings.shared.locale;
+    lc_monetary = systemsettings.shared.locale;
+    lc_name = systemsettings.shared.locale;
+    lc_numeric = systemsettings.shared.locale;
+    lc_paper = systemsettings.shared.locale;
+    lc_telephone = systemsettings.shared.locale;
+    lc_time = systemsettings.shared.locale;
   };
 }
