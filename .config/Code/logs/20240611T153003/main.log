@@ -1,0 +1,5 @@
+2024-06-11 15:30:03.385 [info] update#setState idle
+2024-06-11 15:30:03.385 [info] update#ctor - manual checks only; automatic updates are disabled by user preference
+2024-06-11 15:30:06.066 [info] Extension host with pid 11283 exited with code: 0, signal: unknown.
+2024-06-11 15:30:22.393 [info] Extension host with pid 11284 exited with code: 0, signal: unknown.
+2024-06-11 15:30:54.482 [info] Extension host with pid 11485 exited with code: 0, signal: unknown.
