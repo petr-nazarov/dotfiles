@@ -18,12 +18,15 @@ in
 
   programs.zsh.enable = true;
 
-   programs.nh = {
+  programs.nh = {
     enable = true;
     clean.enable = true;
     clean.extraArgs = "--keep-since 4d --keep 3";
     flake = "/home/nazarov/dotfiles/nixos";
   };
+  environment.systemPackages = with pkgs; [
+    nix-output-monitor
+  ];
 
   fonts.packages = with pkgs; [
     # Fira Code
