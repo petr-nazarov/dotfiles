@@ -7,9 +7,9 @@ rbenv install 3.2.2
 rbenv global 3.2.2
 
 ## node
-curl -fsSL https://fnm.vercel.app/install | bash
-fnm install v18.16.0
-fnm use v18.16.0
+brew install fnm
+fnm install v20.14.0
+fnm use v20.14.0
 npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
 
 git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
