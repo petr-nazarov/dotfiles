@@ -11,3 +11,10 @@ windows:
         - main:
           - fnm use default
         - run: 
+  - api:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-api
+      panes:
+        - main:
+          - fnm use default
+        - run: 
