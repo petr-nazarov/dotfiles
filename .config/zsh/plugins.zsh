@@ -15,6 +15,10 @@ function ya() {
 	rm -f -- "$tmp"
 }
 
+#fnm 
+eval "$(fnm env --use-on-cd)"
+
+
 # # >>> conda initialize >>>
 # # !! Contents within this block are managed by 'conda init' !!
 # __conda_setup="$('/home/nazarov/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"

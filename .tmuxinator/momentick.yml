@@ -1,0 +1,13 @@
+name: momentick
+root: ~/Projects/Momentick
+startup_window: app
+windows:
+  - btop:
+  - Projects: 
+  - app:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-app
+      panes:
+        - main:
+          - fnm use default
+        - run: 

@@ -19,6 +19,8 @@
     rebase = false
 [includeIf "gitdir:~/Projects/Yoobic"]
     path = ~/.secret/ssh/.gitconfig-yoobic
+[includeIf "gitdir:~/Projects/Momentick"]
+    path = ~/.secret/git/momentick.gitconfig
 [init]
 	defaultBranch = main
 [credential "https://github.com"]
