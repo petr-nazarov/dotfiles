@@ -1,6 +1,6 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install gcc antidote stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep
-brew install brave-browser transmission scroll-reverser  kitty flameshot studio-3t  
+brew install  make pkg-config gcc antidote stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep anaconda yazi dmenu moreutils
+brew install brave-browser transmission scroll-reverser kitty flameshot studio-3t  choose-gui
 brew install --cask raycast
 brew install rbenv ruby-build
 rbenv install 3.2.2
@@ -11,6 +11,10 @@ brew install fnm
 fnm install v20.14.0
 fnm use v20.14.0
 npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
+
+#python 
+conda install python=3.12
+conda create -n default 
 
 git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
 

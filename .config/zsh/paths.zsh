@@ -31,7 +31,8 @@ export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 export PATH="$PATH:/snap/bin"
 
 # conda
-export PATH="/home/mrzueck/miniconda3/bin:$PATH"
+#export PATH="/home/mrzueck/miniconda3/bin:$PATH"
+export PATH="/opt/homebrew/anaconda3/bin/:$PATH"
 
 
 # fly
