@@ -3,7 +3,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install gcc antidote stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep
+brew install gcc antidote stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep zplug
 brew install brave-browser transmission scroll-reverser  kitty flameshot studio-3t  
 brew install --cask raycast karabiner-elements scroll-reverser dmenu-mac
 brew install rbenv ruby-build
