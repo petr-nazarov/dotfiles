@@ -1,7 +1,11 @@
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install gcc antidote stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep
 brew install brave-browser transmission scroll-reverser  kitty flameshot studio-3t  
-brew install --cask raycast
+brew install --cask raycast karabiner-elements scroll-reverser dmenu-mac
 brew install rbenv ruby-build
 rbenv install 3.2.2
 rbenv global 3.2.2
@@ -11,10 +15,6 @@ brew install fnm
 fnm install v20.14.0
 fnm use v20.14.0
 npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
-
-git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
-
-
 
 brew install koekeishiya/formulae/yabai koekeishiya/formulae/skhd
 yabai --start-service
