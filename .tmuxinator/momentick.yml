@@ -18,3 +18,10 @@ windows:
         - main:
           - fnm use default
         - run: 
+  - setup_machines:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/setup_machines
+      panes:
+        - main:
+          - fnm use default
+        - run: 

@@ -6,6 +6,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 brew install  make pkg-config gcc zplug stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep anaconda yazi dmenu moreutils
 brew install brave-browser transmission scroll-reverser kitty flameshot studio-3t  choose-gui
 brew install --cask raycast
+brew install --cask docker  
 brew install rbenv ruby-build
 rbenv install 3.2.2
 rbenv global 3.2.2
