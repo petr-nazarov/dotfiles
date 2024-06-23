@@ -12,13 +12,11 @@ export PATH=$PATH:$HOME/.pulumi/bin
 # export PATH="$HOME/.rbenv/bin:$PATH"
 # export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
 # eval "$(rbenv init -)"
+#
+
 
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
-if [ -d $HOME/anaconda3 ]
-then
-  source $HOME/anaconda3/bin/activate
-fi
 # Go
 export PATH="$HOME/go/bin:$PATH"
 export GOBIN="$HOME/go/bin"

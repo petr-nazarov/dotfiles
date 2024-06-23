@@ -3,7 +3,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install  make pkg-config gcc zplug stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep anaconda yazi dmenu moreutils
+brew install  make pkg-config gcc zplug stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep yazi dmenu moreutils
 brew install brave-browser transmission scroll-reverser kitty flameshot studio-3t  choose-gui
 brew install --cask raycast
 brew install --cask docker  
@@ -17,9 +17,10 @@ fnm install v20.14.0
 fnm use v20.14.0
 npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
 
-conda install python=3.12
-conda create -n default 
-
+#pyehon
+curl https://pyenv.run | bash
+pyenv install 3.12 
+pyenv global 3.12
 
 
 
