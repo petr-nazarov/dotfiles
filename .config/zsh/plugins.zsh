@@ -5,18 +5,21 @@ export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(starship init zsh)"
 
 
-# zplug
-source ~/.zplug/init.zsh 
-zplug "plugins/zsh-completions", from:oh-my-zsh
-zplug "plugins/zsh-history-substring-search", from:oh-my-zsh
-zplug "plugins/zsh-autosuggestions", from:oh-my-zsh
-zplug "plugins/colored-man-pages", from:oh-my-zsh
-zplug  "plugins/command-not-found", from:oh-my-zsh
-zplug  "unixorn/fzf-zsh-plugin"
-zplug  "Aloxaf/fzf-tab"
-zplug  "plugins/zsh-autosuggestions", from:oh-my-zsh
-zplug  "plugins/zsh-syntax-highlighting", from:oh-my-zsh
 
+# zplug
+# source ~/.zplug/init.zsh 
+# zplug "robbyrussell/oh-my-zsh", as:plugin
+# zplug "zsh-users/zsh-syntax-highlighting",      defer:3, on:"zsh-users/zsh-autosuggestions"
+# zplug "plugins/zsh-completions", from:oh-my-zsh
+#zplug "plugins/zsh-history-substring-search", from:oh-my-zsh
+# zplug "plugins/colored-man-pages", from:oh-my-zsh
+# zplug  "plugins/command-not-found", from:oh-my-zsh
+# zplug  "unixorn/fzf-zsh-plugin"
+# zplug  "Aloxaf/fzf-tab"
+# zplug  "plugins/zsh-autosuggestions", from:oh-my-zsh
+# zplug  "plugins/zsh-syntax-highlighting", from:oh-my-zsh
+
+eval "$(sheldon source)"
 
 
 # yazi 
