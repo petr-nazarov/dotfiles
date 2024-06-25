@@ -51,7 +51,9 @@ return {
 				-- Nix
 				"nil_ls",
 				-- Python
-				"jedi_language_server",
+				"pyright",
+				"pylint",
+				"black",
 			},
 		})
 		require("mason-lspconfig").setup_handlers({
@@ -67,14 +69,7 @@ return {
 		-- Add pylint if its a pyton file and a .pylintrc is detected
 		local pylintrc_config_file = vim.fn.getcwd() .. "/.pylintrc"
 		if vim.fn.filereadable(pylintrc_config_file) == 1 then
-			table.insert(
-				sources,
-				null_ls.builtins.diagnostics.pylint.with({
-					diagnostics_postprocess = function(diagnostic)
-						diagnostic.code = diagnostic.message_id
-					end,
-				})
-			)
+			table.insert(sources, null_ls.builtins.diagnostics.pylin)
 			table.insert(sources, null_ls.builtins.formatting.black)
 		end
 		-- Add biome source if biome.json is present
