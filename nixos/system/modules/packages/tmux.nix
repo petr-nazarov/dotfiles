@@ -19,15 +19,6 @@
     ];
     extraConfig = ''
 
-      #set -g default-terminal "screen-256color"
-      #set -g default-terminal "xterm-256color"
-      #set-option -ga terminal-overrides ",xterm-256color:Tc"
-      #set-option  -ga terminal-overrides  ",xterm-kitty:Tc"
-      #set -ga terminal-overrides ",*256col*:Tc"
-      #set -ga terminal-overrides '*:Ss=\E[%p1%d q:Se=\E[ q'
-      #set-environment -g COLORTERM "truecolor"
-      #set-option -ga terminal-overrides ",xterm-256color:Tc"
-
       set-option -g default-terminal "screen-256color"
       set-option -sa terminal-features ',linux:RGB'
 

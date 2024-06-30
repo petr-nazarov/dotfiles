@@ -1,0 +1,208 @@
+[15:29:45.151] Log Level: 2
+[15:29:45.152] remote-ssh@0.78.0
+[15:29:45.152] linux x64
+[15:29:45.153] SSH Resolver called for "ssh-remote+dev-server", attempt 1
+[15:29:45.153] "remote.SSH.useLocalServer": true
+[15:29:45.153] "remote.SSH.path": undefined
+[15:29:45.153] "remote.SSH.configFile": undefined
+[15:29:45.153] "remote.SSH.useFlock": true
+[15:29:45.154] "remote.SSH.lockfilesInTmp": false
+[15:29:45.154] "remote.SSH.localServerDownload": auto
+[15:29:45.154] "remote.SSH.remoteServerListenOnSocket": false
+[15:29:45.154] "remote.SSH.showLoginTerminal": false
+[15:29:45.154] "remote.SSH.defaultExtensions": []
+[15:29:45.154] "remote.SSH.loglevel": 2
+[15:29:45.154] "remote.SSH.enableDynamicForwarding": true
+[15:29:45.154] "remote.SSH.enableRemoteCommand": false
+[15:29:45.154] "remote.SSH.serverPickPortsFromRange": {}
+[15:29:45.154] "remote.SSH.serverInstallPath": {}
+[15:29:45.158] SSH Resolver called for host: dev-server
+[15:29:45.158] Setting up SSH remote "dev-server"
+[15:29:45.160] Acquiring local install lock: /tmp/vscode-remote-ssh-143d8ce0-install.lock
+[15:29:45.160] Looking for existing server data file at /home/nazarov/.config/Code/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-143d8ce0-dc96b837cf6bb4af9cd736aa3af08cf8279f7685-0.78.0/data.json
+[15:29:45.161] Using commit id "dc96b837cf6bb4af9cd736aa3af08cf8279f7685" and quality "stable" for server
+[15:29:45.162] Install and start server if needed
+[15:29:45.164] PATH: /nix/store/3xmijza6nscnn52jry8fw2sw2nzsl9am-glib-2.80.2-bin/bin:/run/wrappers/bin:/home/nazarov/.nix-profile/bin:/nix/profile/bin:/home/nazarov/.local/state/nix/profile/bin:/etc/profiles/per-user/nazarov/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/nix/store/kln7kinji3b7sz8r50h4gn9yy6k1js9a-binutils-wrapper-2.41/bin:/nix/store/ppc2l5sh6rgwadv0hnrv17ab0i4fhj37-pciutils-3.12.0/bin:/nix/store/m3dk0c52n0901s6r6cpr8xvjx6w9b8yz-pkgconf-wrapper-2.1.1/bin
+[15:29:45.164] Checking ssh with "ssh -V"
+[15:29:45.169] > OpenSSH_9.7p1, OpenSSL 3.0.13 30 Jan 2024
+
+[15:29:45.171] askpass server listening on /run/user/1000/vscode-ssh-askpass-15ebc20bc643ddb459c37eb0002bc5501f0a7489.sock
+[15:29:45.171] Spawning local server with {"serverId":1,"ipcHandlePath":"/run/user/1000/vscode-ssh-askpass-e5f065b836fcf698fa023afe9f71cc35f278a826.sock","sshCommand":"ssh","sshArgs":["-v","-T","-D","40037","-o","ConnectTimeout=15","dev-server"],"serverDataFolderName":".vscode-server","dataFilePath":"/home/nazarov/.config/Code/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-143d8ce0-dc96b837cf6bb4af9cd736aa3af08cf8279f7685-0.78.0/data.json"}
+[15:29:45.171] Local server env: {"SHELL":"/run/current-system/sw/bin/zsh","DISPLAY":":0","ELECTRON_RUN_AS_NODE":"1","SSH_ASKPASS":"/nix/store/6qan3wa55pnbipf93bdi6gss0drc0hrm-vscode-extension-ms-vscode-remote-remote-ssh-0.78.0/share/vscode/extensions/ms-vscode-remote.remote-ssh/out/local-server/askpass.sh","VSCODE_SSH_ASKPASS_NODE":"/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/code","VSCODE_SSH_ASKPASS_EXTRA_ARGS":"--ms-enable-electron-run-as-node","VSCODE_SSH_ASKPASS_MAIN":"/nix/store/6qan3wa55pnbipf93bdi6gss0drc0hrm-vscode-extension-ms-vscode-remote-remote-ssh-0.78.0/share/vscode/extensions/ms-vscode-remote.remote-ssh/out/askpass-main.js","VSCODE_SSH_ASKPASS_HANDLE":"/run/user/1000/vscode-ssh-askpass-15ebc20bc643ddb459c37eb0002bc5501f0a7489.sock"}
+[15:29:45.173] Spawned 11010
+[15:29:45.238] > local-server-1> Spawned ssh, pid=11018
+[15:29:45.240] stderr> OpenSSH_9.7p1, OpenSSL 3.0.13 30 Jan 2024
+[15:29:45.608] stderr> debug1: Server host key: ssh-ed25519 SHA256:zi/nlU6aDe0xQIGtM48iAOS3AkpswT8YMrLSTNTSEoA
+[15:29:46.035] stderr> Authenticated to 23.88.123.68 ([23.88.123.68]:22) using "publickey".
+[15:29:46.360] > ready: f8a85a87e308
+[15:29:46.439] > Linux 6.6.32 #1-NixOS SMP PREEMPT_DYNAMIC Sat May 25 14:22:56 UTC 2024
+[15:29:46.439] Platform: linux
+[15:29:46.510] > /run/current-system/sw/bin/zsh
+[15:29:46.510] Shell: zsh
+[15:29:46.510] Creating bash subshell inside "zsh"
+[15:29:46.588] > bash version:  5.2.26(1)-release
+[15:29:46.632] > bash version:  5.2.26(1)-release
+[15:29:46.764] > f8a85a87e308: running
+[15:29:46.804] > Warning: Can't find libstdc++.so or ldconfig, can't verify libstdc++ version
+[15:29:46.819] > Acquiring lock on /home/nazarov/.vscode-server/bin/dc96b837cf6bb4af9cd736aa3af08cf8279f7685/vscode-remote-lock.nazarov.dc96b837cf6bb4af9cd736aa3af08cf8279f7685
+[15:29:46.835] > Installing to /home/nazarov/.vscode-server/bin/dc96b837cf6bb4af9cd736aa3af08cf8279f7685...
+[15:29:46.844] > f8a85a87e308%%1%%
+[15:29:46.867] > Downloading with wget
+[15:29:47.371] > Download complete
+[15:29:47.393] > f8a85a87e308%%2%%
+> tar --version:
+[15:29:47.401] > tar (GNU tar) 1.35
+> Copyright (C) 2023 Free Software Foundation, Inc.
+> License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+> This is free software: you are free to change and redistribute it.
+> There is NO WARRANTY, to the extent permitted by law.
+> 
+> Written by John Gilmore and Jay Fenlason.
+[15:29:49.178] > VS Code Node: /home/nazarov/.vscode-server/bin/dc96b837cf6bb4af9cd736aa3af08cf8279f7685/node
+[15:29:49.180] stderr> Could not start dynamically linked executable: /home/nazarov/.vscode-server/bin/dc96b837cf6bb4af9cd736aa3af08cf8279f7685/node
+[15:29:49.180] stderr> NixOS cannot run dynamically linked executables intended for generic
+[15:29:49.180] stderr> linux environments out of the box. For more information, see:
+[15:29:49.180] stderr> https://nix.dev/permalink/stub-ld
+[15:29:49.181] > VS Code Node Version: 
+[15:29:50.067] > /nix/store/nbad47q0m0m9c5xid7zh05hiknwircbp-patchelf-0.15.0
+[15:29:50.078] > patchelf 0.15.0
+[15:29:50.986] stderr> these 2 paths will be fetched (0.01 MiB download, 0.06 MiB unpacked):
+[15:29:50.986] stderr>   /nix/store/7bd6mlnyj4192ssw50hksnqbxmj98p26-binutils-wrapper-2.41
+[15:29:50.986] stderr>   /nix/store/gnjp969f02l4fp2bj6vxibnb6c0qfqb5-expand-response-params
+[15:29:51.016] stderr> copying path '/nix/store/gnjp969f02l4fp2bj6vxibnb6c0qfqb5-expand-response-params' from 'https://cache.nixos.org'...
+[15:29:51.176] stderr> copying path '/nix/store/7bd6mlnyj4192ssw50hksnqbxmj98p26-binutils-wrapper-2.41' from 'https://cache.nixos.org'...
+[15:29:51.208] > /nix/store/7bd6mlnyj4192ssw50hksnqbxmj98p26-binutils-wrapper-2.41
+[15:29:51.225] > Interpreter from bintools: /nix/store/k7zgvzp2r31zkg9xqgjim7mbknryv6bs-glibc-2.39-52/lib/ld-linux-x86-64.so.2
+[15:29:51.975] > /nix/store/xvzz97yk73hw03v5dhhz3j47ggwf1yq1-gcc-13.2.0-lib
+[15:29:52.459] > VS Code Node Version: v18.18.2
+[15:29:52.481] > Checking /home/nazarov/.vscode-server/.dc96b837cf6bb4af9cd736aa3af08cf8279f7685.log and /home/nazarov/.vscode-server/.dc96b837cf6bb4af9cd736aa3af08cf8279f7685.pid for a running server
+[15:29:52.510] > Starting server with command... /home/nazarov/.vscode-server/bin/dc96b837cf6bb4af9cd736aa3af08cf8279f7685/bin/code-server --start-server --host=127.0.0.1 --accept-server-license-terms --enable-remote-auto-shutdown --port=0 --telemetry-level off   &> "/home/nazarov/.vscode-server/.dc96b837cf6bb4af9cd736aa3af08cf8279f7685.log" < /dev/null
+> printenv:
+[15:29:52.517] >     SHELL=/run/current-system/sw/bin/zsh
+>     __HM_SESS_VARS_SOURCED=1
+>     XDG_CONFIG_DIRS=/etc/xdg:/home/nazarov/.nix-profile/etc/xdg:/nix/profile/etc/xdg:/home/nazarov/.local/state/nix/profile/etc/xdg:/etc/profiles/per-user/nazarov/etc/xdg:/nix/var/nix/profiles/default/etc/xdg:/run/current-system/sw/etc/xdg
+>     NIXPKGS_ALLOW_UNFREE=1
+>     LANGUAGE=en_GB.UTF-8
+>     LC_ADDRESS=en_GB.UTF-8
+>     LC_NAME=en_GB.UTF-8
+>     XCURSOR_PATH=/home/nazarov/.icons:/home/nazarov/.local/share/icons:/home/nazarov/.nix-profile/share/icons:/home/nazarov/.nix-profile/share/pixmaps:/nix/profile/share/icons:/nix/profile/share/pixmaps:/home/nazarov/.local/state/nix/profile/share/icons:/home/nazarov/.local/state/nix/profile/share/pixmaps:/etc/profiles/per-user/nazarov/share/icons:/etc/profiles/per-user/nazarov/share/pixmaps:/nix/var/nix/profiles/default/share/icons:/nix/var/nix/profiles/default/share/pixmaps:/run/current-system/sw/share/icons:/run/current-system/sw/share/pixmaps
+>     LOCALE_ARCHIVE_2_27=/nix/store/hmy0ml9nw48c6znk3vn692m1pvk31k54-glibc-locales-2.39-52/lib/locale/locale-archive
+>     LC_MONETARY=en_GB.UTF-8
+>     NO_AT_BRIDGE=1
+>     EDITOR=nvim
+>     PWD=/home/nazarov
+>     NIX_PROFILES=/run/current-system/sw /nix/var/nix/profiles/default /etc/profiles/per-user/nazarov /home/nazarov/.local/state/nix/profile /nix/profile /home/nazarov/.nix-profile
+>     LOGNAME=nazarov
+>     XDG_SESSION_TYPE=tty
+>     CUPS_DATADIR=/nix/store/355dqljy0sny2akxbi2ll2adjavwvrbc-cups-progs/share/cups
+>     NIX_PATH=/home/nazarov/.nix-defexpr/channels:nixpkgs=flake:nixpkgs:/nix/var/nix/profiles/per-user/root/channels
+>     NIXPKGS_CONFIG=/etc/nix/nixpkgs-config.nix
+>     HOME=/home/nazarov
+>     SSH_ASKPASS=
+>     LC_PAPER=en_GB.UTF-8
+>     LANG=en_GB.UTF-8
+>     NIXOS_OZONE_WL=1
+>     TMUX_TMPDIR=/run/user/1000
+>     VSCODE_AGENT_FOLDER=/home/nazarov/.vscode-server
+>     SSH_CONNECTION=77.127.106.150 50078 23.88.123.68 22
+>     GTK_A11Y=none
+>     NIX_USER_PROFILE_DIR=/nix/var/nix/profiles/per-user/nazarov
+>     INFOPATH=/home/nazarov/.nix-profile/info:/home/nazarov/.nix-profile/share/info:/nix/profile/info:/nix/profile/share/info:/home/nazarov/.local/state/nix/profile/info:/home/nazarov/.local/state/nix/profile/share/info:/etc/profiles/per-user/nazarov/info:/etc/profiles/per-user/nazarov/share/info:/nix/var/nix/profiles/default/info:/nix/var/nix/profiles/default/share/info:/run/current-system/sw/info:/run/current-system/sw/share/info
+>     XDG_SESSION_CLASS=user
+>     TERM=
+>     LC_IDENTIFICATION=en_GB.UTF-8
+>     GTK_PATH=/home/nazarov/.nix-profile/lib/gtk-2.0:/home/nazarov/.nix-profile/lib/gtk-3.0:/home/nazarov/.nix-profile/lib/gtk-4.0:/nix/profile/lib/gtk-2.0:/nix/profile/lib/gtk-3.0:/nix/profile/lib/gtk-4.0:/home/nazarov/.local/state/nix/profile/lib/gtk-2.0:/home/nazarov/.local/state/nix/profile/lib/gtk-3.0:/home/nazarov/.local/state/nix/profile/lib/gtk-4.0:/etc/profiles/per-user/nazarov/lib/gtk-2.0:/etc/profiles/per-user/nazarov/lib/gtk-3.0:/etc/profiles/per-user/nazarov/lib/gtk-4.0:/nix/var/nix/profiles/default/lib/gtk-2.0:/nix/var/nix/profiles/default/lib/gtk-3.0:/nix/var/nix/profiles/default/lib/gtk-4.0:/run/current-system/sw/lib/gtk-2.0:/run/current-system/sw/lib/gtk-3.0:/run/current-system/sw/lib/gtk-4.0
+>     FLAKE=/home/nazarov/dotfiles/nixos
+>     LESSOPEN=|/nix/store/bn2kah4gz47m3nashswjavvv3ghb7dl8-lesspipe-2.11/bin/lesspipe.sh %s
+>     USER=nazarov
+>     TZDIR=/etc/zoneinfo
+>     SHLVL=2
+>     __HM_ZSH_SESS_VARS_SOURCED=1
+>     PAGER=less
+>     LC_TELEPHONE=en_GB.UTF-8
+>     QTWEBKIT_PLUGIN_PATH=/home/nazarov/.nix-profile/lib/mozilla/plugins/:/nix/profile/lib/mozilla/plugins/:/home/nazarov/.local/state/nix/profile/lib/mozilla/plugins/:/etc/profiles/per-user/nazarov/lib/mozilla/plugins/:/nix/var/nix/profiles/default/lib/mozilla/plugins/:/run/current-system/sw/lib/mozilla/plugins/
+>     LC_MEASUREMENT=en_GB.UTF-8
+>     __NIXOS_SET_ENVIRONMENT_DONE=1
+>     XDG_SESSION_ID=6
+>     LOCALE_ARCHIVE=/run/current-system/sw/lib/locale/locale-archive
+>     LESSKEYIN_SYSTEM=/nix/store/yyqfcxa824s7iz9g957lk3zxq434p0fp-lessconfig
+>     TERMINFO_DIRS=/home/nazarov/.nix-profile/share/terminfo:/nix/profile/share/terminfo:/home/nazarov/.local/state/nix/profile/share/terminfo:/etc/profiles/per-user/nazarov/share/terminfo:/nix/var/nix/profiles/default/share/terminfo:/run/current-system/sw/share/terminfo
+>     XDG_RUNTIME_DIR=/run/user/1000
+>     SSH_CLIENT=77.127.106.150 50078 22
+>     LC_TIME=en_GB.UTF-8
+>     LC_ALL=en_GB.UTF-8
+>     XDG_DATA_DIRS=/home/nazarov/.nix-profile/share:/nix/profile/share:/home/nazarov/.local/state/nix/profile/share:/etc/profiles/per-user/nazarov/share:/nix/var/nix/profiles/default/share:/run/current-system/sw/share
+>     LIBEXEC_PATH=/home/nazarov/.nix-profile/libexec:/nix/profile/libexec:/home/nazarov/.local/state/nix/profile/libexec:/etc/profiles/per-user/nazarov/libexec:/nix/var/nix/profiles/default/libexec:/run/current-system/sw/libexec
+>     BROWSER=brave
+>     PATH=/run/wrappers/bin:/home/nazarov/.nix-profile/bin:/nix/profile/bin:/home/nazarov/.local/state/nix/profile/bin:/etc/profiles/per-user/nazarov/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
+>     DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+>     LC_NUMERIC=en_GB.UTF-8
+>     OLDPWD=/home/nazarov/.vscode-server/bin/dc96b837cf6bb4af9cd736aa3af08cf8279f7685
+>     _=/run/current-system/sw/bin/printenv
+[15:29:52.531] stderr> rm: cannot remove '/home/nazarov/.vscode-server/.dc96b837cf6bb4af9cd736aa3af08cf8279f7685.token': No such file or directory
+[15:29:52.540] > Spawned remote server: 40645
+[15:29:52.551] > Waiting for server log...
+[15:29:52.599] > Waiting for server log...
+[15:29:52.650] > Waiting for server log...
+[15:29:52.710] >  
+> *
+> * Reminder: You may only use this software with Visual Studio family products,
+> * as described in the license (https://go.microsoft.com/fwlink/?linkid=2077057)
+> *
+>  
+[15:29:52.740] > f8a85a87e308: start
+> SSH_AUTH_SOCK====
+> DISPLAY====
+> webUiAccessToken====
+> listeningOn==40437==
+> osReleaseId==nixos==
+> arch==x86_64==
+> tmpDir==/run/user/1000==
+> platform==linux==
+> unpackResult==success==
+> didLocalDownload==0==
+> downloadTime==538==
+> installTime==1763==
+> extInstallTime====
+> serverStartTime==184==
+> connectionToken==1aa1aa11-1111-11a1-11aa-aa11aaa1aa11==
+> f8a85a87e308: end
+[15:29:52.740] Received install output: 
+SSH_AUTH_SOCK====
+DISPLAY====
+webUiAccessToken====
+listeningOn==40437==
+osReleaseId==nixos==
+arch==x86_64==
+tmpDir==/run/user/1000==
+platform==linux==
+unpackResult==success==
+didLocalDownload==0==
+downloadTime==538==
+installTime==1763==
+extInstallTime====
+serverStartTime==184==
+connectionToken==1aa1aa11-1111-11a1-11aa-aa11aaa1aa11==
+
+[15:29:52.740] Remote server is listening on 40437
+[15:29:52.740] Parsed server configuration: {"serverConfiguration":{"remoteListeningOn":{"port":40437},"osReleaseId":"nixos","arch":"x86_64","webUiAccessToken":"","sshAuthSock":"","display":"","tmpDir":"/run/user/1000","platform":"linux","connectionToken":"1aa1aa11-1111-11a1-11aa-aa11aaa1aa11"},"downloadTime":538,"installTime":1763,"serverStartTime":184,"installUnpackCode":"success"}
+[15:29:52.741] Persisting server connection details to /home/nazarov/.config/Code/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-143d8ce0-dc96b837cf6bb4af9cd736aa3af08cf8279f7685-0.78.0/data.json
+[15:29:52.743] Starting forwarding server. localPort 33391 -> socksPort 40037 -> remotePort 40437
+[15:29:52.743] Forwarding server listening on 33391
+[15:29:52.743] Waiting for ssh tunnel to be ready
+[15:29:52.743] [Forwarding server 33391] Got connection 0
+[15:29:52.744] Tunneled 40437 to local port 33391
+[15:29:52.744] Resolved "ssh-remote+dev-server" to "127.0.0.1:33391"
+[15:29:52.747] ------
+
+
+
+
+[15:29:52.755] [Forwarding server 33391] Got connection 1
+[15:29:52.986] [Forwarding server 33391] Got connection 2
+[15:29:54.325] [Forwarding server 33391] Got connection 3
+[15:29:54.341] [Forwarding server 33391] Got connection 4
+[15:29:54.341] [Forwarding server 33391] Got connection 5
+[15:29:54.341] [Forwarding server 33391] Got connection 6
+[15:29:54.356] [Forwarding server 33391] Got connection 7
+[15:29:54.373] [Forwarding server 33391] Got connection 8

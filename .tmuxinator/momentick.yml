@@ -1,0 +1,33 @@
+name: momentick
+root: ~/Projects/Momentick
+startup_window: app
+windows:
+  - Projects: 
+  - app:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-sdk
+      panes:
+        - main:
+          - fnm use default
+        - run: 
+  - app:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-app
+      panes:
+        - main:
+          - fnm use default
+        - run: 
+  - api:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-api
+      panes:
+        - main:
+          - fnm use default
+        - run: 
+  - setup_machines:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/setup_machines
+      panes:
+        - main:
+          - fnm use default
+        - run: 

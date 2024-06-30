@@ -1,18 +1,26 @@
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install gcc antidote stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep
-brew install brave-browser transmission scroll-reverser  kitty flameshot studio-3t  
+brew install  make pkg-config gcc sheldon stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep yazi dmenu moreutils
+brew install brave-browser transmission scroll-reverser kitty flameshot studio-3t  choose-gui
 brew install --cask raycast
+brew install --cask docker  
 brew install rbenv ruby-build
 rbenv install 3.2.2
 rbenv global 3.2.2
 
 ## node
-curl -fsSL https://fnm.vercel.app/install | bash
-fnm install v18.16.0
-fnm use v18.16.0
+brew install fnm
+fnm install v20.14.0
+fnm use v20.14.0
 npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim
 
-git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
+#pyehon
+curl https://pyenv.run | bash
+pyenv install 3.12 
+pyenv global 3.12
 
 
 
@@ -23,15 +31,8 @@ skhd --start-service
 # create a new file for writing - visudo uses the vim editor by default.
 # go read about this if you have no idea what is going on.
 
-sudo visudo -f /private/etc/sudoers.d/yabai
+echo "$(whoami) ALL=(root) NOPASSWD: sha256:$(shasum -a 256 $(which yabai) | cut -d " " -f 1) $(which yabai) --load-sa" | sudo tee /private/etc/sudoers.d/yabai
 
-# input the line below into the file you are editing.
-#  replace <yabai> with the path to the yabai binary (output of: which yabai).
-#  replace <user> with your username (output of: whoami). 
-#  replace <hash> with the sha256 hash of the yabai binary (output of: shasum -a 256 $(which yabai)).
-#   this hash must be updated manually after running brew upgrade.
-
-<user> ALL=(root) NOPASSWD: sha256:<hash> <yabai> --load-sa
 
 curl -sS https://starship.rs/install.sh | sh
 

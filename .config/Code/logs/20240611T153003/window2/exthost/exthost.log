@@ -1,0 +1,104 @@
+2024-06-11 15:30:03.883 [info] Extension host with pid 11284 started
+2024-06-11 15:30:03.883 [info] [resolveAuthority(ssh-remote,1)][0ms] activating remote resolvers ssh-remote+dev-server
+2024-06-11 15:30:03.883 [info] [resolveAuthority(ssh-remote,1)][0ms] activating resolver for ssh-remote+dev-server...
+2024-06-11 15:30:03.885 [info] ExtensionService#_doActivateExtension ms-vscode-remote.remote-ssh, startup: false, activationEvent: 'onResolveRemoteAuthority:ssh-remote'
+2024-06-11 15:30:03.896 [info] [resolveAuthority(ssh-remote,1)][14ms] invoking final resolve()...
+2024-06-11 15:30:03.917 [info] [resolveAuthority(ssh-remote,1)][35ms] setting tunnel factory...
+2024-06-11 15:30:03.917 [info] [resolveAuthority(ssh-remote,1)][35ms] returned 127.0.0.1:35291
+2024-06-11 15:30:05.532 [info] ExtensionService#_doActivateExtension Catppuccin.catppuccin-vsc, startup: true, activationEvent: '*'
+2024-06-11 15:30:05.535 [info] ExtensionService#_doActivateExtension vscodevim.vim, startup: true, activationEvent: '*'
+2024-06-11 15:30:05.571 [error] Activating extension Catppuccin.catppuccin-vsc failed due to an error:
+2024-06-11 15:30:05.572 [error] Error: EROFS: read-only file system, open '/nix/store/5h8mz110c03qfrsn55rmi5fppgyicfhp-vscode-extension-catppuccin-catppuccin-vsc-2.6.1/share/vscode/extensions/catppuccin.catppuccin-vsc/themes/.flag'
+	at Object.openSync (node:fs:605:3)
+	at Object.func [as openSync] (node:electron/js2c/node_init:2:2214)
+	at Object.writeFileSync (node:fs:2345:35)
+	at j.isFreshInstall (/nix/store/5h8mz110c03qfrsn55rmi5fppgyicfhp-vscode-extension-catppuccin-catppuccin-vsc-2.6.1/share/vscode/extensions/catppuccin.catppuccin-vsc/dist/main.js:1:68895)
+	at Y (/nix/store/5h8mz110c03qfrsn55rmi5fppgyicfhp-vscode-extension-catppuccin-catppuccin-vsc-2.6.1/share/vscode/extensions/catppuccin.catppuccin-vsc/dist/main.js:1:69143)
+	at Z.kb (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:13465)
+	at Z.jb (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:13175)
+	at /nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:11197
+	at async h.n (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:6281)
+	at async h.m (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:6244)
+	at async h.l (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:5701)
+2024-06-11 15:30:05.628 [info] Eager extensions activated
+2024-06-11 15:30:06.579 [error] Error: ENOENT: no such file or directory, open '/home/nazarov/.config/Code/User/globalStorage/vscodevim.vim/.registers'
+2024-06-11 15:30:07.798 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2024-06-11 15:30:22.390 [info] Extension host terminating: renderer closed the MessagePort
+2024-06-11 15:30:22.392 [error] Canceled: Canceled
+	at new O (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:47131)
+	at c.U (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:150:5542)
+	at F.<computed>.z.charCodeAt.F.<computed> (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:150:2993)
+	at r.g (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188926)
+	at r.executeCommand (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188364)
+	at k.registerCommand.description (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:187688)
+	at r.h (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:189465)
+	at r.g (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188457)
+	at r.executeCommand (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188364)
+	at Object.executeCommand (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:163:22673)
+	at t.shutdown (/nix/store/6qan3wa55pnbipf93bdi6gss0drc0hrm-vscode-extension-ms-vscode-remote-remote-ssh-0.78.0/share/vscode/extensions/ms-vscode-remote.remote-ssh/out/extension.js:53:35987)
+	at e.deactivate (/nix/store/6qan3wa55pnbipf93bdi6gss0drc0hrm-vscode-extension-ms-vscode-remote-remote-ssh-0.78.0/share/vscode/extensions/ms-vscode-remote.remote-ssh/out/extension.js:53:115185)
+	at f.eb (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:9780)
+	at /nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:7824
+	at Array.map (<anonymous>)
+	at f.$ (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:7811)
+	at f.terminate (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:8085)
+	at a.terminate (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:163:1513)
+	at t (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:176:9922)
+	at MessagePortMain.<anonymous> (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:176:6347)
+	at MessagePortMain.emit (node:events:517:28)
+	at MessagePortMain._internalPort.emit (node:electron/js2c/utility_init:2:2285) setContext undefined
+2024-06-11 15:30:22.392 [error] Error: ENOENT: no such file or directory, open '/home/nazarov/.config/Code/User/globalStorage/vscodevim.vim/.registers'
+2024-06-11 15:30:22.392 [info] Extension host with pid 11284 exiting with code 0
+2024-06-11 15:30:22.973 [info] Extension host with pid 11485 started
+2024-06-11 15:30:22.973 [info] Skipping acquiring lock for /home/nazarov/.config/Code/User/workspaceStorage/ee8c51138316eb271dce45124cfc8a54.
+2024-06-11 15:30:22.973 [info] $getCanonicalURI invoked for authority (ssh-remote)
+2024-06-11 15:30:22.975 [info] ExtensionService#_doActivateExtension ms-vscode-remote.remote-ssh, startup: false, activationEvent: 'onResolveRemoteAuthority:ssh-remote'
+2024-06-11 15:30:22.986 [info] [resolveAuthority(ssh-remote,1)][0ms] activating remote resolvers ssh-remote+dev-server
+2024-06-11 15:30:22.986 [info] [resolveAuthority(ssh-remote,1)][0ms] activating resolver for ssh-remote+dev-server...
+2024-06-11 15:30:22.986 [info] [resolveAuthority(ssh-remote,1)][0ms] invoking final resolve()...
+2024-06-11 15:30:23.005 [info] [resolveAuthority(ssh-remote,1)][19ms] setting tunnel factory...
+2024-06-11 15:30:23.005 [info] [resolveAuthority(ssh-remote,1)][19ms] returned 127.0.0.1:34625
+2024-06-11 15:30:24.574 [info] ExtensionService#_doActivateExtension Catppuccin.catppuccin-vsc, startup: true, activationEvent: '*'
+2024-06-11 15:30:24.576 [info] ExtensionService#_doActivateExtension vscodevim.vim, startup: true, activationEvent: '*'
+2024-06-11 15:30:24.603 [error] Activating extension Catppuccin.catppuccin-vsc failed due to an error:
+2024-06-11 15:30:24.603 [error] Error: EROFS: read-only file system, open '/nix/store/5h8mz110c03qfrsn55rmi5fppgyicfhp-vscode-extension-catppuccin-catppuccin-vsc-2.6.1/share/vscode/extensions/catppuccin.catppuccin-vsc/themes/.flag'
+	at Object.openSync (node:fs:605:3)
+	at Object.func [as openSync] (node:electron/js2c/node_init:2:2214)
+	at Object.writeFileSync (node:fs:2345:35)
+	at j.isFreshInstall (/nix/store/5h8mz110c03qfrsn55rmi5fppgyicfhp-vscode-extension-catppuccin-catppuccin-vsc-2.6.1/share/vscode/extensions/catppuccin.catppuccin-vsc/dist/main.js:1:68895)
+	at Y (/nix/store/5h8mz110c03qfrsn55rmi5fppgyicfhp-vscode-extension-catppuccin-catppuccin-vsc-2.6.1/share/vscode/extensions/catppuccin.catppuccin-vsc/dist/main.js:1:69143)
+	at Z.kb (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:13465)
+	at Z.jb (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:13175)
+	at /nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:11197
+	at async h.n (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:6281)
+	at async h.m (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:6244)
+	at async h.l (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:5701)
+2024-06-11 15:30:24.660 [info] Eager extensions activated
+2024-06-11 15:30:25.625 [error] Error: ENOENT: no such file or directory, open '/home/nazarov/.config/Code/User/globalStorage/vscodevim.vim/.registers'
+2024-06-11 15:30:25.980 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2024-06-11 15:30:54.479 [info] Extension host terminating: renderer closed the MessagePort
+2024-06-11 15:30:54.481 [error] Canceled: Canceled
+	at new O (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:143:47131)
+	at c.U (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:150:5542)
+	at F.<computed>.z.charCodeAt.F.<computed> (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:150:2993)
+	at r.g (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188926)
+	at r.executeCommand (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188364)
+	at k.registerCommand.description (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:187688)
+	at r.h (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:189465)
+	at r.g (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188457)
+	at r.executeCommand (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:153:188364)
+	at Object.executeCommand (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:163:22673)
+	at t.shutdown (/nix/store/6qan3wa55pnbipf93bdi6gss0drc0hrm-vscode-extension-ms-vscode-remote-remote-ssh-0.78.0/share/vscode/extensions/ms-vscode-remote.remote-ssh/out/extension.js:53:35987)
+	at e.deactivate (/nix/store/6qan3wa55pnbipf93bdi6gss0drc0hrm-vscode-extension-ms-vscode-remote-remote-ssh-0.78.0/share/vscode/extensions/ms-vscode-remote.remote-ssh/out/extension.js:53:115185)
+	at f.eb (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:9780)
+	at /nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:7824
+	at Array.map (<anonymous>)
+	at f.$ (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:7811)
+	at f.terminate (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:159:8085)
+	at a.terminate (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:163:1513)
+	at t (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:176:9922)
+	at MessagePortMain.<anonymous> (/nix/store/snglls64alc8xnb2ynmlbaj1n6sy19i7-vscode-1.89.1/lib/vscode/resources/app/out/vs/workbench/api/node/extensionHostProcess.js:176:6347)
+	at MessagePortMain.emit (node:events:517:28)
+	at MessagePortMain._internalPort.emit (node:electron/js2c/utility_init:2:2285) setContext undefined
+2024-06-11 15:30:54.481 [error] Error: ENOENT: no such file or directory, open '/home/nazarov/.config/Code/User/globalStorage/vscodevim.vim/.registers'
+2024-06-11 15:30:54.481 [info] Extension host with pid 11485 exiting with code 0

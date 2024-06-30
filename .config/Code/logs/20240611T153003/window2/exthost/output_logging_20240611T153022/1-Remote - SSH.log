@@ -1,0 +1,41 @@
+[15:30:22.984] Log Level: 2
+[15:30:22.984] remote-ssh@0.78.0
+[15:30:22.985] linux x64
+[15:30:22.987] SSH Resolver called for "ssh-remote+dev-server", attempt 1
+[15:30:22.987] "remote.SSH.useLocalServer": true
+[15:30:22.987] "remote.SSH.path": undefined
+[15:30:22.987] "remote.SSH.configFile": undefined
+[15:30:22.987] "remote.SSH.useFlock": true
+[15:30:22.987] "remote.SSH.lockfilesInTmp": false
+[15:30:22.987] "remote.SSH.localServerDownload": auto
+[15:30:22.987] "remote.SSH.remoteServerListenOnSocket": false
+[15:30:22.987] "remote.SSH.showLoginTerminal": false
+[15:30:22.987] "remote.SSH.defaultExtensions": []
+[15:30:22.987] "remote.SSH.loglevel": 2
+[15:30:22.987] "remote.SSH.enableDynamicForwarding": true
+[15:30:22.987] "remote.SSH.enableRemoteCommand": false
+[15:30:22.988] "remote.SSH.serverPickPortsFromRange": {}
+[15:30:22.988] "remote.SSH.serverInstallPath": {}
+[15:30:22.991] SSH Resolver called for host: dev-server
+[15:30:22.991] Setting up SSH remote "dev-server"
+[15:30:22.993] Acquiring local install lock: /tmp/vscode-remote-ssh-143d8ce0-install.lock
+[15:30:22.994] Looking for existing server data file at /home/nazarov/.config/Code/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-143d8ce0-dc96b837cf6bb4af9cd736aa3af08cf8279f7685-0.78.0/data.json
+[15:30:22.995] Found local server running: {"remoteListeningOn":{"port":40437},"osReleaseId":"nixos","arch":"x86_64","webUiAccessToken":"","sshAuthSock":"","display":"","tmpDir":"/run/user/1000","platform":"linux","connectionToken":"1aa1aa11-1111-11a1-11aa-aa11aaa1aa11","pid":11010,"ipcHandlePath":"/run/user/1000/vscode-ssh-askpass-e5f065b836fcf698fa023afe9f71cc35f278a826.sock","socksPort":40037,"startupTime":1718108985173}
+[15:30:22.999] Found running server - short-circuiting install
+[15:30:23.000] Starting forwarding server. localPort 34625 -> socksPort 40037 -> remotePort 40437
+[15:30:23.000] Forwarding server listening on 34625
+[15:30:23.001] Waiting for ssh tunnel to be ready
+[15:30:23.001] [Forwarding server 34625] Got connection 0
+[15:30:23.001] Tunneled 40437 to local port 34625
+[15:30:23.002] Resolved "ssh-remote+dev-server" to "127.0.0.1:34625"
+[15:30:23.005] ------
+
+
+
+
+[15:30:23.020] [Forwarding server 34625] Got connection 1
+[15:30:23.174] [Forwarding server 34625] Got connection 2
+[15:30:24.473] [Forwarding server 34625] Got connection 3
+[15:30:24.513] [Forwarding server 34625] Got connection 4
+[15:30:24.514] [Forwarding server 34625] Got connection 5
+[15:30:24.557] [Forwarding server 34625] Got connection 6

@@ -43,7 +43,7 @@ cmd - 8 : yabai -m space --focus 8
 cmd - 9 : yabai -m space --focus 9
 cmd - 0 : yabai -m space --focus 10
 cmd - tab : yabai -m space --focus 10
-cmd - 0x0A : yabai -m space --focus 11 # 0x0A is the hex value for the § key
+cmd - 0xC0 : yabai -m space --focus 11 # 0x0A is the hex value for the § key
 
 # move focused window to next/prev workspace
 cmd + shift - 1 : yabai -m window --space 1
@@ -57,7 +57,7 @@ cmd + shift - 8 : yabai -m window --space 8
 cmd + shift - 9 : yabai -m window --space 9
 cmd + shift - 0 : yabai -m window --space 10
 cmd + shift - tab : yabai -m window --space 10
-cmd + shift - 0x0A : yabai -m window --space 11 # 0x0A is the hex value for the § key
+cmd + shift - 0xC0 : yabai -m window --space 11 # 0x0A is the hex value for the § key
 # # mirror tree y-axis
 cmd + shift - y : yabai -m space --mirror y-axis
 
@@ -76,7 +76,8 @@ cmd + shift - 0 : yabai -m space --balance
 cmd + shift - q : yabai -m window --close
 
 cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
-cmd - e: /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser $(cat ~/.secrets/bookmarks.txt | choose | awk '{ print $NF }')
+#cmd - e: /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser $(cat ~/.secrets/bookmarks.txt | choose | ifne awk '{ print $NF }') 
+#cmd - e: cat ~/.secrets/bookmarks.txt | choose | ifne awk '{ print $NF }' |ifne /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser 
 cmd + shift - e :cat ~/.secrets/bookmarks.txt | choose | awk '{ print $NF }' | pbcopy
 
 # # enter fullscreen mode for the focused container
