@@ -1,6 +1,7 @@
 # My dotfiles 
 This dotfiles uses stow to create symlinks. 
 
+
 ```sh
 git clone  git@github.com:petr-nazarov/dotfiles.git
 ```
