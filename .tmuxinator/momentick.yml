@@ -3,31 +3,45 @@ root: ~/Projects/Momentick
 startup_window: app
 windows:
   - Projects: 
-  - app:
+  - sdk:
       layout: main-horizontal
       root:  ~/Projects/Momentick/momentick-sdk
       panes:
         - main:
-          - fnm use default
         - run: 
-  - app:
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
+  - iac:
       layout: main-horizontal
-      root:  ~/Projects/Momentick/momentick-app
+      root:  ~/Projects/Momentick/momentick-iac
       panes:
         - main:
-          - fnm use default
         - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
   - api:
       layout: main-horizontal
       root:  ~/Projects/Momentick/momentick-api
       panes:
         - main:
-          - fnm use default
         - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
+  - app:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-app
+      panes:
+        - main:
+        - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
   - setup_machines:
       layout: main-horizontal
       root:  ~/Projects/Momentick/setup_machines
       panes:
         - main:
-          - fnm use default
         - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
+  - github-actions:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-github-actions
+      panes:
+        - main:
+        - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK

@@ -1,4 +1,4 @@
--- Init lazy  
+-- Init lazy
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({
@@ -12,8 +12,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Some vim seettings 
-vim.g.mapleader = " " 
+
+
+-- Some vim seettings
+vim.g.mapleader = " "
 
 require("lazy").setup("plugins")
 require("opts")
