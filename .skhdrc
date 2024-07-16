@@ -76,8 +76,7 @@ cmd + shift - 0 : yabai -m space --balance
 cmd + shift - q : yabai -m window --close
 
 cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
-#cmd - e: /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser $(cat ~/.secrets/bookmarks.txt | choose | ifne awk '{ print $NF }') 
-#cmd - e: cat ~/.secrets/bookmarks.txt | choose | ifne awk '{ print $NF }' |ifne /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser 
+cmd - e: cat ~/.secrets/bookmarks.txt | choose | ifne awk '{ print $NF }' | ifne xargs /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser 
 cmd + shift - e :cat ~/.secrets/bookmarks.txt | choose | awk '{ print $NF }' | pbcopy
 
 # # enter fullscreen mode for the focused container

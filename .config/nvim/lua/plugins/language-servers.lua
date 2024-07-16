@@ -45,13 +45,16 @@ return {
 				-- JS / TS
 				"tsserver",
 				-- Go
-				"gopls",
+				--"gopls",
 				-- Markdown
 				"marksman",
 				-- Nix
-				"nil_ls",
+				--"nil_ls",
 				-- Python
 				"pyright",
+				"basedpyright",
+				"ruff_lsp",
+				"ruff",
 				"pylint",
 				"black",
 			},
