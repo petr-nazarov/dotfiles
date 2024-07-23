@@ -52,11 +52,7 @@ return {
 				--"nil_ls",
 				-- Python
 				"pyright",
-				"basedpyright",
-				"ruff_lsp",
 				"ruff",
-				"pylint",
-				"black",
 			},
 		})
 		require("mason-lspconfig").setup_handlers({
@@ -69,12 +65,8 @@ return {
 			null_ls.builtins.formatting.stylua,
 			null_ls.builtins.completion.spell,
 		}
-		-- Add pylint if its a pyton file and a .pylintrc is detected
-		local pylintrc_config_file = vim.fn.getcwd() .. "/.pylintrc"
-		if vim.fn.filereadable(pylintrc_config_file) == 1 then
-			table.insert(sources, null_ls.builtins.diagnostics.pylin)
-			table.insert(sources, null_ls.builtins.formatting.black)
-		end
+    table.insert(sources, null_ls.builtins.formatting.ruff)
+
 		-- Add biome source if biome.json is present
 		local biome_config_path = vim.fn.getcwd() .. "/biome.json"
 		if vim.fn.filereadable(biome_config_path) == 1 then
