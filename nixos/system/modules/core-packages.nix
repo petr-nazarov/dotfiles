@@ -1,17 +1,10 @@
 
 { config, pkgs, systemSettings, ... }:
 
-let 
-    gcloud = pkgs.google-cloud-sdk.withExtraComponents( with pkgs.google-cloud-sdk.components; [
-      gke-gcloud-auth-plugin
-    ]);
-
-in
 {
   imports = [
     #./packages/zsh.nix
     ./packages/tmux.nix
-    ./packages/vscode.nix
     ./packages/nvim.nix
 
   ];
@@ -62,12 +55,6 @@ in
       eza
       moreutils
 
-      # DevOps
-      pulumi-bin
-      heroku
-      gcloud
-      kubectl
-      hcloud
 
       # Programming language
       jre8
@@ -85,7 +72,6 @@ in
       yazi
       btop
 
-      doppler
 
   ];
 
