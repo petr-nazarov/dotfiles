@@ -60,12 +60,54 @@ return {
 				lspconfig[server].setup({})
 			end,
 		})
+
 		-- Null ls
 		local sources = {
 			null_ls.builtins.formatting.stylua,
 			null_ls.builtins.completion.spell,
 		}
-    table.insert(sources, null_ls.builtins.formatting.ruff)
+
+		-- Define a custom Ruff source
+		local helpers = require("null-ls.helpers")
+		local ruff_source = {
+			method = null_ls.methods.DIAGNOSTICS,
+			filetypes = { "python" },
+			generator = helpers.generator_factory({
+				command = "ruff",
+				args = { "--stdin-filename", "$FILENAME", "-" },
+				to_stdin = true,
+				from_stderr = true,
+				format = "line",
+				check_exit_code = function(code)
+					return code <= 1
+				end,
+				on_output = function(params)
+					local output = params.output
+					local diagnostics = {}
+					if output == nil or type(output) ~= "table" then
+						return diagnostics
+					end
+					for _, message in ipairs(output) do
+						local col = message.column - 1
+						table.insert(diagnostics, {
+							row = message.line,
+							col = col,
+							end_col = col + message.end_column,
+							code = message.code,
+							source = "ruff",
+							message = message.message,
+							severity = helpers.diagnostics.severities["warning"],
+						})
+					end
+					return diagnostics
+				end,
+			}),
+		}
+		-- Add Ruff for Python formatting if pyproject.toml is present
+		local pyproject_config_path = vim.fn.getcwd() .. "/pyproject.toml"
+		if vim.fn.filereadable(pyproject_config_path) == 1 then
+			table.insert(sources, ruff_source)
+		end
 
 		-- Add biome source if biome.json is present
 		local biome_config_path = vim.fn.getcwd() .. "/biome.json"
