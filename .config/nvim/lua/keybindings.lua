@@ -1,7 +1,6 @@
 local wk = require("which-key")
+copilot_bindings = {
 
-wk.register({
-  c = {
     name = "Copilot",
     c = {
       ":CopilotChatToggle<CR>",
@@ -27,7 +26,9 @@ wk.register({
       ":CopilotChatTests<CR>",
       "Chat Tests",
     },
-  },
+}
+wk.register({
+  c = copilot_bindings,
   d = {
     name = "Debug",
     l = {
@@ -313,6 +314,7 @@ wk.register({
 }, { prefix = "<leader>" })
 
 wk.register({
+  c = copilot_bindings,
   ["/"] = {
     ":CommentToggle<CR>",
     "Comment",

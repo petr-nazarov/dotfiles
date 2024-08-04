@@ -3,23 +3,16 @@ root: ~/Projects/Momentick
 startup_window: app
 windows:
   - Projects: 
-  - sdk:
+  - monorepo-copy:
       layout: main-horizontal
-      root:  ~/Projects/Momentick/momentick-sdk
+      root:  ~/Projects/Momentick/momentick-monorepo-copy
       panes:
         - main:
         - run: 
           - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
-  - iac:
+  - monorepo:
       layout: main-horizontal
-      root:  ~/Projects/Momentick/momentick-iac
-      panes:
-        - main:
-        - run: 
-          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
-  - api:
-      layout: main-horizontal
-      root:  ~/Projects/Momentick/momentick-api
+      root:  ~/Projects/Momentick/momentick-monorepo
       panes:
         - main:
         - run: 
@@ -27,13 +20,6 @@ windows:
   - app:
       layout: main-horizontal
       root:  ~/Projects/Momentick/momentick-app
-      panes:
-        - main:
-        - run: 
-          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
-  - setup_machines:
-      layout: main-horizontal
-      root:  ~/Projects/Momentick/setup_machines
       panes:
         - main:
         - run: 
