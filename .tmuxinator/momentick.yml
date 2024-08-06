@@ -3,31 +3,31 @@ root: ~/Projects/Momentick
 startup_window: app
 windows:
   - Projects: 
-  - app:
+  - monorepo-copy:
       layout: main-horizontal
-      root:  ~/Projects/Momentick/momentick-sdk
+      root:  ~/Projects/Momentick/momentick-monorepo-copy
       panes:
         - main:
-          - fnm use default
         - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
+  - monorepo:
+      layout: main-horizontal
+      root:  ~/Projects/Momentick/momentick-monorepo
+      panes:
+        - main:
+        - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
   - app:
       layout: main-horizontal
       root:  ~/Projects/Momentick/momentick-app
       panes:
         - main:
-          - fnm use default
         - run: 
-  - api:
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
+  - github-actions:
       layout: main-horizontal
-      root:  ~/Projects/Momentick/momentick-api
+      root:  ~/Projects/Momentick/momentick-github-actions
       panes:
         - main:
-          - fnm use default
         - run: 
-  - setup_machines:
-      layout: main-horizontal
-      root:  ~/Projects/Momentick/setup_machines
-      panes:
-        - main:
-          - fnm use default
-        - run: 
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK

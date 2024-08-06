@@ -45,15 +45,14 @@ return {
 				-- JS / TS
 				"tsserver",
 				-- Go
-				"gopls",
+				--"gopls",
 				-- Markdown
 				"marksman",
 				-- Nix
-				"nil_ls",
+				--"nil_ls",
 				-- Python
 				"pyright",
-				"pylint",
-				"black",
+				"ruff",
 			},
 		})
 		require("mason-lspconfig").setup_handlers({
@@ -61,17 +60,55 @@ return {
 				lspconfig[server].setup({})
 			end,
 		})
+
 		-- Null ls
 		local sources = {
 			null_ls.builtins.formatting.stylua,
 			null_ls.builtins.completion.spell,
 		}
-		-- Add pylint if its a pyton file and a .pylintrc is detected
-		local pylintrc_config_file = vim.fn.getcwd() .. "/.pylintrc"
-		if vim.fn.filereadable(pylintrc_config_file) == 1 then
-			table.insert(sources, null_ls.builtins.diagnostics.pylin)
-			table.insert(sources, null_ls.builtins.formatting.black)
+
+		-- Define a custom Ruff source
+		local helpers = require("null-ls.helpers")
+		local ruff_source = {
+			method = null_ls.methods.DIAGNOSTICS,
+			filetypes = { "python" },
+			generator = helpers.generator_factory({
+				command = "ruff",
+				args = { "--stdin-filename", "$FILENAME", "-" },
+				to_stdin = true,
+				from_stderr = true,
+				format = "line",
+				check_exit_code = function(code)
+					return code <= 1
+				end,
+				on_output = function(params)
+					local output = params.output
+					local diagnostics = {}
+					if output == nil or type(output) ~= "table" then
+						return diagnostics
+					end
+					for _, message in ipairs(output) do
+						local col = message.column - 1
+						table.insert(diagnostics, {
+							row = message.line,
+							col = col,
+							end_col = col + message.end_column,
+							code = message.code,
+							source = "ruff",
+							message = message.message,
+							severity = helpers.diagnostics.severities["warning"],
+						})
+					end
+					return diagnostics
+				end,
+			}),
+		}
+		-- Add Ruff for Python formatting if pyproject.toml is present
+		local pyproject_config_path = vim.fn.getcwd() .. "/pyproject.toml"
+		if vim.fn.filereadable(pyproject_config_path) == 1 then
+			table.insert(sources, ruff_source)
 		end
+
 		-- Add biome source if biome.json is present
 		local biome_config_path = vim.fn.getcwd() .. "/biome.json"
 		if vim.fn.filereadable(biome_config_path) == 1 then

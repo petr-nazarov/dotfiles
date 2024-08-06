@@ -87,6 +87,22 @@
             };
             modules = systemModules; 
           };
+          home-server = lib.nixosSystem {
+            inherit system;
+            specialArgs= {
+                systemSettings = {
+                  inherit shared;
+                  hostname = "home-server";
+                  gui = true;
+                };
+                pkgs-unstable = import nixpkgs-unstable {
+                 inherit system;
+                  config.allowUnfree = true;
+                };
+            };
+            modules = systemModules; 
+          };
+          
         };
         homeConfigurations = {
           "nazarov@desktop" = home-manager.lib.homeManagerConfiguration {
@@ -117,6 +133,16 @@
               systemSettings = {
                 inherit shared;
                 hostname = "dev-server";
+                gui = false;
+              };
+            };
+          };
+          "nazarov@home-server"= home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              systemSettings = {
+                inherit shared;
+                hostname = "home-server";
                 gui = false;
               };
             };
