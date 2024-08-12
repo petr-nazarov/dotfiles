@@ -36,5 +36,6 @@
       sioyek #pdf
       qbittorrent
       obs-studio
+      moonlight-qt
   ];
 }
