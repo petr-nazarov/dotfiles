@@ -36,6 +36,7 @@
       ./modules/ssh-server.nix
       ./modules/gnome.nix
       ./modules/jellyfin-client.nix
+      ./modules/storage.nix
 
     ] else [])
     ++ [ 
