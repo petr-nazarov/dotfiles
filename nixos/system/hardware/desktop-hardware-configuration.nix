@@ -43,4 +43,5 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  networking.hostId = "7ef50890"; 
 }

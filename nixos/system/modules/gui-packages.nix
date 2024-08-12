@@ -24,6 +24,7 @@
       ## KDE
       #libsForQt5.polonium
       ## programs
+      gnome.nautilus
       openrefine
       slack
       zoom

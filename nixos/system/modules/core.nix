@@ -3,6 +3,10 @@
 
 {
 
+   services.udisks2.enable = true;
+   boot.supportedFilesystems = [ "zfs" ];
+   environment.systemPackages = with pkgs; [ zfs ];
+
   
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -23,5 +27,6 @@
   system.stateVersion = "unstable"; # Did you read the comment?
 
   networking.networkmanager.enable = true;
+
 
 }
