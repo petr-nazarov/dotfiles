@@ -8,7 +8,15 @@
 
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm= {
+    enable = true;
+    autoLogin = {
+      enable = true;
+      user = "nazarov";
+    };
+    
+
+  };
   services.xserver.desktopManager.gnome.enable = true;
 
   security.polkit.enable = true;
