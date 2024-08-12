@@ -54,6 +54,11 @@
       procs
       eza
       moreutils
+      util-linux
+      file
+      smartmontools
+      speedtest-cli
+      btrfs-progs
 
 
       # Programming language

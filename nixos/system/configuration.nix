@@ -35,6 +35,9 @@
       ./hardware/home-server-hardware-configuration.nix
       ./modules/ssh-server.nix
       ./modules/gnome.nix
+      ./modules/jellyfin-client.nix
+      ./modules/storage.nix
+
     ] else [])
     ++ [ 
       ./modules/core.nix

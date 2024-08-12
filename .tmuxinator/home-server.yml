@@ -1,0 +1,10 @@
+name: home-server
+root: ~/tv
+startup_window: tv
+windows:
+- tv: 
+   layout: main-horizontal
+   panes:
+     - editor:
+       - nvim
+     - term:
