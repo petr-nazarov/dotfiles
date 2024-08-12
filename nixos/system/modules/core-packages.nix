@@ -59,6 +59,7 @@
       # Programming language
       jre8
       python3
+      ruff
       python311Packages.pip
       ruby
       go
