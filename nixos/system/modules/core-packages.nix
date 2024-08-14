@@ -59,6 +59,8 @@
       smartmontools
       speedtest-cli
       btrfs-progs
+      usbutils
+      parted
 
 
       # Programming language

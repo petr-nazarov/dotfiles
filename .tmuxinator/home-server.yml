@@ -1,8 +1,8 @@
 name: home-server
-root: ~/tv
-startup_window: tv
+root: ~/home-server
+startup_window: home-server 
 windows:
-- tv: 
+- home-server: 
    layout: main-horizontal
    panes:
      - editor:
