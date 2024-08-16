@@ -59,6 +59,7 @@
       smartmontools
       speedtest-cli
       btrfs-progs
+      exfat
       usbutils
       parted
 

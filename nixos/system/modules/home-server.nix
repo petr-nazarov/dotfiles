@@ -2,14 +2,9 @@
 { config, pkgs, systemSettings, ... }:
 
 {
-  virtualisation.docker.daemon.settings = {
-       log-driver = "loki";
-       log-opts = {
-            loki-url = "http://localhost:3100/loki/api/v1/push";
-            loki-batch-size = "400";
-            loki-retries="2";
-            loki-max-backoff="800ms";
-            loki-timeout="1s";
-       };
+  fileSystems."/mnt/storage" = {
+    device = "/dev/sda2"; # Replace with your actual device name
+    fsType = "exfat";
+    options = [ "auto" "rw" "uid=1000" "gid=100" ]; # Adjust uid and gid as needed
   };
 }
