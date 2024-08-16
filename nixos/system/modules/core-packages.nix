@@ -78,6 +78,7 @@
 
       # TUI programs
       lazygit
+      lazydocker
       yazi
       btop
 
