@@ -12,19 +12,17 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" ];
 
-
-  hardware.cpu.intel.updateMicrocode = true;
-  hardware.enableAllFirmware = true; boot.extraModulePackages = [ ];
-
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/5a9461df-d615-4b7d-83b2-b1bc1f126f99";
+    { device = "/dev/disk/by-uuid/a41b4947-f0a3-4b96-95a0-4e339443bb3b";
       fsType = "ext4";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/D636-2AB6";
+    { device = "/dev/disk/by-uuid/3E7D-81C4";
       fsType = "vfat";
+      options = [ "fmask=0077" "dmask=0077" ];
     };
+
 
   swapDevices = [ ];
 
@@ -42,6 +40,5 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostId = "7ef50890"; 
+  services.getty.autologinUser = "nazarov";
 }

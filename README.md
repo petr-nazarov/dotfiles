@@ -13,6 +13,10 @@ nix-shell -p gitAndTools.gh
 
 # Instructions 
 While in `~/dotfiles/nixos`
+First time:
+```sh 
+sudo nixos-rebuild --flake .#desktop 
+```
 To rebuild system run `nh os swith`
 To homemanager run `nh home swith`
 To clean unused run `nh clean all --keep 1`
