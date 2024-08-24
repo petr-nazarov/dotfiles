@@ -34,10 +34,8 @@
     ++ (if (systemSettings.hostname == "home-server") then [
       ./hardware/home-server-hardware-configuration.nix
       ./modules/ssh-server.nix
-      ./modules/gnome.nix
       ./modules/jellyfin-client.nix
-      ./modules/storage.nix
-
+      ./modules/home-server.nix
     ] else [])
     ++ [ 
       ./modules/core.nix

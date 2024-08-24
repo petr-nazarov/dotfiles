@@ -59,6 +59,9 @@
       smartmontools
       speedtest-cli
       btrfs-progs
+      exfat
+      usbutils
+      parted
 
 
       # Programming language
@@ -75,6 +78,7 @@
 
       # TUI programs
       lazygit
+      lazydocker
       yazi
       btop
 
