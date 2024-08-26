@@ -59,9 +59,10 @@
       smartmontools
       speedtest-cli
       btrfs-progs
-      exfat
       usbutils
       parted
+      exfatprogs
+      unixtools.fdisk
 
 
       # Programming language

@@ -41,4 +41,6 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   services.getty.autologinUser = "nazarov";
+#  services.xserver.displayManager.autoLogin.user = "nazarov";
+#  services.xserver.displayManager.autoLogin.enable = true;
 }
