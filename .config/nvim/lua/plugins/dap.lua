@@ -151,9 +151,9 @@ return {
 					},
 				}
 			end
-			require("dap.ext.vscode").load_launchjs(nil, {
-				node = { "javascript", "typescript" },
-			})
+			-- require("dap.ext.vscode").load_launchjs(nil, {
+			-- 	node = { "javascript", "typescript" },
+			-- })
 
 			-- Styles
 			vim.api.nvim_set_hl(0, "blue", { fg = "#3d59a1" })

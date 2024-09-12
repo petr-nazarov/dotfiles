@@ -9,25 +9,23 @@ windows:
       panes:
         - main:
         - run: 
-          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_APP_CLI_DEV
   - monorepo:
       layout: main-horizontal
       root:  ~/Projects/Momentick/momentick-monorepo
       panes:
         - main:
         - run: 
-          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
+          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_APP_CLI_DEV
   - app:
       layout: main-horizontal
       root:  ~/Projects/Momentick/momentick-app
       panes:
         - main:
         - run: 
-          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
   - github-actions:
       layout: main-horizontal
       root:  ~/Projects/Momentick/momentick-github-actions
       panes:
         - main:
         - run: 
-          - export DOPPLER_TOKEN=$DOPPLER_TOKEN_MOMENTICK
