@@ -24,6 +24,8 @@
       ## KDE
       #libsForQt5.polonium
       ## programs
+      gnome.nautilus
+      gparted
       openrefine
       slack
       zoom
@@ -36,5 +38,6 @@
       sioyek #pdf
       qbittorrent
       obs-studio
+      moonlight-qt
   ];
 }

@@ -15,12 +15,12 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/f3e00687-b608-4020-85ce-309ae05e6311";
+    { device = "/dev/disk/by-uuid/f01576d0-70ad-468a-92d3-28bcf8d014b5";
       fsType = "ext4";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/1591-3FD3";
+    { device = "/dev/disk/by-uuid/4525-8AB9";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
@@ -32,12 +32,15 @@
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp0s20f0u2u1.useDHCP = lib.mkDefault true;
   # networking.interfaces.enp125s0u2u2.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlp3s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
-  boot.loader.systemd-boot.enable = true;
+ boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  services.getty.autologinUser = "nazarov";
+
 }

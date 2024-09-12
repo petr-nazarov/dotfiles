@@ -1,0 +1,10 @@
+name: home-server
+root: ~/home-server
+startup_window: home-server 
+windows:
+- home-server: 
+   layout: main-horizontal
+   panes:
+     - editor:
+       - nvim
+     - term:

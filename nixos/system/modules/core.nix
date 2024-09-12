@@ -24,4 +24,5 @@
 
   networking.networkmanager.enable = true;
 
+
 }

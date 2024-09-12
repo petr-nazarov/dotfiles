@@ -14,6 +14,8 @@
       ./modules/hardware-acceleration.nix
       ./modules/dev-packages.nix
       ./modules/timers.nix
+      ./modules/ssh-server.nix
+      ./modules/home-server.nix
     ] else [])
     ++ (if (systemSettings.hostname == "matebook") then [
       ./hardware/matebook-hardware-configuration.nix
@@ -34,7 +36,7 @@
     ++ (if (systemSettings.hostname == "home-server") then [
       ./hardware/home-server-hardware-configuration.nix
       ./modules/ssh-server.nix
-      ./modules/gnome.nix
+      ./modules/jellyfin-client.nix
     ] else [])
     ++ [ 
       ./modules/core.nix

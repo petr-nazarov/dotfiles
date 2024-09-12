@@ -54,11 +54,21 @@
       procs
       eza
       moreutils
+      util-linux
+      file
+      smartmontools
+      speedtest-cli
+      btrfs-progs
+      usbutils
+      parted
+      exfatprogs
+      unixtools.fdisk
 
 
       # Programming language
       jre8
       python3
+      ruff
       python311Packages.pip
       ruby
       go
@@ -69,6 +79,7 @@
 
       # TUI programs
       lazygit
+      lazydocker
       yazi
       btop
 
