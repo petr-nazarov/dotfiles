@@ -15,7 +15,9 @@ source $HOME/.config/zsh/aliases.zsh
 source $HOME/.config/zsh/variables.zsh
 
 ### Secrets ###
-source $HOME/.secrets/secrets.zsh
+if [ -f "$HOME/.secrets/secrets.zsh" ]; then
+  source $HOME/.secrets/secrets.zsh
+fi
 
 ### Key Binds ###
 source $HOME/.config/zsh/bind-keys.zsh
@@ -41,3 +43,10 @@ unset __conda_setup
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# fnm
+FNM_PATH="/home/peter/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="/home/peter/.local/share/fnm:$PATH"
+  eval "`fnm env`"
+fi
