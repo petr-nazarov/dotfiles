@@ -76,7 +76,7 @@ cmd + shift - 0 : yabai -m space --balance
 cmd + shift - q : yabai -m window --close
 
 cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
-cmd - e: cat ~/.secrets/bookmarks.txt | choose | ifne awk '{ print $NF }' | ifne xargs chromium
+cmd - e: cat ~/.secrets/bookmarks.txt | choose | ifne awk '{ print $NF }' | ifne xargs /Applications/Zen\ Browser.app/Contents/MacOS/zen --new-tab
 cmd + shift - e :cat ~/.secrets/bookmarks.txt | choose | awk '{ print $NF }' | pbcopy
 
 # # enter fullscreen mode for the focused container
