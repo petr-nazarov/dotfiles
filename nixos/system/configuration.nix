@@ -8,6 +8,7 @@
   imports =
     (if (systemSettings.hostname == "desktop") then [
       ./hardware/desktop-hardware-configuration.nix
+      ./modules/keyboard.nix
       ./modules/hypr.nix
       ./modules/sound.nix
       ./modules/gui-packages.nix
@@ -19,8 +20,10 @@
     ] else [])
     ++ (if (systemSettings.hostname == "matebook") then [
       ./hardware/matebook-hardware-configuration.nix
+      ./modules/keyboard.nix
       ./modules/laptop.nix
       ./modules/hypr.nix
+      ./modules/gnome-display-manager.nix
       ./modules/sound.nix
       ./modules/gui-packages.nix
       ./modules/hardware-acceleration.nix
@@ -35,6 +38,7 @@
     ] else [])
     ++ (if (systemSettings.hostname == "home-server") then [
       ./hardware/home-server-hardware-configuration.nix
+      ./modules/keyboard.nix
       ./modules/ssh-server.nix
       ./modules/jellyfin-client.nix
     ] else [])
