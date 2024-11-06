@@ -9,7 +9,7 @@ apt-get install sudo -y \
 
 # Install firs class packages
 ## For debian
-sudo apt install -y wget make gcc git vim gcc build-essential unzip libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix fd-find stow
+sudo apt install -y wget make gcc git vim gcc build-essential unzip libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix  stow
 ## For arch
 yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse
 systemctl enable --now cronie.service
@@ -18,32 +18,29 @@ systemctl enable --now cronie.service
 sudo apt-get install -y zsh
 sudo chsh -s $(which zsh) \
 	chsh -s $(which zsh) \
-	git clone https://github.com/mattmc3/antidote.git ~/apps/zsh-antidote \
 	cd ~/apps/ \
 	curl -sS https://starship.rs/install.sh | sh
 
 # Install languages
 
 ## Python
-cd ~/apps
-sudo apt-get install libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
-curl -O https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh
-bash ./Anaconda3-2020.05-Linux-x86_64.sh
-conda config --set changeps1 False
+curl https://pyenv.run | bash
 source ~/.zshrc
+pyenv install 3.11.9
+pyenv global 3.11.9
+curl -sSL https://install.python-poetry.org | python 
 
 ## Ruby
 cd ~/
 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
-exec $SHELL
-rbenv install 3.2.2
-rbenv global 3.2.2
+~/.rbenv/bin/rbenv install 3.2.2
+~/.rbenv/bin/rbenv global 3.2.2
 
 ## node
 curl -fsSL https://fnm.vercel.app/install | bash
-fnm install v18.16.0
-fnm use v18.16.0
+fnm install v20.9.0
+fnm use v20.9.0
 npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter neovim @biomejs/biome
 ## bun
 curl -fsSL https://bun.sh/install | bash
@@ -54,14 +51,14 @@ cd ~/apps/
 wget https://golang.org/dl/go1.17.5.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go1.17.5.linux-amd64.tar.gz
 
-## Rust
+## Rust (Cargo)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Install terminal programs
 ## Debian
-sudo apt install -y fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layzygit asciidoctor libmagic-dev
+sudo apt install -y  ripgrep fzf xclip  btop   asciidoctor libmagic-dev
 ## Arch
-yay -S --noconfirm fd ripgrep bat fzf xclip procs btop lf pistol-git neovim layzygit asciidoctor libmagic-dev
+yay -S --noconfirm fd ripgrep bat fzf xclip procs btop  pistol-git neovim layzygit asciidoctor libmagic-dev
 
 # Yazi
 ## Both
@@ -74,9 +71,23 @@ sudo apt install -y ffmpegthumbnailer unrar poppler
 # pistol
 sudo apt-get install go install github.com/doronbehar/pistol/cmd/pistol@latest
 
+
+## lazygit 
+cd ~/apps
+wget https://github.com/jesseduffield/lazygit/releases/download/v0.44.0/lazygit_0.44.0_Linux_x86_64.tar.gz
+tar -xzvf lazygit_0.44.0_Linux_x86_64.tar.gz 
+sudo cp lazygit /usr/bin/
+
+## fd
+cargo install fd-find
+## procs 
+cargo install procs
+## sheldon
+cargo install sheldon
 ## eza
 cargo install eza
-
+## bat
+cargo install bat
 ## tmux and tmuxinator
 sudo apt install tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -120,3 +131,13 @@ sudo ufw allow ssh
 sudo ufw allow http
 sudo ufw allow https
 sudo ufw enable
+
+
+#Nvim debian
+cd ~/apps
+sudo apt update
+sudo apt install fuse
+wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
+chmod u+x nvim.appimage
+sudo mv nvim.appimage /usr/local/bin/nvim
+

@@ -89,23 +89,6 @@ return {
           main = "ibl",
         },
         {
-          'anuvyklack/pretty-fold.nvim',
-           config = function()
-              require('pretty-fold').setup({
-                 keep_indentation = true,
-                 fill_char = '━',
-                 sections = {
-                    left = {
-                       'content'
-                    },
-                    right = {
-                       '┫ ', 'number_of_folded_lines', ' ┣━━',
-                    }
-                 }
-              })
-           end
-        },
-        {
           "folke/noice.nvim",
           event = "VeryLazy",
           opts = {

@@ -1,31 +1,37 @@
 local wk = require("which-key")
-copilot_bindings = {
 
-    name = "Copilot",
-    c = {
-      ":CopilotChatToggle<CR>",
-      "Chat Open",
-    },
-    d = {
-      ":CopilotChatDocs<CR>",
-      "Chat Docs",
-    },
-    e = {
-      ":CopilotChatExplain<CR>",
-      "Chat explain",
-    },
-    f = {
-      ":CopilotChatFix<CR>",
-      "Chat Fix",
-    },
-    g = {
-      ":CopilotChatCommit<CR>",
-      "Chat Git Commit",
-    },
-    t = {
-      ":CopilotChatTests<CR>",
-      "Chat Tests",
-    },
+copilot_bindings = {
+  name = "Copilot",
+  c = {
+ -- ":lua require('CopilotChat').toggle({ window = { layout = 'vertical', title = 'Copilot' } })  <CR>",
+    ": CopilotChatToggle <CR>",
+    "Chat Open",
+  },
+  d = {
+    -- ":lua require('CopilotChat').toggle({ window = { layout = 'vertical', title = 'Copilot',   prompt = '/COPILOT_GENERATE Please add documentation comment for the selection.' } })  <CR>",
+    ": CopilotChatDocs <CR>",
+    "Chat Docs",
+  },
+  e = {
+    -- ":lua require('CopilotChat').toggle({ window = { layout = 'vertical', title = 'Copilot',   prompt = '/COPILOT_EXPLAIN Write an explanation for the active selection as paragraphs of text.' } })  <CR>",
+    ": CopilotChatExplain <CR>",
+    "Chat explain",
+  },
+  f = {
+    -- ":lua require('CopilotChat').toggle({ window = { layout = 'vertical', title = 'Copilot',   prompt = '/COPILOT_GENERATE There is a problem in this code. Rewrite the code to show it with the bug fixed.'  } })  <CR>",
+    ": CopilotChatFix <CR>",
+    "Chat Fix",
+  },
+  g = {
+    -- ":lua require('CopilotChat').toggle({ window = { layout = 'vertical', title = 'Copilot',    prompt = 'Write commit message for the change with commitizen convention. Make sure the title has maximum 50 characters and message is wrapped at 72 characters. Wrap the whole message in code block with language gitcommit. follow conventional commits', selection = select.gitdiff } })  <CR>",
+    ": CopilotChatCommit <CR>",
+    "Chat Git Commit",
+  },
+  t = {
+    -- ":lua require('CopilotChat').toggle({ window = { layout = 'vertical', title = 'Copilot',      prompt = '/COPILOT_GENERATE Please generate tests for my code.'  } })  <CR>",
+    ": CopilotChatTests <CR>",
+    "Chat Tests",
+  },
 }
 wk.register({
   c = copilot_bindings,
@@ -255,7 +261,7 @@ wk.register({
     e = {
       ":ToggleDiag<CR>",
       "Errors/ Diagnostics",
-    }
+    },
   },
   w = {
     "<cmd> :wa <CR>",
@@ -281,8 +287,8 @@ wk.register({
     },
     Q = {
       ":qa<CR>",
-      "Quit All"
-    }
+      "Quit All",
+    },
   },
   y = {
     name = "Yank",
@@ -309,8 +315,7 @@ wk.register({
   ["/"] = {
     ":CommentToggle<CR>",
     "Comment",
-  }
-
+  },
 }, { prefix = "<leader>" })
 
 wk.register({
@@ -318,7 +323,7 @@ wk.register({
   ["/"] = {
     ":CommentToggle<CR>",
     "Comment",
-  }
+  },
 }, { prefix = "<leader>", mode = "v" })
 
 local map = vim.api.nvim_set_keymap
