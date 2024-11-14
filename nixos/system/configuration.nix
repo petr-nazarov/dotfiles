@@ -16,7 +16,6 @@
       ./modules/dev-packages.nix
       ./modules/timers.nix
       ./modules/ssh-server.nix
-      ./modules/home-server.nix
     ] else [])
     ++ (if (systemSettings.hostname == "matebook") then [
       ./hardware/matebook-hardware-configuration.nix
