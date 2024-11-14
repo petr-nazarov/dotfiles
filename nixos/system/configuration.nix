@@ -39,7 +39,8 @@
       ./hardware/home-server-hardware-configuration.nix
       ./modules/keyboard.nix
       ./modules/ssh-server.nix
-      ./modules/jellyfin-client.nix
+      ./modules/dev-packages.nix
+      ./modules/home-server.nix
     ] else [])
     ++ [ 
       ./modules/core.nix
