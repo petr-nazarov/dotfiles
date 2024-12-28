@@ -10,7 +10,7 @@
   pp = !git push -u origin HEAD 
   s = status
   pl = pull origin
-  update =  !git fetch origin master:master && git merge master
+  update =  !git fetch origin main:main && git merge main
   finish = !git checkout master && git branch -d $1
   wip = !git add . && git commit -m "WIP" --no-verify
   wips = !git wip && git sync 
