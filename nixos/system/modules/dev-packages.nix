@@ -28,6 +28,7 @@ in
       kubectl
       hcloud
       doppler
+      usbimager
   ];
 
 
