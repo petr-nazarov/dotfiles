@@ -33,298 +33,87 @@ copilot_bindings = {
     "Chat Tests",
   },
 }
-wk.register({
-  c = copilot_bindings,
-  d = {
-    name = "Debug",
-    l = {
-      name = "List",
-      b = {
-        ":FzfLua dap_breakpoints <CR>",
-        "List breakpoints",
-      },
-      e = {
-        ":FzfLua dap_commands<CR>",
-        "List executables / commands",
-      },
-      c = {
-        ":FzfLua dap_configurations<CR>",
-        "List configurations",
-      },
-      v = {
-        ":FzfLua dap_variables<CR>",
-        "List variables",
-      },
-      f = {
-        ":FzfLua dap_frames<CR>",
-        "List frames",
-      },
-    },
+wk.add(
+  {
+    { "<leader>/", ":CommentToggle<CR>", desc = "Comment" },
+    { "<leader>O", ":FzfLua files<CR>", desc = "Open file ignore gitignore" },
+    { "<leader>Q", group = "Quit" },
+    { "<leader>QQ", ":qa<CR>", desc = "Quit All" },
+    { "<leader>Qb", ":1,$bd!<CR>", desc = "Buffers" },
+    { "<leader>Qq", ":q<CR>", desc = "Quit" },
+    { "<leader>W", "<cmd> :w <CR>", desc = "Save " },
+    { "<leader>d", group = "Debug" },
+    { "<leader>d<Down>", "::lua require'dap'.step_into()<CR>", desc = "Step Down/In" },
+    { "<leader>d<Right>", "::lua require'dap'.step_over()<CR>", desc = "Step Over" },
+    { "<leader>d<Up>", "::lua require'dap'.step_out()<CR>", desc = "Step Up/Out" },
+    { "<leader>dB", "::lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint conditioin))<CR>", desc = "Set conditional breakpoint" },
+    { "<leader>db", "::lua require'dap'.toggle_breakpoint()<CR>", desc = "Toggle Breakpoint" },
+    { "<leader>dc", "::lua require'dap'.continue()<CR>", desc = "Continue / Start Debugging" },
+    { "<leader>di", ":lua require('dapui').eval(nil, {enter=true})<CR>", desc = "Inspect" },
+    { "<leader>dl", group = "List" },
+    { "<leader>dlb", ":FzfLua dap_breakpoints <CR>", desc = "List breakpoints" },
+    { "<leader>dlc", ":FzfLua dap_configurations<CR>", desc = "List configurations" },
+    { "<leader>dle", ":FzfLua dap_commands<CR>", desc = "List executables / commands" },
+    { "<leader>dlf", ":FzfLua dap_frames<CR>", desc = "List frames" },
+    { "<leader>dlv", ":FzfLua dap_variables<CR>", desc = "List variables" },
+    { "<leader>dq", "::lua require'dap'.close()<CR>", desc = "Quit Debugging" },
+    { "<leader>ds", group = "Step" },
+    { "<leader>dsi", "::lua require'dap'.step_into()<CR>", desc = "Step Down/In" },
+    { "<leader>dso", "::lua require'dap'.step_over()<CR>", desc = "Step Over" },
+    { "<leader>dsu", "::lua require'dap'.step_out()<CR>", desc = "Step Up/Out" },
+    { "<leader>du", group = "UI" },
+    { "<leader>dui", ":lua require'dapui'.toggle()<CR>", desc = "Toggle UI" },
+    { "<leader>duv", "::DapVirtualTextToggle <CR>", desc = "Toggle Virtual text" },
+    { "<leader>duw", ":lua require'dap.ui.widgets'.hover() <CR>", desc = "Widgets" },
+    { "<leader>e", group = "Errors / Diagnostics" },
+    { "<leader>ef", ":lua vim.lsp.buf.code_action()<CR>", desc = "Fix / code action" },
+    { "<leader>ei", ":lua vim.diagnostic.open_float()<CR>", desc = "Inspect" },
+    { "<leader>el", ":FzfLua diagnostics_workspace <CR>", desc = "List" },
+    { "<leader>en", ":lua vim.diagnostic.goto_next()<CR>", desc = "Next" },
+    { "<leader>ep", ":lua vim.diagnostic.goto_prev()<CR>", desc = "Previous" },
+    { "<leader>et", ":ToggleDiag<CR>", desc = "Toggle" },
+    { "<leader>f", group = "Files" },
+    { "<leader>fS", ":wa<CR>", desc = "Save all open buffers" },
+    { "<leader>ff", ":: lua vim.lsp.buf.format { async = true }<CR>", desc = "Format file" },
+    { "<leader>fs", ":w<CR>", desc = "Save file" },
+    { "<leader>g", group = "Git" },
+    { "<leader>gb", "<cmd>lua require 'gitsigns'.blame_line()<cr>", desc = "Blame" },
+    { "<leader>gj", "<cmd>lua require 'gitsigns'.next_hunk({navigation_message = false})<cr>", desc = "Next Hunk" },
+    { "<leader>gk", "<cmd>lua require 'gitsigns'.prev_hunk({navigation_message = false})<cr>", desc = "Prev Hunk" },
+    { "<leader>h", ":FzfLua buffers<CR>", desc = "History" },
+    { "<leader>m", ":FzfLua marks<CR>", desc = "Marks" },
+    { "<leader>o", ":FzfLua git_files<CR>", desc = "Open gited file" },
+    { "<leader>p", ":FzfLua commands<CR>", desc = "Open command pallet" },
+    { "<leader>q", ":q<CR>", desc = "Quit" },
+    { "<leader>r", ":lua require('persistence').load()<CR>", desc = "Restore last session" },
+    { "<leader>s", group = "Search" },
+    { "<leader>sF", ":FzfLua grep_project<CR>", desc = "Files Content" },
+    { "<leader>sb", ":FzfLua dap_breakpoints<CR>", desc = "List breakpoints" },
+    { "<leader>sf", ":FzfLua files<CR>", desc = "Files" },
+    { "<leader>sh", ":FzfLua buffers<CR>", desc = "History" },
+    { "<leader>sk", ":FzfLua keymaps<CR>", desc = "Keymaps" },
+    { "<leader>sp", ":FzfLua resume<CR>", desc = "Previous" },
+    { "<leader>ss", ":FzfLua grep_curbuf<CR>", desc = "Search in current file" },
+    { "<leader>t", group = "Toggle" },
+    { "<leader>ta", group = "All" },
+    { "<leader>tah", ':execute "setlocal nonumber norelativenumber" | execute "ToggleDiagOff" | execute "Gitsigns toggle_signs false | execute "Gitsigns toggle_current_line_blame false" <CR>', desc = "Hide" },
+    { "<leader>tas", ':execute "setlocal number relativenumber" | execute "ToggleDiagOn" | execute "Gitsigns toggle_signs true | execute "Gitsigns toggle_current_line_blame true" <CR>', desc = "Show" },
+    { "<leader>te", ":ToggleDiag<CR>", desc = "Errors/ Diagnostics" },
+    { "<leader>tl", group = "Lines" },
+    { "<leader>tlh", ":setlocal nonumber norelativenumber<CR>", desc = "Hide" },
+    { "<leader>tls", ":setlocal number relativenumber<CR>", desc = "Show" },
+    { "<leader>tt", "<cmd> FloatermNew --opener=edit yazi <CR>", desc = "File manager" },
+    { "<leader>w", "<cmd> :wa <CR>", desc = "Save all" },
+    { "<leader>y", group = "Yank" },
+    { "<leader>yF", "<cmd> let @+ = expand('%:p') <CR>", desc = "Yank full file path" },
+    { "<leader>yf", "<cmd> let @+ = expand('%') <CR>", desc = "Yank relative file path" },
+    { "<leader>z", group = "Fold" },
+    { "<leader>zM", "::lua require('ufo').closeAllFolds()<CR>", desc = "Close all folds" },
+    { "<leader>zR", "::lua require('ufo').openAllFolds()<CR>", desc = "Open all folds" },
+    { "<leader>/", ":CommentToggle<CR>", desc = "Comment", mode = "v" },
 
-    b = {
-      "::lua require'dap'.toggle_breakpoint()<CR>",
-      "Toggle Breakpoint",
-    },
-    B = {
-      "::lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint conditioin))<CR>",
-      "Set conditional breakpoint",
-    },
-    i = {
-      ":lua require('dapui').eval(nil, {enter=true})<CR>",
-      "Inspect",
-    },
-    u = {
-      name = "UI",
-      i = {
-        ":lua require'dapui'.toggle()<CR>",
-        "Toggle UI",
-      },
-      v = {
-        "::DapVirtualTextToggle <CR>",
-        "Toggle Virtual text",
-      },
-      w = {
-        ":lua  require'dap.ui.widgets'.hover() <CR>",
-        "Widgets",
-      },
-    },
-    ["<Right>"] = {
-      "::lua require'dap'.step_over()<CR>",
-      "Step Over",
-    },
-    ["<Down>"] = {
-      "::lua require'dap'.step_into()<CR>",
-      "Step Down/In",
-    },
-    ["<Up>"] = {
-      "::lua require'dap'.step_out()<CR>",
-      "Step Up/Out",
-    },
-    s = {
-      name = "Step",
-      o = {
-        "::lua require'dap'.step_over()<CR>",
-        "Step Over",
-      },
-      i = {
-        "::lua require'dap'.step_into()<CR>",
-        "Step Down/In",
-      },
-      u = {
-        "::lua require'dap'.step_out()<CR>",
-        "Step Up/Out",
-      },
-    },
-    c = {
-      "::lua require'dap'.continue()<CR>",
-      "Continue / Start Debugging",
-    },
-    q = {
-      "::lua require'dap'.close()<CR>",
-      "Quit Debugging",
-    },
-  },
-  e = {
-    name = "Errors / Diagnostics",
-    n = {
-      ":lua vim.diagnostic.goto_next()<CR>",
-      "Next",
-    },
-    p = {
-      ":lua vim.diagnostic.goto_prev()<CR>",
-      "Previous",
-    },
-    i = {
-      ":lua vim.diagnostic.open_float()<CR>",
-      "Inspect",
-    },
-    l = {
-      ":FzfLua diagnostics_workspace <CR>",
-      "List",
-    },
-    f = {
-      ":lua vim.lsp.buf.code_action()<CR>",
-      "Fix / code action",
-    },
-    t = {
-      ":ToggleDiag<CR>",
-      "Toggle",
-    },
-  },
-  f = {
-    name = "Files",
-    f = {
-      ":: lua vim.lsp.buf.format { async = true }<CR>",
-      "Format file",
-    },
-
-    s = {
-      ":w<CR>",
-      "Save file",
-    },
-    S = {
-      ":wa<CR>",
-      "Save all open buffers",
-    },
-  },
-  g = {
-    name = "Git",
-    j = { "<cmd>lua require 'gitsigns'.next_hunk({navigation_message = false})<cr>", "Next Hunk" },
-    k = { "<cmd>lua require 'gitsigns'.prev_hunk({navigation_message = false})<cr>", "Prev Hunk" },
-    b = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", "Blame" },
-  },
-  h = {
-    ":FzfLua buffers<CR>",
-    "History",
-  },
-  m = {
-    ":FzfLua marks<CR>",
-    "Marks",
-  },
-  o = {
-    ":FzfLua git_files<CR>",
-    "Open gited file",
-  },
-  O = {
-    ":FzfLua files<CR>",
-    "Open file ignore gitignore",
-  },
-  p = {
-    ":FzfLua commands<CR>",
-    "Open command pallet",
-  },
-  r = {
-    ":lua require('persistence').load()<CR>",
-    "Restore last session",
-  },
-  s = {
-    name = "Search",
-    s = {
-      ":FzfLua grep_curbuf<CR>",
-      "Search in current file",
-    },
-    h = {
-      ":FzfLua buffers<CR>",
-      "History",
-    },
-    p = {
-      ":FzfLua resume<CR>",
-      "Previous",
-    },
-    f = {
-      ":FzfLua files<CR>",
-      "Files",
-    },
-    F = {
-      ":FzfLua grep_project<CR>",
-      "Files Content",
-    },
-    k = {
-      ":FzfLua keymaps<CR>",
-      "Keymaps",
-    },
-
-    b = {
-      ":FzfLua dap_breakpoints<CR>",
-      "List breakpoints",
-    },
-  },
-  t = {
-    name = "Toggle",
-    t = {
-      "<cmd> FloatermNew --opener=edit yazi <CR>",
-      "File manager",
-    },
-    a = {
-      name = "All",
-      h = {
-        ':execute "setlocal nonumber norelativenumber" | execute "ToggleDiagOff" | execute "Gitsigns toggle_signs false | execute "Gitsigns toggle_current_line_blame false" <CR>',
-        "Hide",
-      },
-      s = {
-        ':execute "setlocal number relativenumber" | execute "ToggleDiagOn" | execute "Gitsigns toggle_signs true | execute "Gitsigns toggle_current_line_blame true" <CR>',
-        "Show",
-      },
-    },
-
-    l = {
-      name = "Lines",
-      h = {
-        ":setlocal nonumber norelativenumber<CR>",
-        "Hide",
-      },
-      s = {
-        ":setlocal number relativenumber<CR>",
-        "Show",
-      },
-    },
-    e = {
-      ":ToggleDiag<CR>",
-      "Errors/ Diagnostics",
-    },
-  },
-  w = {
-    "<cmd> :wa <CR>",
-    "Save all",
-  },
-  W = {
-    "<cmd> :w <CR>",
-    "Save ",
-  },
-  q = {
-    ":q<CR>",
-    "Quit",
-  },
-  Q = {
-    name = "Quit",
-    b = {
-      ":1,$bd!<CR>",
-      "Buffers",
-    },
-    q = {
-      ":q<CR>",
-      "Quit",
-    },
-    Q = {
-      ":qa<CR>",
-      "Quit All",
-    },
-  },
-  y = {
-    name = "Yank",
-    f = {
-      "<cmd> let @+ = expand('%')  <CR>",
-      "Yank relative file path",
-    },
-    F = {
-      "<cmd> let @+ = expand('%:p')  <CR>",
-      "Yank full file path",
-    },
-  },
-  z = {
-    name = "Fold",
-    R = {
-      "::lua require('ufo').openAllFolds()<CR>",
-      "Open all folds",
-    },
-    M = {
-      "::lua require('ufo').closeAllFolds()<CR>",
-      "Close all folds",
-    },
-  },
-  ["/"] = {
-    ":CommentToggle<CR>",
-    "Comment",
-  },
-}, { prefix = "<leader>" })
-
-wk.register({
-  c = copilot_bindings,
-  ["/"] = {
-    ":CommentToggle<CR>",
-    "Comment",
-  },
-}, { prefix = "<leader>", mode = "v" })
+  }
+)
 
 local map = vim.api.nvim_set_keymap
 map("n", "<C-w>m", [[: tab split<CR>]], {})
