@@ -41,9 +41,8 @@ return {
 				"html",
 				"astro",
 				"emmet_ls",
-				----'tailwindcss',
 				-- JS / TS
-				"tsserver",
+        "ts_ls",
 				-- Go
 				--"gopls",
 				-- Markdown

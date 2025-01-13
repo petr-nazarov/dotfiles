@@ -16,8 +16,8 @@ return {
       },
       files = { previewer = "bat" },
       grep = {
-        grep_opts = "--binary-files=without-match --line-number --recursive --color=auto --perl-regexp -e ",
-        rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096  -e",
+        rg_glob = true,
+        glob_flag = "--iglob"
       },
       manpages = { previewer = "man_native" },
       helptags = { previewer = "help_native" },
