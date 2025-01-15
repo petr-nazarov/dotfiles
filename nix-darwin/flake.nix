@@ -12,6 +12,10 @@
     configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
+      # fonts.packages = with pkgs; [
+      #   (nerdfonts.override { fonts = [ "FiraCode" ]; })
+      # ];
+
       homebrew = {
           enable = true;
           brews = [
@@ -64,8 +68,9 @@
       };
       environment.systemPackages =
         [ 
-          pkgs.vim
-          pkgs.cowsay
+          pkgs.nerd-fonts.fira-code  
+          # pkgs.vim
+          # pkgs.cowsay
 
         ];
 
