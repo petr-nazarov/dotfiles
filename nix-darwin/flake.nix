@@ -58,6 +58,8 @@
             "studio-3t"
             "google-cloud-sdk"
             "scroll-reverser" 
+            "zen-browser"
+            "karabiner-elements"
 
           ];
       };
