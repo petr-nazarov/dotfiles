@@ -12,6 +12,52 @@
     configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
+      homebrew = {
+          enable = true;
+          brews = [
+            "libomp"
+            "zlib"
+            "pyenv"
+            "choose-gui"
+            "doppler"
+            "gs"
+            "make"
+            "pkg-config"
+            "gcc" 
+            "sheldon" 
+            "stow"
+            "lf"
+            "eza" 
+            "bat" 
+            "fzf" 
+            "rg"
+            "fd"
+            "xclip" 
+            "procs" 
+            "btop"
+            "neovim"
+            "lazygit" 
+            "ripgrep" 
+            "yazi"
+            "moreutils"
+            "rbenv"
+            "ruby-build"
+            "fnm"
+            "starship"
+          ];
+      casks = [
+            "kitty"
+            "raycast"
+            "docker"
+            "anydesk"
+            "slack"
+            "studio-3t"
+            "google-cloud-sdk"
+            "scroll-reverser" 
+
+          ];
+      };
+
       services = {
           skhd.enable = true;
           yabai.enable = true;
@@ -25,6 +71,14 @@
 
       # Necessary for using flakes on this system.
       nix.settings.experimental-features = "nix-command flakes";
+
+      # Add the new WindowManager setting
+      system.defaults = {
+        WindowManager = {
+          EnableStandardClickToShowDesktop = false; # true = Always, false = Only in Stage Manager
+        };
+      };
+
 
       # Enable alternative shell support in nix-darwin.
       # programs.fish.enable = true;

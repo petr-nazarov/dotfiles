@@ -8,6 +8,10 @@ export PATH="$HOME/apps/bin:$PATH"
 # add Pulumi to the PATH
 export PATH=$PATH:$HOME/.pulumi/bin
 
+
+# brew starship
+export PATH="/opt/homebrew/opt/starship/bin:$PATH"
+
 #ruby
 if [ -f "$HOME/.rbenv/bin/rbenv" ]; then
   export PATH="$HOME/.rbenv/bin:$PATH"

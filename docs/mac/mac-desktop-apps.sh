@@ -4,12 +4,12 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install  make pkg-config gcc sheldon stow lf eza bat fzf rg fd xclip procs btop neovim lazygit ripgrep yazi dmenu moreutils
-brew install brave-browser transmission scroll-reverser kitty flameshot studio-3t  choose-gui
+brew install scroll-reverser kitty flameshot studio-3t  choose-gui
 brew install --cask raycast
 brew install --cask docker  
 brew install rbenv ruby-build
-rbenv install 3.2.2
-rbenv global 3.2.2
+rbenv install 3.4.1
+rbenv global 3.4.1
 
 ## node
 brew install fnm
@@ -19,7 +19,7 @@ npm i -g yarn eslint prettier typescript @johnnymorganz/stylua-bin tree-sitter n
 
 #pyehon
 curl https://pyenv.run | bash
-pyenv install 3.12 
+pyenv install 3.12
 pyenv global 3.12
 
 
@@ -35,5 +35,3 @@ echo "$(whoami) ALL=(root) NOPASSWD: sha256:$(shasum -a 256 $(which yabai) | cut
 
 
 curl -sS https://starship.rs/install.sh | sh
-
-LV_BRANCH='release-1.3/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.3/neovim-0.9/utils/installer/install.sh)
