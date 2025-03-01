@@ -1,6 +1,8 @@
 {
   description = "My nix config";
   inputs = {
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+
     nixpkgs-unstable = {
      url = "github:NixOS/nixpkgs/nixos-unstable";
     };
@@ -18,10 +20,13 @@
 
 
    
-  outputs = {self, nixpkgs, nixpkgs-unstable, home-manager, ...} : 
+  outputs = {self, nixpkgs, nixpkgs-unstable, home-manager, zen-browser, ...} : 
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
+      flakePackages = {
+           zen-browser = zen-browser;
+        };
       pkgs = import nixpkgs  {
         system = "x86_64-linux";
 	config.allowUnfree = true;
@@ -50,6 +55,7 @@
                   hostname = "desktop";
                   gui = true;
                 };
+                flakePackages = flakePackages;
                 pkgs-unstable = import nixpkgs-unstable {
                  inherit system;
                   config.allowUnfree = true;
@@ -65,6 +71,8 @@
                   hostname = "matebook";
                   gui = true;
                 };
+                flakePackages = flakePackages;
+
                 pkgs-unstable = import nixpkgs-unstable {
                  inherit system;
                   config.allowUnfree = true;
@@ -80,6 +88,7 @@
                   hostname = "dev-server";
                   gui = false;
                 };
+                flakePackages = flakePackages;
                 pkgs-unstable = import nixpkgs-unstable {
                  inherit system;
                   config.allowUnfree = true;
@@ -95,6 +104,7 @@
                   hostname = "home-server";
                   gui = true;
                 };
+                flakePackages = flakePackages;
                 pkgs-unstable = import nixpkgs-unstable {
                  inherit system;
                   config.allowUnfree = true;
