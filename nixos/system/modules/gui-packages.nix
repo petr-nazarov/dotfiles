@@ -38,6 +38,7 @@
       qbittorrent
       obs-studio
       moonlight-qt
+      obsidian
       flakePackages.zen-browser.packages."${systemSettings.shared.system}".default
   ];
 }
