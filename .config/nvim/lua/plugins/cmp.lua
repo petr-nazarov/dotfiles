@@ -9,10 +9,10 @@ return {
 		"hrsh7th/vim-vsnip",
 		"hrsh7th/cmp-vsnip",
 		{ "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
-		{
-			"CopilotC-Nvim/CopilotChat.nvim",
-			branch = "canary",
-		},
+		-- {
+		-- 	"CopilotC-Nvim/CopilotChat.nvim",
+		-- 	branch = "canary",
+		-- },
 		"zbirenbaum/copilot.lua",
 		"zbirenbaum/copilot-cmp",
 		-- Snippets
@@ -98,17 +98,5 @@ return {
 			panel = { enabled = false },
 		})
 		require("copilot_cmp").setup()
-		require("CopilotChat").setup({
-			window = {
-				layout = "vertical",
-				context = "buffer",
-				mappings = {
-					reset = {
-						normal = "",
-						insert = "",
-					},
-				},
-			},
-		})
 	end,
 }
