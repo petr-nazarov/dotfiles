@@ -48,6 +48,8 @@
             "ruby-build"
             "fnm"
             "starship"
+            "dust"
+            "gh"
           ];
       casks = [
             "kitty"

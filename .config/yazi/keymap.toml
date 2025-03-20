@@ -3,7 +3,7 @@
 "$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 [manager]
 keymap = [
-	{ on = [ "<Esc>" ], run = "escape",             desc = "Exit visual mode, clear selected, or cancel search" },
+	{ on = [ "<Esc>" ], run = "escape",             desc = "Exit visual mode, clear toggleed, or cancel search" },
 	{ on = [ "q" ],     run = "quit",               desc = "Exit the process" },
 	{ on = [ "Q" ],     run = "quit --no-cwd-file", desc = "Exit the process without writing cwd-file" },
 	{ on = [ "<C-q>" ], run = "close",              desc = "Close the current tab, or quit if it is last tab" },
@@ -29,8 +29,8 @@ keymap = [
 	{ on = [ "<PageUp>" ],     run = "arrow -100%", desc = "Move cursor up one page" },
 	{ on = [ "<PageDown>" ],   run = "arrow 100%",  desc = "Move cursor down one page" },
 
-	{ on = [ "h" ], run = [ "leave", "escape --visual --select" ], desc = "Go back to the parent directory" },
-	{ on = [ "l" ], run = [ "enter", "escape --visual --select" ], desc = "Enter the child directory" },
+	{ on = [ "h" ], run = [ "leave", "escape --visual --toggle" ], desc = "Go back to the parent directory" },
+	{ on = [ "l" ], run = [ "enter", "escape --visual --toggle" ], desc = "Enter the child directory" },
 
 	{ on = [ "H" ], run = "back",    desc = "Go back to the previous directory" },
 	{ on = [ "L" ], run = "forward", desc = "Go forward to the next directory" },
@@ -48,27 +48,27 @@ keymap = [
 	{ on = [ "g", "g" ], run = "arrow -99999999", desc = "Move cursor to the top" },
 	{ on = [ "G" ],      run = "arrow 99999999",  desc = "Move cursor to the bottom" },
 
-	# Selection
-	{ on = [ "<Space>" ], run = [ "select --state=none", "arrow 1" ], desc = "Toggle the current selection state" },
-	{ on = [ "v" ],       run = "visual_mode",                        desc = "Enter visual mode (selection mode)" },
+	# toggleion
+	{ on = [ "<Space>" ], run = [ "toggle --state=none", "arrow 1" ], desc = "Toggle the current toggleion state" },
+	{ on = [ "v" ],       run = "visual_mode",                        desc = "Enter visual mode (toggleion mode)" },
 	{ on = [ "V" ],       run = "visual_mode --unset",                desc = "Enter visual mode (unset mode)" },
-	{ on = [ "<C-a>" ],   run = "select_all --state=true",            desc = "Select all files" },
-	{ on = [ "<C-r>" ],   run = "select_all --state=none",            desc = "Inverse selection of all files" },
+	{ on = [ "<C-a>" ],   run = "toggle_all --state=true",            desc = "toggle all files" },
+	{ on = [ "<C-r>" ],   run = "toggle_all --state=none",            desc = "Inverse toggleion of all files" },
 
 	# Operation
-	{ on = [ "o" ],         run = "open",                                                 desc = "Open the selected files" },
-	{ on = [ "O" ],         run = "open --interactive",                                   desc = "Open the selected files interactively" },
-	{ on = [ "<Enter>" ],   run = "open",                                                 desc = "Open the selected files" },
-	{ on = [ "<C-Enter>" ], run = "open --interactive",                                   desc = "Open the selected files interactively" },
-	{ on = [ "y" ],         run = [ "yank", "escape --visual --select" ],                 desc = "Copy the selected files" },
-	{ on = [ "Y" ],         run = [ "unyank", "escape --visual --select" ],               desc = "Cancel the yank status of files" },
-	{ on = [ "x" ],         run = [ "yank --cut", "escape --visual --select" ],           desc = "Cut the selected files" },
+	{ on = [ "o" ],         run = "open",                                                 desc = "Open the toggleed files" },
+	{ on = [ "O" ],         run = "open --interactive",                                   desc = "Open the toggleed files interactively" },
+	{ on = [ "<Enter>" ],   run = "open",                                                 desc = "Open the toggleed files" },
+	{ on = [ "<C-Enter>" ], run = "open --interactive",                                   desc = "Open the toggleed files interactively" },
+	{ on = [ "y" ],         run = [ "yank", "escape --visual --toggle" ],                 desc = "Copy the toggleed files" },
+	{ on = [ "Y" ],         run = [ "unyank", "escape --visual --toggle" ],               desc = "Cancel the yank status of files" },
+	{ on = [ "x" ],         run = [ "yank --cut", "escape --visual --toggle" ],           desc = "Cut the toggleed files" },
 	{ on = [ "p" ],         run = "paste",                                                desc = "Paste the files" },
 	{ on = [ "P" ],         run = "paste --force",                                        desc = "Paste the files (overwrite if the destination exists)" },
 	{ on = [ "-" ],         run = "link",                                                 desc = "Symlink the absolute path of files" },
 	{ on = [ "_" ],         run = "link --relative",                                      desc = "Symlink the relative path of files" },
-	{ on = [ "d" ],         run = [ "remove", "escape --visual --select" ],               desc = "Move the files to the trash" },
-	{ on = [ "D" ],         run = [ "remove --permanently", "escape --visual --select" ], desc = "Permanently delete the files" },
+	{ on = [ "d" ],         run = [ "remove", "escape --visual --toggle" ],               desc = "Move the files to the trash" },
+	{ on = [ "D" ],         run = [ "remove --permanently", "escape --visual --toggle" ], desc = "Permanently delete the files" },
 	{ on = [ "a" ],         run = "create",                                               desc = "Create a file or directory (ends with / for directories)" },
 	{ on = [ "r" ],         run = "rename --cursor=before_ext",                           desc = "Rename a file or directory" },
 	{ on = [ ";" ],         run = "shell",                                                desc = "Run a shell command" },
@@ -167,12 +167,12 @@ keymap = [
 	{ on = [ "?" ], run = "help", desc = "Open help" }
 ]
 
-[select]
+[toggle]
 
 keymap = [
-	{ on = [ "<C-q>" ],   run = "close",          desc = "Cancel selection" },
-	{ on = [ "<Esc>" ],   run = "close",          desc = "Cancel selection" },
-	{ on = [ "<Enter>" ], run = "close --submit", desc = "Submit the selection" },
+	{ on = [ "<C-q>" ],   run = "close",          desc = "Cancel toggleion" },
+	{ on = [ "<Esc>" ],   run = "close",          desc = "Cancel toggleion" },
+	{ on = [ "<Enter>" ], run = "close --submit", desc = "Submit the toggleion" },
 
 	{ on = [ "k" ], run = "arrow -1", desc = "Move cursor up" },
 	{ on = [ "j" ], run = "arrow 1",  desc = "Move cursor down" },
@@ -202,7 +202,7 @@ keymap = [
 	{ on = [ "I" ], run = [ "move -999", "insert" ],             desc = "Move to the BOL, and enter insert mode" },
 	{ on = [ "A" ], run = [ "move 999", "insert --append" ],     desc = "Move to the EOL, and enter append mode" },
 	{ on = [ "v" ], run = "visual",                              desc = "Enter visual mode" },
-	{ on = [ "V" ], run = [ "move -999", "visual", "move 999" ], desc = "Enter visual mode and select all" },
+	{ on = [ "V" ], run = [ "move -999", "visual", "move 999" ], desc = "Enter visual mode and toggle all" },
 
 	# Character-wise movement
 	{ on = [ "h" ],       run = "move -1", desc = "Move back a character" },
@@ -237,12 +237,12 @@ keymap = [
 	{ on = [ "<A-d>" ], run = "kill forward",  desc = "Kill forwards to the end of the current word" },
 
 	# Cut/Yank/Paste
-	{ on = [ "d" ], run = "delete --cut",                              desc = "Cut the selected characters" },
+	{ on = [ "d" ], run = "delete --cut",                              desc = "Cut the toggleed characters" },
 	{ on = [ "D" ], run = [ "delete --cut", "move 999" ],              desc = "Cut until the EOL" },
-	{ on = [ "c" ], run = "delete --cut --insert",                     desc = "Cut the selected characters, and enter insert mode" },
+	{ on = [ "c" ], run = "delete --cut --insert",                     desc = "Cut the toggleed characters, and enter insert mode" },
 	{ on = [ "C" ], run = [ "delete --cut --insert", "move 999" ],     desc = "Cut until the EOL, and enter insert mode" },
 	{ on = [ "x" ], run = [ "delete --cut", "move 1 --in-operating" ], desc = "Cut the current character" },
-	{ on = [ "y" ], run = "yank",           desc = "Copy the selected characters" },
+	{ on = [ "y" ], run = "yank",           desc = "Copy the toggleed characters" },
 	{ on = [ "p" ], run = "paste",          desc = "Paste the copied characters after the cursor" },
 	{ on = [ "P" ], run = "paste --before", desc = "Paste the copied characters before the cursor" },
 
