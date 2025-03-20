@@ -1,8 +1,7 @@
 
-{ config, pkgs, systemSettings, ... }:
+{ config, pkgs, systemSettings, flakePackages, ... }:
 
 {
-
   nixpkgs.overlays = [
     (final: prev: {
       postman = prev.postman.overrideAttrs(old: rec {
@@ -39,5 +38,7 @@
       qbittorrent
       obs-studio
       moonlight-qt
+      obsidian
+      flakePackages.zen-browser.packages."${systemSettings.shared.system}".default
   ];
 }
