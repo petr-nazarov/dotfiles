@@ -11,7 +11,15 @@ apt-get install sudo -y \
 ## For debian
 sudo apt install -y wget make gcc git vim gcc build-essential unzip libevent-dev ncurses-dev bison pkg-config ninja-build gettext libtool libtool-bin autoconf automake cmake g++ curl gnupg2 dirmngr git-core zlib1g-dev libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev postfix  stow
 ## For arch
-yay -S --noconfirm linux-headers linux-headers-generic cronie stow openssh fuse
+sudo pacman -S openssh
+sudo systemctl enable sshd
+sudo systemctl start sshd
+yay -S --noconfirm linux-headers linux-headers-generic cronie stow fuse
+
+## if firewall present
+sudo ufw allow ssh
+sudo ufw enable
+
 systemctl enable --now cronie.service
 
 ## zsh
