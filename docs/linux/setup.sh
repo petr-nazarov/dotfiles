@@ -14,16 +14,26 @@ sudo apt install -y wget make gcc git vim gcc build-essential unzip libevent-dev
 sudo pacman -S openssh
 sudo systemctl enable sshd
 sudo systemctl start sshd
+# Install yay
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/yay-bin.git ~/apps/yay
+cd ~/apps/yay
+makepkg -si
+
+
 yay -S --noconfirm linux-headers linux-headers-generic cronie stow fuse
 
 ## if firewall present
 sudo ufw allow ssh
 sudo ufw enable
 
-systemctl enable --now cronie.service
+sudo systemctl enable --now cronie.service
 
 ## zsh
 sudo apt-get install -y zsh
+## or 
+yay -S zsh
+
 sudo chsh -s $(which zsh) \
 	chsh -s $(which zsh) \
 	cd ~/apps/ \
@@ -34,8 +44,8 @@ sudo chsh -s $(which zsh) \
 ## Python
 curl https://pyenv.run | bash
 source ~/.zshrc
-pyenv install 3.11.9
-pyenv global 3.11.9
+pyenv install 3.12.4
+pyenv global 3.12.4
 curl -sSL https://install.python-poetry.org | python 
 
 ## Ruby
