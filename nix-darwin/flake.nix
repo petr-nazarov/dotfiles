@@ -50,6 +50,7 @@
             "starship"
             "dust"
             "gh"
+            "shortcat"
           ];
       casks = [
             "kitty"

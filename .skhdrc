@@ -74,6 +74,9 @@ cmd + shift - 0 : yabai -m space --balance
 
 # # close focused window
 cmd + shift - q : yabai -m window --close
+cmd - w : # do nothing
+cmd - q : # do nothing
+cmd - m : # do nothing
 
 cmd - return : zsh -c "/opt/homebrew/bin/kitty -d ~"
 cmd - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | /opt/homebrew/bin/ifne awk '{print \$NF}' | xargs /Applications/Zen\\ Browser.app/Contents/MacOS/zen --new-tab " 
