@@ -6,19 +6,27 @@ sudo systemctl start sshd
 
 
 # Install yay
-sudo pacman -S --needed git base-devel
+sudo pacman -Syy --needed git base-devel
 git clone https://aur.archlinux.org/yay-bin.git ~/apps/yay
 cd ~/apps/yay
 makepkg -si
 
 # Install base packages
-yay -S --noconfirm linux-headers linux-headers-generic cronie stow fuse less zsh unzip
+yay -Syy --noconfirm linux-headers linux-headers-generic cronie stow fuse less zsh unzip
 # terminal programs
-yay -S --noconfirm fd ripgrep bat fzf xclip procs btop  pistol-git neovim layzygit asciidoctor libmagic-dev ffmpegthumbnailer unrar poppler less
+yay -Syy --noconfirm fd ripgrep bat fzf xclip procs btop  pistol-git neovim layzygit asciidoctor libmagic-dev ffmpegthumbnailer unrar poppler less nvim
 
 
 ## if firewall present
 sudo ufw allow ssh
 sudo ufw enable
-
+# Cron jobs
 sudo systemctl enable --now cronie.service
+
+# Docker 
+yay -Syy --noconfirm docker docker-compose
+sudo systemctl enable --now docker.service
+sudo usermod -aG docker $USER
+newgrp docker
+source ~/.zshrc
+
