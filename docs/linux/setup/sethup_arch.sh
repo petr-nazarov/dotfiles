@@ -12,9 +12,7 @@ cd ~/apps/yay
 makepkg -si
 
 # Install base packages
-yay -Syy --noconfirm linux-headers linux-headers-generic cronie stow fuse less zsh unzip
-# terminal programs
-yay -Syy --noconfirm fd ripgrep bat fzf xclip procs btop  pistol-git neovim layzygit asciidoctor libmagic-dev ffmpegthumbnailer unrar poppler less nvim
+yay -Syy --noconfirm base-devel linux-headers linux-headers-generic cronie stow fuse less zsh unzip wget curl fd ripgrep bat fzf xclip procs btop  pistol-git neovim layzygit asciidoctor libmagic-dev ffmpegthumbnailer unrar poppler less vi vim nvim tmux tmuxinator
 
 
 ## if firewall present
