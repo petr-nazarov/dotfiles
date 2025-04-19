@@ -34,3 +34,18 @@ if [ -d "$FNM_PATH" ]; then
   export PATH="/home/peter/.local/share/fnm:$PATH"
   eval "`fnm env`"
 fi
+
+# fnm
+FNM_PATH="/home/nazarov/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="/home/nazarov/.local/share/fnm:$PATH"
+  eval "`fnm env`"
+fi
+
+# pnpm
+export PNPM_HOME="/home/nazarov/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

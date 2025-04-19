@@ -4,6 +4,11 @@ chsh -s $(which zsh)
 cd ~/apps
 curl -sS https://starship.rs/install.sh | sh
 
+# Tmux plugins
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+tmux source ~/.tmux.conf
+
+
 ## Python
 curl https://pyenv.run | bash
 source ~/.zshrc
