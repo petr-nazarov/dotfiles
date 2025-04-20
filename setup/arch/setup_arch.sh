@@ -2,8 +2,6 @@
 # ssh 
 sudo pacman -S openssh
 
-
-
 # Install yay
 sudo pacman -Syy --needed git base-devel
 git clone https://aur.archlinux.org/yay-bin.git ~/apps/yay
