@@ -9,7 +9,7 @@ cd ~/apps/yay
 makepkg -si
 
 # Install base packages
-yay -Syy --noconfirm github-cli git base-devel linux-headers linux-headers-generic cronie stow fuse less zsh unzip wget curl fd ripgrep bat fzf xclip procs btop  pistol-git neovim layzygit asciidoctor libmagic-dev ffmpegthumbnailer unrar poppler less vi vim nvim tmux tmuxinator lazygit lazydocker
+yay -Syy --noconfirm github-cli git base-devel linux-headers linux-headers-generic cronie stow fuse less zsh unzip wget curl fd ripgrep bat fzf xclip procs btop  pistol-git neovim layzygit asciidoctor libmagic-dev ffmpegthumbnailer unrar poppler less vi vim nvim tmux tmuxinator lazygit lazydocker bind
 
 
 # Fonts
