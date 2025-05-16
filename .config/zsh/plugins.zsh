@@ -21,6 +21,8 @@ function ya() {
 #fnm 
 eval "$(fnm env --use-on-cd)"
 
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
 
 #pyenv 
 export PYENV_ROOT="$HOME/.pyenv"
