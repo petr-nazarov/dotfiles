@@ -1,0 +1,35 @@
+name: Dagger Security Scan
+on:
+  push:
+    # This empty 'branches' list or omitting it entirely
+    # triggers on pushes to ALL branches.
+    branches:
+      - "**"
+    # Optional: ignore tags to avoid double-runs on releases
+    tags-ignore:
+      - "**"
+  pull_request:
+
+jobs:
+  scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # Fetch-depth 0 is critical if you decide to
+          # add history-scanning (git) later.
+          fetch-depth: 0
+
+      - name: Run Dagger Scan
+        uses: dagger/dagger-for-github@v7
+        with:
+          verb: call
+          # Replace 'scan-secrets' with your actual function name
+          args: scan-secrets --source .
+        env:
+          # GITHUB_TOKEN is needed if your Dagger module
+          # talks back to GitHub (like posting comments).
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
