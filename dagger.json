@@ -1,5 +1,5 @@
 {
-  "name": "my-dotfiles",
+  "name": "dotfiles",
   "engineVersion": "v0.19.11",
   "sdk": {
     "source": "python"

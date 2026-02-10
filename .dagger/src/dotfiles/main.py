@@ -2,15 +2,16 @@ import dagger
 from dagger import dag, function, object_type, Directory
 
 @object_type
-class MyDotfiles:
+class Dotfiles:
     @function
     async def scan_secrets(self, source: Directory) -> str:
+        clean_source = source.without_directory(".git")
         # 1. Gitleaks Fix: Use the full path or just the subcommand 
         # because the binary is usually the entrypoint.
         gitleaks = (
             dag.container()
             .from_("zricethezav/gitleaks:latest")
-            .with_mounted_directory("/src", source)
+            .with_mounted_directory("/src", clean_source)
             .with_workdir("/src")
             # We use 'gitleaks' explicitly here as the command
             .with_exec(["gitleaks", "detect", "--verbose", "--source", "."])
@@ -20,7 +21,7 @@ class MyDotfiles:
         trufflehog = (
             dag.container()
             .from_("trufflesecurity/trufflehog:latest")
-            .with_mounted_directory("/src", source)
+            .with_mounted_directory("/src", clean_source)
             .with_workdir("/src")
             .with_exec(["trufflehog", "filesystem", ".", "--fail"])
         )
