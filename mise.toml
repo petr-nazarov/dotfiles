@@ -1,0 +1,8 @@
+[tools]
+editorconfig-checker = "latest"
+just = "latest"
+pre-commit = "latest"
+prettier = "latest"
+shfmt = "latest"
+stylua = "latest"
+taplo = "latest"

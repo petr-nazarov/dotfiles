@@ -1,0 +1,17 @@
+name: dotfiles
+startup_window: dotfiles
+windows:
+  - secrets:
+      layout: main-horizontal
+      root: ~/.secrets
+      panes:
+        - editor:
+            - nvim
+        - term:
+  - dotfiles:
+      layout: main-horizontal
+      root: ~/dotfiles
+      panes:
+        - editor:
+            - nvim
+        - term:

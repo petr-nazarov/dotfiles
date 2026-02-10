@@ -1,0 +1,26 @@
+[tools]
+python = "3.12.8"
+go = "latest"
+rust = "latest"
+node = "24.13.0"
+pnpm = "latest"
+bun = "latest"
+sops = "latest"
+age = "latest"
+
+starship = "latest"
+fzf = "latest"
+fd = "latest"
+jq = "latest"
+ripgrep = "latest"
+direnv = "latest"
+bat = "latest"
+eza = "latest"
+delta = "latest"
+tmux = "latest"
+yazi = "latest"
+lazygit = "latest"
+lazydocker = "latest"
+
+[tasks.deploy]
+run = "echo 'Deploying dotfiles...'"

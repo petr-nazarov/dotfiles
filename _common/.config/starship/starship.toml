@@ -1,0 +1,113 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+format = """
+$nix_shell\
+$hostname\
+$shlvl\
+$singularity\
+$kubernetes\
+$directory\
+$vcsh\
+❯ \
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$hg_branch\
+$fill \ 
+$docker_context\
+$package\
+$c\
+$cmake\
+$cobol\
+$daml\
+$dart\
+$deno\
+$dotnet\
+$elixir\
+$elm\
+$erlang\
+$golang\
+$haskell\
+$helm\
+$java\
+$julia\
+$kotlin\
+$lua\
+$nim\
+$nodejs\
+$ocaml\
+$perl\
+$php\
+$pulumi\
+$purescript\
+$python\
+$raku\
+$rlang\
+$red\
+$ruby\
+$rust\
+$scala\
+$swift\
+$terraform\
+$vlang\
+$vagrant\
+$zig\
+$buf\
+$conda\
+$spack\
+$memory_usage\
+$aws\
+$gcloud\
+$openstack\
+$azure\
+$env_var\
+$crystal\
+$custom\
+$sudo\
+$cmd_duration\
+$jobs\
+$time 
+$battery\
+$status\
+$container\
+$shell\
+$character
+"""
+
+# Inserts a blank line between shell prompts
+# add_newline = true
+
+[fill]
+symbol = " "
+
+[git_branch]
+format = "[$symbol$branch(:$remote_branch)]($style) "
+
+[hostname]
+format = "[$ssh_symbol$hostname: ](bold green)"
+ssh_symbol = '🌐'
+
+[pulumi]
+format = "[$symbol($username@)$stack]($style) "
+
+[gcloud]
+format = "'[$symbol$account(@$domain))]($style) '"
+disabled = true
+
+[nodejs]
+format = "[$symbol($version )]($style)"
+
+[package]
+format = "[$symbol$version]($style) "
+[memory_usage]
+symbol = " "
+format = "$symbol[${ram}( | ${swap})]($style) "
+threshold = 70
+style = "bold red"
+disabled = false
+
+[time]
+format = "[$time]($style) "
+disabled = false

@@ -1,0 +1,13 @@
+name: momentick
+root: ~/Projects/Momentick/momentick-monorepo-copy
+startup_window: monorepo
+windows:
+  - ai:
+      layout: main-horizontal
+      panes:
+        - run:
+  - monorepo:
+      layout: main-horizontal
+      panes:
+        - main:
+        - run:

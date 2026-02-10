@@ -1,0 +1,19 @@
+name: Personal
+root: ~/Projects/Personal
+startup_window: personal
+windows:
+  - personal:
+      layout: main-horizontal
+      panes:
+        - editor:
+        - term:
+  - personal1:
+      layout: main-horizontal
+      panes:
+        - editor:
+        - term:
+  - personal2:
+      layout: main-horizontal
+      panes:
+        - editor:
+        - term:

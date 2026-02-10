@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2 # Use the latest version
+    hooks:
+      - id: gitleaks
+  - repo: local
+    hooks:
+      - id: just-fix
+        name: just fix
+        entry: just fix
+        language: system
+        pass_filenames: false # 'just lint' scans the whole project anyway
+        stages: [commit]

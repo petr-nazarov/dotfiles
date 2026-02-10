@@ -1,0 +1,90 @@
+cmd - h : yabai -m window --focus west
+cmd - j : yabai -m window --focus south
+cmd - k : yabai -m window --focus north
+cmd - l : yabai -m window --focus east
+# (alt) change focus (using arrow keys)
+cmd - left  : yabai -m window --focus west
+cmd - down  : yabai -m window --focus south
+cmd - up    : yabai -m window --focus north
+cmd - right : yabai -m window --focus east
+
+
+# shift window in current workspace
+cmd + shift - h : yabai -m window --swap west || $(yabai -m window --display west; yabai -m display --focus west)
+cmd + shift - j : yabai -m window --swap south || $(yabai -m window --display south; yabai -m display --focus south)
+cmd + shift - k : yabai -m window --swap north || $(yabai -m window --display north; yabai -m display --focus north)
+cmd + shift - l : yabai -m window --swap east || $(yabai -m window --display east; yabai -m display --focus east)
+# alternatively, use the arrow keys
+cmd + shift - left : yabai -m window --swap west || $(yabai -m window --display west; yabai -m display --focus west)
+cmd + shift - down : yabai -m window --swap south || $(yabai -m window --display south; yabai -m display --focus south)
+cmd + shift - up : yabai -m window --swap north || $(yabai -m window --display north; yabai -m display --focus north)
+cmd + shift - right : yabai -m window --swap east || $(yabai -m window --display east; yabai -m display --focus east)
+
+# set insertion point in focused container
+cmd + ctrl - h : yabai -m window --insert west
+cmd + ctrl - j : yabai -m window --insert south
+cmd + ctrl - k : yabai -m window --insert north
+cmd + ctrl - l : yabai -m window --insert east
+# (alt) set insertion point in focused container using arrows
+cmd + ctrl - left  : yabai -m window --insert west
+cmd + ctrl - down  : yabai -m window --insert south
+cmd + ctrl - up    : yabai -m window --insert north
+cmd + ctrl - right : yabai -m window --insert east
+
+# #  focus on space
+cmd - 1 : yabai -m space --focus 1
+cmd - 2 : yabai -m space --focus 2
+cmd - 3 : yabai -m space --focus 3
+cmd - 4 : yabai -m space --focus 4
+cmd - 5 : yabai -m space --focus 5
+cmd - 6 : yabai -m space --focus 6
+cmd - 7 : yabai -m space --focus 7
+cmd - 8 : yabai -m space --focus 8
+cmd - 9 : yabai -m space --focus 9
+cmd - 0 : yabai -m space --focus 10
+cmd - tab : yabai -m space --focus 9 
+cmd - 0xC0 : yabai -m space --focus 11 # 0x0A is the hex value for the § key
+
+# move focused window to next/prev workspace
+cmd + shift - 1 : yabai -m window --space 1
+cmd + shift - 2 : yabai -m window --space 2
+cmd + shift - 3 : yabai -m window --space 3
+cmd + shift - 4 : yabai -m window --space 4
+cmd + shift - 5 : yabai -m window --space 5
+cmd + shift - 6 : yabai -m window --space 6
+cmd + shift - 7 : yabai -m window --space 7
+cmd + shift - 8 : yabai -m window --space 8
+cmd + shift - 9 : yabai -m window --space 9
+cmd + shift - 0 : yabai -m window --space 10
+cmd + shift - tab : yabai -m window --space 9 
+cmd + shift - 0xC0 : yabai -m window --space 11 # 0x0A is the hex value for the § key
+# # mirror tree y-axis
+cmd + shift - y : yabai -m space --mirror y-axis
+
+# # mirror tree x-axis
+cmd + shift - x : yabai -m space --mirror x-axis
+
+# balance size of windows
+cmd + shift - 0 : yabai -m space --balance
+
+# # change layout of desktop
+# cmd - e : yabai -m space --layout bsp
+# cmd - l : yabai -m space --layout float
+# cmd - s : yabai -m space --layout stack
+
+# # close focused window
+cmd + shift - q : yabai -m window --close
+cmd - w : # do nothing
+cmd - q : # do nothing
+cmd - m : # do nothing
+
+cmd - return : alacritty msg create-window || open /Applications/Alacritty.app
+cmd - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | /opt/homebrew/bin/ifne awk '{print \$NF}' | xargs /Applications/Zen\\ Browser.app/Contents/MacOS/zen --new-tab " 
+cmd + shift - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | awk '{print \$NF}'  |  pbcopy"
+
+# # enter fullscreen mode for the focused container
+# cmd - f : yabai -m window --toggle zoom-fullscreen
+
+# # toggle window native fullscreen
+# cmd + shift - f : yabai -m window --toggle native-fullscreen
+

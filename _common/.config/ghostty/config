@@ -1,0 +1,15 @@
+theme=catppuccin-macchiato.conf
+font-size = 20
+font-family = "Fira Code"
+font-thicken = true
+#font-style = "Regular"
+clipboard-read = allow
+clipboard-write = allow
+copy-on-select = true
+clipboard-paste-protection = false
+confirm-close-surface = false
+shell-integration-features = sudo
+term="xterm-256color"
+
+
+keybind = shift+enter=text:\x1b\r
