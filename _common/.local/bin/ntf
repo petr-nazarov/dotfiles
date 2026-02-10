@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+xargs -I{} curl -d {} $NTFY_AUTH_URL/general

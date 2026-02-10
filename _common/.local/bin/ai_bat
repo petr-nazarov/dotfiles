@@ -1,0 +1,42 @@
+#!/usr/bin/env zsh
+
+# 3. Logic for Pattern Selection (Checking the new $1)
+case "$1" in
+code)
+	PATTERN="explain_code"
+	shift # Remove 'code' from arguments
+	;;
+typo)
+	PATTERN="fix_typos"
+	shift # Remove 'typo' from arguments
+	;;
+translate)
+	PATTERN="translate"
+	shift # Remove from arguments
+	;;
+esac
+
+# 3. Handle Input (The "Big/Complex" Input Fix)
+# If there are arguments left, use them.
+# If not, or if data is being piped in, read from STDIN.
+if [ -t 0 ]; then
+	# No pipe detected, use remaining arguments
+	PROMPT="$*"
+else
+	# Pipe detected (multiline/complex data)
+	# We combine arguments AND stdin for maximum flexibility
+	PROMPT="$* $(cat)"
+fi
+
+# 4. Error check
+if [[ -z "${PROMPT// /}" ]]; then
+	echo "Usage: ?? [code|typo] <prompt or piped input>"
+	exit 1
+fi
+
+# 5. Execute Fabric and buffer the response
+# Using a variable ensures Neovim doesn't open until Gemini is finished
+# echo "$PROMPT" | fabric -s --model="qwen3-coder:30b" -p "raw_query" | bat -l markdown --pager=never
+# echo "$PROMPT" | fabric -s --model="gpt-oss:20b" -p "raw_query" | bat -l markdown --pager=never
+
+echo "$PROMPT" | fabric -s --model="qwen3-64k:latest" -p "raw_query" | bat -l markdown --pager=never

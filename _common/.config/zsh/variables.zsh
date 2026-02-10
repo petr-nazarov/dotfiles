@@ -4,7 +4,6 @@ export SHELL=zsh
 export EDITOR=nvim
 export BROWSER=zen-browser
 
-export PATH="$HOME/dotfiles/scripts:$PATH"
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
 # FZF

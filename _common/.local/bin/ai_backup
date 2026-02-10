@@ -1,0 +1,73 @@
+#!/usr/bin/env zsh
+
+# 1. Capture the caller type only if it matches ?? or ???
+case "$1" in
+"??" | "???")
+	CALLER_TYPE="$1"
+	shift # Only remove from the argument list if it matched
+	;;
+*)
+	# Optional: Default value if no marker is found
+	CALLER_TYPE="default"
+	;;
+esac
+
+PATTERN="raw_query"
+USE_NVIM=false
+
+# 2. Logic for Output Destination
+if [[ "$CALLER_TYPE" == "???" ]]; then
+	USE_NVIM=true
+fi
+
+# 3. Logic for Pattern Selection (Checking the new $1)
+case "$1" in
+code)
+	PATTERN="explain_code"
+	shift # Remove 'code' from arguments
+	;;
+typo)
+	PATTERN="fix_typos"
+	shift # Remove 'typo' from arguments
+	;;
+translate)
+	PATTERN="translate"
+	shift # Remove from arguments
+	;;
+esac
+
+# 3. Handle Input (The "Big/Complex" Input Fix)
+# If there are arguments left, use them.
+# If not, or if data is being piped in, read from STDIN.
+if [ -t 0 ]; then
+	# No pipe detected, use remaining arguments
+	PROMPT="$*"
+else
+	# Pipe detected (multiline/complex data)
+	# We combine arguments AND stdin for maximum flexibility
+	PROMPT="$* $(cat)"
+fi
+
+# 4. Error check
+if [[ -z "${PROMPT// /}" ]]; then
+	echo "Usage: ?? [code|typo] <prompt or piped input>"
+	exit 1
+fi
+
+# 5. Execute Fabric and buffer the response
+# Using a variable ensures Neovim doesn't open until Gemini is finished
+RESPONSE=$(echo "$PROMPT" | fabric-ai -p "$PATTERN")
+
+## Load full prompt
+#PATTERN_PROMPT=$(cat "$HOME/.config/fabric/patterns/${PATTERN}/system.md")
+#FULL_PROMPT="${PATTERN_PROMPT}${PROMPT}"
+
+# RESPONSE=$(gemini -m gemini-2.5-flash -s=restrictive-open -p "$FULL_PROMPT")
+# RESPONSE=$( opencode -m github-copilot/gpt-4.1 --agent plan run "${FULL_PROMPT}" )
+
+# 6. Route Output
+if [ "$USE_NVIM" = true ]; then
+	echo "$RESPONSE" | nvim -c "set ft=markdown buftype=nowrite nobackup noswapfile noundofile" -
+else
+	echo "$RESPONSE"
+fi

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# 1. Use --cached to see what you are actually about to commit
+# If you use 'git diff' without --cached, it looks at unstaged changes,
+# but 'git commit' only commits staged changes!
+DIFF_CONTENT=$(git diff --cached)
+
+if [ -z "$DIFF_CONTENT" ]; then
+	echo "No staged changes found. Use 'git add' first."
+	exit 1
+fi
+
+echo "Fabric is generating your message..."
+
+# 2. Get the AI message
+# GIT_MESSAGE=$(echo "$DIFF_CONTENT" | fabric -m "llama3.1:8b" -p "create_git_commit_message_from_diff")
+GIT_MESSAGE=$(echo "$DIFF_CONTENT" | fabric -m "qwen3-64k:latest" -p "create_git_commit_message_from_diff")
+
+echo $GIT_MESSAGE
+# 3. Create a temp file
+TEMP_MSG_FILE=$(mktemp)
+echo "$GIT_MESSAGE" >"$TEMP_MSG_FILE"
+
+# 4. The Magic Command
+# -F takes the message from the file
+# -e opens your editor (Neovim/Vim) so you can edit it
+git commit -e -F "$TEMP_MSG_FILE"
+
+# 5. Cleanup
+rm "$TEMP_MSG_FILE"

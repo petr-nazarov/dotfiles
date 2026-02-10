@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+CMD="$*"
+
+if [ -z "$CMD" ]; then
+	echo "No command provided" >&2
+	exit 1
+fi
+
+# Ensure Wayland + user env
+export XDG_SESSION_TYPE=wayland
+export WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+
+# Launch terminal and run command
+ghostty -e sh -lc "$CMD"
