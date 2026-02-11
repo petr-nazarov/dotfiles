@@ -24,3 +24,6 @@ lazydocker = "latest"
 
 [tasks.deploy]
 run = "echo 'Deploying dotfiles...'"
+
+[settings]
+experimental = true

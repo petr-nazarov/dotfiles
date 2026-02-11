@@ -61,6 +61,10 @@ opt.splitbelow = true -- bool: Place new window below the current one
 -- auto format
 vim.g.autoformat = true
 
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = "*.yml.j2",
+  command = "set filetype=yaml.jinja2",
+})
 -- vim.api.nvim_create_autocmd("BufWritePre", {
 --   callback = function()
 --     vim.lsp.buf.format({
