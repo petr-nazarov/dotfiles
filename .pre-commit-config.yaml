@@ -11,4 +11,4 @@ repos:
         entry: just fix
         language: system
         pass_filenames: false  # 'just lint' scans the whole project anyway
-        stages: [commit]
+        stages: [pre-commit]
