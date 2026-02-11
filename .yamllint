@@ -1,0 +1,11 @@
+---
+extends: default
+
+rules:
+  line-length:
+    max: 130
+    allow-non-breakable-words: true  # Recommended: ignores long URLs/Paths
+    allow-non-breakable-inline-mappings: true
+  truthy:
+    # This allows 'on' to be used without quotes
+    check-keys: false # This stops the linter from yelling at 'on:' keys

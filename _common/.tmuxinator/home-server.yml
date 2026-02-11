@@ -1,3 +1,4 @@
+---
 name: home-server
 root: ~/Projects/Personal/home-network
 startup_window: home-server

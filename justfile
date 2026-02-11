@@ -21,32 +21,22 @@ unsync:
 
 # Run all linters and formatters
 lint:
-    just lint-lua
-    just lint-toml
-    just lint-json-yaml
-    # just lint-generic
-
-lint-lua:
     stylua --check .
+    taplo lint --check
+    ymllint .
 
-lint-toml:
-    taplo fmt --check
+lint-fix:
+    stylua  .
+    taplo lint
+    yamllint .
 
-lint-json-yaml:
-    prettier --check "**/*.{json,yml,yaml}"
-
-# lint-generic:
-#   ec # Automatically fix what can be fixed
 format:
     stylua .
     taplo fmt
     shfmt -w .
-    prettier --write "**/*.{json,yml,yaml}"
 fix:
+  just lint-fix
   just format
-  git add .
-  just lint
-  git add .
 # Run full automated ci workflow in dagger, usefull for testing ci
 ci:
   dagger call lint --source .

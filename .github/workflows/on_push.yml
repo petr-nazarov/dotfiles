@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+---
 name: Dagger Security Scan
 on:
   push:
@@ -29,17 +31,17 @@ jobs:
           # Replace 'scan-secrets' with your actual function name
           args: scan-secrets --source .
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
-      # 2. Notify on Failure
       - name: Notify on Failure
-        if: failure() # <--- This is the GitHub "magic"
+        if: failure()
         run: |
+          # Use backslashes to break the URL and parameters onto new lines
           curl -X POST "${{ secrets.NOTIF_SERVER }}/message?token=${{ secrets.NOTIF_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "title": "❌ CI Secrets scan Failure: '"${{ github.repository }}"'",
-            "message": "The Dagger pipeline failed on branch '"${{ github.ref_name }}"'. Check the logs for details.",
-            "priority": 8
-          }'
+            -H "Content-Type: application/json" \
+            -d '{
+              "title": "❌ CI Secrets scan Failure: ${{ github.repository }}",
+              "message": "The Dagger pipeline failed on branch ${{ github.ref_name }}. Check logs.",
+              "priority": 8
+            }'
   lint:
     name: Lint
     runs-on: ubuntu-latest
