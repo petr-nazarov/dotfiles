@@ -17,7 +17,7 @@ just unsync # unsync dotfiles
 ## Structure:
 - '_common' - the content of this folder will be linked to your home repo. Platform independent configs are stored here.
 - '_linux' - the content of this folder will be linked to your home repo. Only configs specific to linux os will be stored here
-- '_macos' - the content of this folder will be linked to your home repo. Only configs specific to MacOS os will be stored here
+- '_mac' - the content of this folder will be linked to your home repo. Only configs specific to MacOS os will be stored here
 ## Gotchas
 - Dont forget to install tmux plugins In tmux click `ctrl+a I`
 
