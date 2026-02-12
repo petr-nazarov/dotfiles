@@ -1,3 +1,6 @@
+init:
+  pre-commit install
+
 [linux]
 sync:
   stow  -t "$HOME" _common
