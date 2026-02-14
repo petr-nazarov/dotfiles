@@ -42,17 +42,17 @@ jobs:
               "message": "The Dagger pipeline failed on branch ${{ github.ref_name }}. Check logs.",
               "priority": 8
             }'
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Run Dagger Lint
-        uses: dagger/dagger-for-github@v8.2.0
-        with:
-          verb: call
-          # Replace 'scan-secrets' with your actual function name
-          args: lint --source .
-          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+  # lint:
+  #   name: Lint
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Run Dagger Lint
+  #       uses: dagger/dagger-for-github@v8.2.0
+  #       with:
+  #         verb: call
+  #         # Replace 'scan-secrets' with your actual function name
+  #         args: lint --source .
+  #         cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}

@@ -58,7 +58,7 @@
   "cpu": {
     "interval": 5,
     "format": "󰍛",
-    "on-click": "$HOME/dotfiles/scripts/run-in-new-term btop"
+    "on-click": "$HOME/.local/bin/run-in-new-term btop"
   },
   "clock": {
     "format": "{:%d.%m.%Y %H:%M %a}",
@@ -83,7 +83,7 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "$HOME/dotfiles/scripts/run-in-new-term impala"
+    "on-click": "$HOME/.local/bin/run-in-new-term impala"
   },
   "battery": {
     "format": "{capacity}% {icon}",
@@ -132,7 +132,7 @@
     "format-connected": "󰂱",
     "format-no-controller": "",
     "tooltip-format": "Devices connected: {num_connections}",
-    "on-click": "$HOME/dotfiles/scripts/run-in-new-term bluetui"
+    "on-click": "$HOME/.local/bin/run-in-new-term bluetui"
   },
   "pulseaudio": {
     "format": "{volume}% {icon}",
@@ -152,7 +152,7 @@
         "󰕾"
       ]
     },
-    "on-click": "$HOME/dotfiles/scripts/run-in-new-term wiremix",
+    "on-click": "$HOME/.local/bin/run-in-new-term wiremix",
     "on-click-right": "systemctl --user restart wireplumber",
     "tooltip-format": "Playing at {volume}%",
     "scroll-step": 5,
