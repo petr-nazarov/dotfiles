@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+# 3. Handle Input (The "Big/Complex" Input Fix)
+# If there are arguments left, use them.
+# If not, or if data is being piped in, read from STDIN.
+if [ -t 0 ]; then
+	# No pipe detected, use remaining arguments
+	PROMPT="$*"
+else
+	# Pipe detected (multiline/complex data)
+	# We combine arguments AND stdin for maximum flexibility
+	PROMPT="$* $(cat)"
+fi
+
+MODEL="claude-haiku-4-5"
+echo "$PROMPT" | fabric -s --model="$MODEL" -p "code_gen"

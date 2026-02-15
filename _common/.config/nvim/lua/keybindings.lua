@@ -1,4 +1,6 @@
 local wk = require("which-key")
+
+
 copilot_bindings = {
   name = "Copilot",
   c = {
