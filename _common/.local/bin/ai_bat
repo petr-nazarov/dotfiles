@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-
 # 3. Logic for Pattern Selection (Checking the new $1)
 case "$1" in
 code)
@@ -34,9 +33,10 @@ if [[ -z "${PROMPT// /}" ]]; then
 	exit 1
 fi
 
+MODEL="claude-haiku-4-5"
 # 5. Execute Fabric and buffer the response
 # Using a variable ensures Neovim doesn't open until Gemini is finished
 # echo "$PROMPT" | fabric -s --model="qwen3-coder:30b" -p "raw_query" | bat -l markdown --pager=never
 # echo "$PROMPT" | fabric -s --model="gpt-oss:20b" -p "raw_query" | bat -l markdown --pager=never
 
-echo "$PROMPT" | fabric -s --model="qwen3-64k:latest" -p "raw_query" | bat -l markdown --pager=never
+echo "$PROMPT" | fabric -s --model="$MODEL" -p "raw_query" | bat -l markdown --pager=never

@@ -11,10 +11,10 @@ if [ -z "$DIFF_CONTENT" ]; then
 fi
 
 echo "Fabric is generating your message..."
-
+MODEL="claude-haiku-4-5"
 # 2. Get the AI message
 # GIT_MESSAGE=$(echo "$DIFF_CONTENT" | fabric -m "llama3.1:8b" -p "create_git_commit_message_from_diff")
-GIT_MESSAGE=$(echo "$DIFF_CONTENT" | fabric -m "qwen3-64k:latest" -p "create_git_commit_message_from_diff")
+GIT_MESSAGE=$(echo "$DIFF_CONTENT" | fabric -m "$MODEL" -p "create_git_commit_message_from_diff")
 
 echo $GIT_MESSAGE
 # 3. Create a temp file
