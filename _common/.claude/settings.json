@@ -1,0 +1,37 @@
+{
+  "apiKeyHelper": "source .secrets/non-sync.zsh && echo $ANTHROPIC_API_KEY",
+  "model": "opus",
+   "hooks": {
+  "UserPromptSubmit": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.claude/ccnotify/ccnotify.py UserPromptSubmit"
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.claude/ccnotify/ccnotify.py Stop"
+        }
+      ]
+    }
+  ],
+  "Notification": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.claude/ccnotify/ccnotify.py Notification"
+        }
+      ]
+    }
+  ]
+}
+
+}
