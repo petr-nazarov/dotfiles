@@ -1,7 +1,7 @@
 ---
-name: home-server
-root: ~/Projects/Personal/home-network
-startup_window: home-server
+name: infrastructure 
+root: ~/Projects/Personal/infrastructure
+startup_window: infrastructure
 windows:
   - home-server:
       layout: main-horizontal

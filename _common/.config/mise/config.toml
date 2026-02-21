@@ -21,6 +21,7 @@ tmux = "latest"
 yazi = "latest"
 lazygit = "latest"
 lazydocker = "latest"
+crush = "latest"
 
 [tasks.deploy]
 run = "echo 'Deploying dotfiles...'"
