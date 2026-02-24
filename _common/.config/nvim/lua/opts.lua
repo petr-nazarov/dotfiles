@@ -27,7 +27,8 @@ vim.api.nvim_command("set spell")
 
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.signcolumn = "number"
+vim.opt.signcolumn = "yes"
+vim.opt.statuscolumn = "%s%=%{v:lnum} %{v:relnum} "
 
 -- [[ Filetypes ]]
 vim.api.nvim_command("filetype plugin  on")

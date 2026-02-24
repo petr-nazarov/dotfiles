@@ -53,34 +53,50 @@ wk.add(
         local file = vim.fn.expand("%:p") -- Absolute pa
         local line = vim.fn.line(".")
         local cmd = string.format("b %s:%s", file, line)
-        vim.fn.setreg("+", cmd)   -- Yank to system clipboard
+        vim.fn.setreg("+", cmd)       -- Yank to system clipboard
         vim.notify("Yanked: " .. cmd) -- Visual feedback
       end,
       desc = "Yank pdb command"
     },
 
-    { "<leader>e",   group = "Errors / Diagnostics" },
-    { "<leader>ef",  ":lua vim.lsp.buf.code_action()<CR>",                                                                                                                                       desc = "Fix / code action" },
-    { "<leader>ei",  ":lua vim.diagnostic.open_float()<CR>",                                                                                                                                     desc = "Inspect" },
-    { "<leader>el",  ":FzfLua diagnostics_workspace <CR>",                                                                                                                                       desc = "List" },
-    { "<leader>en",  ":lua vim.diagnostic.goto_next()<CR>",                                                                                                                                      desc = "Next" },
-    { "<leader>ep",  ":lua vim.diagnostic.goto_prev()<CR>",                                                                                                                                      desc = "Previous" },
-    { "<leader>et",  ":ToggleDiag<CR>",                                                                                                                                                          desc = "Toggle" },
-    { "<leader>f",   group = "Files" },
-    { "<leader>fS",  ":wa<CR>",                                                                                                                                                                  desc = "Save all open buffers" },
-    { "<leader>ff",  ":: lua vim.lsp.buf.format { async = true }<CR>",                                                                                                                           desc = "Format file" },
-    { "<leader>fs",  ":w<CR>",                                                                                                                                                                   desc = "Save file" },
-    { "<leader>g",   group = "Git" },
-    { "<leader>gd",   group = "Git Diff" },
-    { "<leader>gdd",  "<cmd>:DiffviewOpen<cr>",                                                                                                                             desc = "Show diffview" },
-    { "<leader>gdr",  "<cmd>:DiffviewRefresh<cr>",                                                                                                                             desc = "Refresh diffview" },
-    { "<leader>gdh",  "<cmd>:DiffviewFileHistory %<cr>",                                                                                                                             desc = "File History" },
-    { "<leader>gdq",  "<cmd>:DiffviewClose<cr>",                                                                                                                             desc = "Close Diffview" },
-    { "<leader>gi",  "<cmd>lua require 'gitsigns'.preview_hunk()<cr>",                                                                                                                             desc = "Preview hunk" },
+    { "<leader>e",  group = "Errors / Diagnostics" },
+    { "<leader>ef", ":lua vim.lsp.buf.code_action()<CR>",             desc = "Fix / code action" },
+    { "<leader>ei", ":lua vim.diagnostic.open_float()<CR>",           desc = "Inspect" },
+    { "<leader>el", ":FzfLua diagnostics_workspace <CR>",             desc = "List" },
+    { "<leader>en", ":lua vim.diagnostic.goto_next()<CR>",            desc = "Next" },
+    { "<leader>ep", ":lua vim.diagnostic.goto_prev()<CR>",            desc = "Previous" },
+    { "<leader>et", ":ToggleDiag<CR>",                                desc = "Toggle" },
+    { "<leader>f",  group = "Files" },
+    { "<leader>fS", ":wa<CR>",                                        desc = "Save all open buffers" },
+    { "<leader>ff", ":: lua vim.lsp.buf.format { async = true }<CR>", desc = "Format file" },
+    { "<leader>fs", ":w<CR>",                                         desc = "Save file" },
+    { "<leader>l",  group = "LSP" },
+    { "<leader>ll", ":lua FzfLua.lsp_document_symbols()<CR>" ,            desc = "Document symbols" },
+    { "<leader>ls", ":lua FzfLua.lsp_finder()<CR>" ,            desc = "Lsp Search" },
+    { "<leader>la", ":lua FzfLua.lsp_code_actions()<CR>" ,            desc = "Code actions" },
+    { "<leader>lr", ":lua vim.lsp.buf.rename()<CR>" ,            desc = "Rename symbol" },
+    { "<leader>g",  group = "Git" },
+    { "<leader>gd", group = "Git Diff" },
+    { "<leader>gN", ":lua require('neogit').open({ kind = 'floating' })<CR>" ,            desc = "Neogit (Status)" },
+    {
+      "<leader>gg",
+      function()
+        if next(require('diffview.lib').views) == nil then
+          vim.cmd('DiffviewOpen')
+        else
+          vim.cmd('DiffviewClose')
+        end
+      end,
+      desc = "Toggle diffview"
+    },
+    { "<leader>gdr", "<cmd>:DiffviewRefresh<cr>",                                                                                                                                                desc = "Refresh diffview" },
+    { "<leader>gdh", "<cmd>:DiffviewFileHistory %<cr>",                                                                                                                                          desc = "File History" },
+    { "<leader>gdq", "<cmd>:DiffviewClose<cr>",                                                                                                                                                  desc = "Close Diffview" },
+    { "<leader>gi",  "<cmd>lua require 'gitsigns'.preview_hunk()<cr>",                                                                                                                           desc = "Preview hunk" },
     { "<leader>gb",  "<cmd>lua require 'gitsigns'.blame_line()<cr>",                                                                                                                             desc = "Blame" },
     { "<leader>gn",  "<cmd>lua require 'gitsigns'.next_hunk({navigation_message = false})<cr>",                                                                                                  desc = "Next Hunk" },
     { "<leader>gp",  "<cmd>lua require 'gitsigns'.prev_hunk({navigation_message = false})<cr>",                                                                                                  desc = "Prev Hunk" },
-    { "<leader>gs",   ":lua FzfLua.combine({ pickers = 'git_status' })<CR>",                                                                                                               desc = "History" },
+    { "<leader>gs",  ":lua FzfLua.combine({ pickers = 'git_status' })<CR>",                                                                                                                      desc = "History" },
     { "<leader>h",   ":lua FzfLua.combine({ pickers = 'buffers;oldfiles;' })<CR>",                                                                                                               desc = "History" },
     { "<leader>m",   ":FzfLua marks<CR>",                                                                                                                                                        desc = "Marks" },
     { "<leader>O",   ":lua FzfLua.combine({ pickers = 'files' })<CR>",                                                                                                                           desc = "Open file" },
@@ -124,6 +140,6 @@ local map = vim.api.nvim_set_keymap
 -- Paste over visual selection without losing the current clipboard buffer
 vim.keymap.set("x", "p", [["_dP]])
 map("n", "<C-w>m", [[: tab split<CR>]], {})
-map("n", "gd", [[: FzfLua lsp_definitions<CR>]], {})
-map("n", "gr", [[: FzfLua lsp_references<CR>]], {})
+map("n", "gd", ":lua FzfLua.lsp_definitions() <CR>", {})
+map("n", "gr", ":lua FzfLua.lsp_finder() <CR>", {})
 map("n", "K", [[:: lua vim.lsp.buf.hover()<CR>]], {})

@@ -18,7 +18,8 @@ return {
       files = { previewer = "bat" },
       grep = {
         rg_glob = true,
-        glob_flag = "--iglob"
+        glob_flag = "--iglob",
+        rg_opts = "--hidden --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e",
       },
       manpages = { previewer = "man_native" },
       helptags = { previewer = "help_native" },
