@@ -14,6 +14,8 @@ alias tmux="TERM=screen-256color-bce tmux"
 alias ls="eza -la --git -F --icons --group-directories-first"
 alias ps="procs"
 alias cat="bat"
+alias lg="lazygit"
+alias ld="lazydocker"
 # Use single quotes to prevent the shell from treating ? as a wildcard
 alias '??'='ai_bat'
 alias '???'='ai "???"'

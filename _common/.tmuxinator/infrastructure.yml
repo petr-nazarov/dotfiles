@@ -1,5 +1,5 @@
 ---
-name: infrastructure 
+name: infrastructure
 root: ~/Projects/Personal/infrastructure
 startup_window: infrastructure
 windows:
