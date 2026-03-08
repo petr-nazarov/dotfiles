@@ -58,7 +58,7 @@
   "cpu": {
     "interval": 5,
     "format": "󰍛",
-    "on-click": "$HOME/.local/bin/run-in-new-term btop"
+    "on-click": "$HOME/.local/bin/powermenu"
   },
   "clock": {
     "format": "{:%d.%m.%Y %H:%M %a}",
