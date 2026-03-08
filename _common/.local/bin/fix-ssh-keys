@@ -1,0 +1,5 @@
+#!/bin/sh
+KEY_NAME=$1
+sudo chmod 600 ~/.ssh/$KEY_NAME
+sudo chmod 644 ~/.ssh/$KEY_NAME.pub
+sudo chmod 700 ~/.ssh

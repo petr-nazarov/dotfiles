@@ -1,5 +1,4 @@
 {
-  "apiKeyHelper": "source .secrets/non-sync.zsh && echo $ANTHROPIC_API_KEY",
   "model": "opus",
   "hooks": {
     "UserPromptSubmit": [

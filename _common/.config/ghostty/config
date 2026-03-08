@@ -11,5 +11,15 @@ confirm-close-surface = false
 shell-integration-features = sudo
 term="xterm-256color"
 
-
 keybind = shift+enter=text:\x1b\r
+
+
+# Disable splits and tabs we are cool and use tmux
+keybind = super+d=unbind
+keybind = super+shift+d=unbind
+keybind = super+t=unbind
+keybind = super+shift+[=unbind
+keybind = super+shift+]=unbind
+window-save-state = "never"
+# Optional: Make it even cleaner
+window-decoration = false
