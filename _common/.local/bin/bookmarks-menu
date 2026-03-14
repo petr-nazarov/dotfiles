@@ -1,2 +1,2 @@
 #!/usr/bin/env zsh
-cat $HOME/.secrets/bookmarks.txt | sed "/^$/d" | sed '/^\#/d' | walker -d | awk '{ print $NF }'
+cat $HOME/.secrets/bookmarks.txt | sed "/^$/d" | sed '/^\#/d' | tofi | awk '{ print $NF }'
