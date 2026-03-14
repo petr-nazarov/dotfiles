@@ -1,6 +1,6 @@
 ---
 name: infrastructure
-root: ~/Projects/Personal/infrastructure
+root: ~/infrastructure
 startup_window: infrastructure
 windows:
   - home-server:
