@@ -13,11 +13,9 @@ fi
 
 PATTERN=$(cat $HOME/.config/fabric_custom_patterns/create_git_commit_message_from_diff/system.md)
 
-
-
 GIT_MESSAGE=$(claude -p "$PATTERN $DIFF_CONTENT")
 
-echo $GIT_MESSAGE
+# echo $GIT_MESSAGE
 # 3. Create a temp file
 TEMP_MSG_FILE=$(mktemp)
 echo "$GIT_MESSAGE" >"$TEMP_MSG_FILE"
