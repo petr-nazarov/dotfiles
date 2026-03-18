@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+TITLE=$1
+TEXT=$2
+paplay /usr/share/sounds/freedesktop/stereo/window-attention.oga
+notify-send "$TITLE" "$TEXT"
+

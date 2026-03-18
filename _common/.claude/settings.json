@@ -1,22 +1,12 @@
 {
   "model": "opus",
   "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/ccnotify/ccnotify.py UserPromptSubmit"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/ccnotify/ccnotify.py Stop"
+            "command": "~/.local/bin/notify-attention 'ClaudeCode' 'Answered'"
           }
         ]
       }
@@ -26,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/ccnotify/ccnotify.py Notification"
+            "command": "~/.local/bin/notify-attention Notification"
           }
         ]
       }
