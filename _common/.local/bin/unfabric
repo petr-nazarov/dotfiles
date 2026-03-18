@@ -1,0 +1,92 @@
+#!/usr/bin/env zsh
+
+PATTERNS_DIR="${HOME}/.config/fabric_custom_patterns"
+
+usage() {
+    echo "Usage: unfabric [-p pattern] [prompt]"
+    echo "       echo 'prompt' | unfabric [-p pattern]"
+    echo ""
+    echo "Options:"
+    echo "  -p pattern    Pattern to use"
+    echo "  -l            List available patterns"
+    echo "  -h            Show this help"
+    exit "${1:-0}"
+}
+
+list_patterns() {
+    echo "Available patterns:"
+    for dir in "$PATTERNS_DIR"/*/; do
+        [[ -d "$dir" ]] && echo "  - $(basename "$dir")"
+    done
+}
+
+suggest_pattern() {
+    local input="$1"
+    local best_match=""
+    local best_score=0
+
+    for dir in "$PATTERNS_DIR"/*/; do
+        [[ -d "$dir" ]] || continue
+        local name=$(basename "$dir")
+        # Simple substring match scoring
+        if [[ "$name" == *"$input"* || "$input" == *"$name"* ]]; then
+            local score=${#name}
+            if (( score > best_score )); then
+                best_score=$score
+                best_match=$name
+            fi
+        fi
+    done
+
+    if [[ -n "$best_match" ]]; then
+        echo "Did you mean: $best_match?"
+    fi
+}
+
+pattern=""
+prompt=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -p)
+            [[ -z "$2" ]] && { echo "Error: -p requires a pattern name"; exit 1; }
+            pattern="$2"
+            shift 2
+            ;;
+        -l)
+            list_patterns
+            exit 0
+            ;;
+        -h|--help)
+            usage 0
+            ;;
+        -*)
+            echo "Error: unknown option $1"
+            usage 1
+            ;;
+        *)
+            prompt="$1"
+            shift
+            ;;
+    esac
+done
+
+# Read from stdin if no prompt argument and stdin is piped
+if [[ -z "$prompt" && ! -t 0 ]]; then
+    prompt=$(cat)
+fi
+
+# Validate pattern if provided
+if [[ -n "$pattern" ]]; then
+    if [[ ! -d "$PATTERNS_DIR/$pattern" ]]; then
+        echo "Error: unknown pattern '$pattern'"
+        suggest_pattern "$pattern"
+        echo ""
+        list_patterns
+        exit 1
+    fi
+fi
+
+pattern_content=$(cat ${PATTERNS_DIR}/${pattern:-default}/system.md)
+
+claude -p "$pattern_content $prompt"

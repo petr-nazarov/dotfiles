@@ -11,7 +11,4 @@ else
 	PROMPT="$* $(cat)"
 fi
 
-
-
-PATTERN=$(cat $HOME/.config/fabric_custom_patterns/code_gen/system.md)
-claude -p "$PATTERN $PROMPT"
+unfabric -p code_gen  "$PROMPT"
