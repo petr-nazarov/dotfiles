@@ -1,4 +1,3 @@
-
 # My dotfiles 
 This dotfiles uses stow to create symlinks. 
 ```sh
@@ -10,6 +9,13 @@ just sync # syncs the dotfiles
 just unsync # unsync dotfiles
 
 ```
+## On a barebones asrch system:
+```
+sudo pacman -S git openssh github-cli just stow mise zsh
+gh auth login -s admin:public_key
+gh repo clone dotfiles
+```
+
 ## Tec stack:
 - mise to install required dependencies
 - just to run simple commands

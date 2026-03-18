@@ -5,8 +5,6 @@ rust = "latest"
 node = "24.13.0"
 pnpm = "latest"
 bun = "latest"
-sops = "latest"
-age = "latest"
 
 starship = "latest"
 fzf = "latest"
