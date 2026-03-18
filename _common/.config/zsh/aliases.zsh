@@ -19,3 +19,4 @@ alias ld="lazydocker"
 # Use single quotes to prevent the shell from treating ? as a wildcard
 alias '??'='ai_bat'
 alias '???'='ai "???"'
+alias 'cg'='ai_codegen'
