@@ -6,3 +6,5 @@ hyprctl keyword monitor "DP-1, 3440x1440@144, 0x0, 1"
 hyprctl monitors -j | jq -r '.[] | select(.name | startswith("HEADLESS")) | .name' | xargs -I {} hyprctl output remove {}
 
 systemctl --user start hypridle
+
+notify-attention "Sunshine Stream" "Stream ended, virtual display removed"

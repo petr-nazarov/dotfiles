@@ -7,13 +7,18 @@ MONITOR_NAME=$(hyprctl monitors -j | jq -r '.[] | select(.name | startswith("HEA
 systemctl --user stop hypridle
 
 # 2. Set resolution (adjust to your client's screen)
-hyprctl keyword monitor "${MONITOR_NAME}, 3840x2160@60, 0x0, 1"
+hyprctl keyword monitor "${MONITOR_NAME}, 3840x2160@60, 3440x0, 1"
 
-# sleep 1
-# hyprctl dispatch moveworkspacetomonitor 8 ${MONITOR_NAME}
-# hyprctl dispatch movetoworkspacesilent 8,title:^Lutris$
-# hyprctl dispatch workspace 8
-# hyprctl keyword cursor:no_hardware_cursors true
+# 3. Move all windows to workspace 1 on the virtual monitor
+hyprctl clients -j | jq -r '.[].address' | while read -r addr; do
+  hyprctl dispatch movetoworkspacesilent "1,address:${addr}"
+done
 
-# 3. Disable your physical monitor (Change 'DP-1' to your real monitor name)
-# hyprctl keyword monitor "DP-1, disable"
+# 4. Focus workspace 1 on the virtual monitor
+hyprctl dispatch focusmonitor "${MONITOR_NAME}"
+hyprctl dispatch workspace 1
+
+# 5. Disable your physical monitor
+hyprctl keyword monitor "DP-1, disable"
+
+notify-attention "Sunshine Stream" "Stream started on virtual display ${MONITOR_NAME} at 3840x2160@60Hz"
