@@ -3,6 +3,8 @@
 *.log.*
 
 *
-!ccnotify/
+!skills/
+!skills/**
 !agents/
+!agents/**
 !settings.json
