@@ -1,6 +1,11 @@
 #!/usr/bin/env zsh
 TITLE=$1
 TEXT=$2
-paplay /usr/share/sounds/freedesktop/stereo/window-attention.oga
-notify-send "$TITLE" "$TEXT"
 
+if [[ "$(uname)" == "Darwin" ]]; then
+	afplay /System/Library/Sounds/Glass.aiff
+	osascript -e "display notification \"$TEXT\" with title \"$TITLE\""
+else
+	paplay /usr/share/sounds/freedesktop/stereo/window-attention.oga
+	notify-send "$TITLE" "$TEXT"
+fi

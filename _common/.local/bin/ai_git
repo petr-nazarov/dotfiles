@@ -10,10 +10,8 @@ if [ -z "$DIFF_CONTENT" ]; then
 	exit 1
 fi
 
-
 echo "Generating Git Commit Message:"
-GIT_MESSAGE=$(unfabric -p create_git_commit_message_from_diff  "$DIFF_CONTENT")
-
+GIT_MESSAGE=$(unfabric -p create_git_commit_message_from_diff "$DIFF_CONTENT")
 
 # 3. Create a temp file
 TEMP_MSG_FILE=$(mktemp)
