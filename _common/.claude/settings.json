@@ -21,5 +21,10 @@
         ]
       }
     ]
-  }
+  },
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "voiceEnabled": true
 }

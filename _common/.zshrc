@@ -22,3 +22,6 @@ fi
 source $HOME/.config/zsh/bind-keys.zsh
 
 
+
+# opencode
+export PATH=/home/nazarov/.opencode/bin:$PATH
