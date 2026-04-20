@@ -26,13 +26,13 @@ case $SELECTION in
 	systemctl poweroff
 	;;
 *"Toggle sleep")
-  if pgrep -x hypridle > /dev/null; then
-    pkill hypridle
-    notify-send "hypridle stopped"
-else
-    uwsm app -- hypridle &
-    notify-send "hypridle started"
-fi
+	if pgrep -x hypridle >/dev/null; then
+		pkill hypridle
+		notify-send "hypridle stopped"
+	else
+		uwsm app -- hypridle &
+		notify-send "hypridle started"
+	fi
 
 	;;
 esac

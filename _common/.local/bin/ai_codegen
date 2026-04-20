@@ -11,4 +11,4 @@ else
 	PROMPT="$* $(cat)"
 fi
 
-unfabric -p code_gen  "$PROMPT"
+unfabric -p code_gen "$PROMPT"
