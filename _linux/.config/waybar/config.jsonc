@@ -18,8 +18,9 @@
     "backlight",
     "bluetooth",
     "network",
-    "cpu",
     "battery",
+    "memory",
+    "cpu",
     "clock"
   ],
   "hyprland/workspaces": {
@@ -59,6 +60,12 @@
     "interval": 5,
     "format": "󰍛",
     "on-click": "$HOME/.local/bin/powermenu"
+  },
+  "memory": {
+    "interval": 30,
+    "format": "",
+    "max-length": 10,
+    "on-click": "tofi-drun | xargs hyprctl dispatch exec --"
   },
   "clock": {
     "format": "{:%d.%m.%Y %H:%M %a}",
