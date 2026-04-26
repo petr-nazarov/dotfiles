@@ -76,15 +76,19 @@
       "actions": [
         {
           "label": "",
-          "command": "cmst"
+          "command": "$HOME/.local/bin/run-in-new-term impala"
         },
         {
           "label": "",
-          "command": "cmst"
+          "command": "$HOME/.local/bin/run-in-new-term bluetui"
         },
         {
           "label": "󰖀",
-          "command": "pavucontrol"
+          "command": "$HOME/.local/bin/run-in-new-term wiremix"
+        },
+        {
+          "label": "⏻",
+          "command": "$HOME/.local/bin/powermenu"
         }
       ]
     }
