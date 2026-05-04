@@ -90,7 +90,9 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "$HOME/.local/bin/run-in-new-term impala"
+    "on-click": "$HOME/.local/bin/run-in-new-term impala",
+    "on-click-right": "$HOME/.local/bin/network-restart-menu"
+
   },
   "battery": {
     "format": "{capacity}% {icon}",

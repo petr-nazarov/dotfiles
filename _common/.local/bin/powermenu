@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-SELECTION="$(printf "1 - Lock\n2 - Suspend\n3 - Log out\n4 - Reboot\n5 - Reboot to UEFI\n6 - Hard reboot\n7 - Shutdown\n8 - Toggle sleep" | tofi --prompt-text "Power Menu: ")"
+SELECTION="$(printf "1 - Lock\n2 - Suspend\n3 - Log out\n4 - Reboot\n5 - Reboot to UEFI\n6 - Hard reboot\n7 - Shutdown\n8 - Toggle sleep\n9 - Network restart" | tofi --prompt-text "Power Menu: ")"
 
 case $SELECTION in
 *"Lock")
@@ -33,6 +33,8 @@ case $SELECTION in
 		uwsm app -- hypridle &
 		notify-send "hypridle started"
 	fi
-
+	;;
+*"Network restart")
+  $HOME/.local/bin/network-restart-menu
 	;;
 esac
