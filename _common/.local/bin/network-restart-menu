@@ -1,3 +1,4 @@
 #!/usr/bin/env zsh
-ip -o link show | awk '{print $2}' | sed 's/://' | tofi --prompt-text "Select interface:" | xargs networkctl reconfigure
+ip -o link show | awk '{print $2 $9}' | sed 's/:/ /' | tofi --prompt-text "Select interface:" | awk '{print $1}'| xargs networkctl reconfigure
+
 
