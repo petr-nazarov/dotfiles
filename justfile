@@ -2,9 +2,19 @@ init:
   pre-commit install
 
 [linux]
-sync:
+sync: link-monitors
   stow  -t "$HOME" _common
   stow -t "$HOME" _linux
+
+[linux]
+link-monitors:
+  #!/usr/bin/env sh
+  case "$(hostname)" in
+    home-desktop) cfg="monitors.desktop.conf" ;;
+    *)            cfg="monitors.laptop.conf" ;;
+  esac
+  ln -sf "$HOME/.config/hypr/$cfg" "$HOME/.config/hypr/monitors.conf"
+  echo "monitors.conf -> $cfg"
 [macos]
 sync:
   stow  -t "$HOME" _common
