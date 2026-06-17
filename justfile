@@ -1,36 +1,43 @@
 init:
   pre-commit install
+sync-headless:
+  rm $HOME/.zshrc
+  stow -t "$HOME" _headless
+unsync-headless:
+  stow -D -t "$HOME" _headless
+sync-common-gui:
+  #!/usr/bin/env sh
+  [ -z "${DISPLAY}${WAYLAND_DISPLAY}" ] && exit 0
+  stow -t "$HOME" _common_gui
+unsync-common-gui:
+  stow -D -t "$HOME" _common_gui
 
 [linux]
-sync: link-monitors
-  stow  -t "$HOME" _common
-  stow -t "$HOME" _linux
+sync: sync-headless sync-common-gui link-monitors
+  stow -t "$HOME" _linux_gui
+[macos]
+sync: sync-headless sync-common-gui
+  stow -t "$HOME" _mac_gui
+
 
 [linux]
+unsync:
+  stow  -D -t "$HOME" _common
+
+[macos]
+unsync:
+  stow  -D -t "$HOME" _common
+
 link-monitors:
   #!/usr/bin/env sh
+  [ -z "${DISPLAY}${WAYLAND_DISPLAY}" ] && exit 0
   case "$(hostname)" in
     home-desktop) cfg="monitors.desktop.conf" ;;
-    *)            cfg="monitors.laptop.conf" ;;
+    matebook)     cfg="monitors.laptop.conf" ;;
+    *)            exit 0 ;;
   esac
   ln -sf "$HOME/.config/hypr/$cfg" "$HOME/.config/hypr/monitors.conf"
   echo "monitors.conf -> $cfg"
-[macos]
-sync:
-  stow  -t "$HOME" _common
-  stow -t "$HOME" _mac
-
-
-[linux]
-unsync:
-  stow  -D -t "$HOME" _common
-  stow  -D -t "$HOME" _linux
-
-[macos]
-unsync:
-  stow  -D -t "$HOME" _common
-  stow -D -t "$HOME" _mac
-
 
 # Run all linters and formatters
 lint:
