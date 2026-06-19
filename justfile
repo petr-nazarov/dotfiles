@@ -2,9 +2,14 @@ init:
   pre-commit install
 sync-headless:
   rm $HOME/.zshrc
-  stow -t "$HOME" _headless
+  stow --no-folding -t "$HOME" _headless
 unsync-headless:
   stow -D -t "$HOME" _headless
+sync-claude:
+  stow --no-folding -t "$HOME" _claude
+unsync-claude:
+  stow -D -t "$HOME" _claude
+
 sync-common-gui:
   #!/usr/bin/env sh
   [ -z "${DISPLAY}${WAYLAND_DISPLAY}" ] && exit 0
@@ -13,20 +18,19 @@ unsync-common-gui:
   stow -D -t "$HOME" _common_gui
 
 [linux]
-sync: sync-headless sync-common-gui link-monitors
+sync: sync-headless sync-claude sync-common-gui link-monitors
   stow -t "$HOME" _linux_gui
 [macos]
-sync: sync-headless sync-common-gui
+sync: sync-headless sync-claude sync-common-gui
   stow -t "$HOME" _mac_gui
 
 
 [linux]
-unsync:
-  stow  -D -t "$HOME" _common
-
+unsync: unsync-headless unsync-claude unsync-common-gui 
+  stow -D -t "$HOME" _linux_gui
 [macos]
-unsync:
-  stow  -D -t "$HOME" _common
+unsync: unsync-headless unsync-claude unsync-common-gui 
+  stow -D -t "$HOME" _mac_gui
 
 link-monitors:
   #!/usr/bin/env sh

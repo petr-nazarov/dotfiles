@@ -1,38 +1,4 @@
-# My dotfiles 
-This dotfiles uses stow to create symlinks. 
-```sh
-git clone  git@github.com:petr-nazarov/dotfiles.git
-```
-## Use:
-```bash
-just sync # syncs the dotfiles
-just unsync # unsync dotfiles
-
-```
-## On a barebones asrch system:
-```
-sudo pacman -S git openssh github-cli just stow mise zsh
-gh auth login -s admin:public_key
-gh repo clone dotfiles
-```
-
-## Tec stack:
-- mise to install required dependencies
-- just to run simple commands
-- stow to symlinks
-## Structure:
-- '_common' - the content of this folder will be linked to your home repo. Platform independent configs are stored here.
-- '_linux' - the content of this folder will be linked to your home repo. Only configs specific to linux os will be stored here
-- '_mac' - the content of this folder will be linked to your home repo. Only configs specific to MacOS os will be stored here
-## Gotchas
-- Dont forget to install tmux plugins In tmux click `ctrl+a I`
-
-
-
-
-
-
-# 🛠️ Dotfiles 
+# Dotfiles
 
 A portable, automated configuration suite managed with **Stow**, powered by **Mise**, and validated by **Dagger**.
 
@@ -41,42 +7,50 @@ git clone git@github.com:petr-nazarov/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ```
 
----
-
-## 🚀 Usage
+## Usage
 
 This repo uses **`just`** as the command runner for everyday tasks.
 
 | Command | Description |
 | :--- | :--- |
-| `just sync` | Automatically detects OS and symlinks relevant configs using GNU Stow. |
+| `just sync` | Detects OS and symlinks all relevant config layers using GNU Stow. |
 | `just unsync` | Safely removes symlinks without deleting config files. |
-| `just fix` | Run linting and formatting on files |
-| `just ci` | Runs the Dagger pipeline (Linting + Secret Scanning) locally. |
+| `just sync-headless` | Symlinks only the headless (terminal) config layer. |
+| `just sync-claude` | Symlinks only the Claude config layer. |
+| `just fix` | Run linting and formatting on files. |
+| `just ci` | Runs the Dagger pipeline (linting + secret scanning) locally. |
 
----
+## Tech Stack
 
-## 🛠️ Tech Stack
+- **[Stow](https://www.gnu.org/software/stow/)**: Maps repo folders to `$HOME` via symlinks.
+- **[Mise](https://mise.jdx.dev/)**: Manages tool dependencies (runtimes, CLIs, etc.).
+- **[Just](https://github.com/casey/just)**: Task runner for common repo operations.
+- **[Dagger](https://dagger.io/)**: Containerized CI/CD pipeline for secret scanning and linting.
 
-* **[Stow](https://www.gnu.org/software/stow/)**: Manages symlink  to map repo folders to `$HOME`.
-* **[Mise](https://mise.jdx.dev/)**: Manages dependencies, like linters, formatters, etc.
-* **[Just](https://github.com/casey/just)**: Tool to run tasks from the repo.
-* **[Dagger](https://dagger.io/)**: Containerized CI/CD pipeline for secret scanning and linting.
+## Structure
 
----
+Configs are split into layers to stay platform-agnostic:
 
-## 📂 Structure
+| Folder | Description |
+| :--- | :--- |
+| `_headless/` | Shell, `nvim`, `tmux`, and all other terminal configs. No GUI. Synced everywhere. |
+| `_claude/` | Claude Code config (`~/.claude`). |
+| `_common_gui/` | GUI configs that are cross-platform (e.g. `kitty`, `ghostty`). |
+| `_linux_gui/` | Linux-only configs (e.g. Hyprland, `rofi`). |
+| `_mac_gui/` | macOS-only configs (e.g. `yabai`, `skhd`). |
 
-The configuration is split into layers to remain platform-agnostic:
+## Bootstrap (bare Arch system)
 
-* **`_common/`**: Shell aliases, `nvim`, `tmux`, and other cross-platform configs.
-* **`_linux/`**: Linux-specific tools (e.g., `hyperland`).
-* **`_macos/`**: Mac-specific settings (e.g., `skhd`, `yabai` ).
+```bash
+sudo pacman -S git openssh github-cli just stow mise zsh
+gh auth login -s admin:public_key
+gh repo clone dotfiles ~/dotfiles
+cd ~/dotfiles
+just sync
+```
 
+## Gotchas
 
----
-
-## ⚠️ Gotchas
-
-* **Tmux Plugins**: After syncing, open tmux and press `Ctrl + a` followed by `I` (capital I) to fetch plugins.
-* **Pathing**: Ensure `~/.local/bin` is in your `$PATH` to use the custom scripts.
+- **Tmux plugins**: After syncing, open tmux and press `Ctrl+a` then `I` (capital I) to fetch plugins.
+- **PATH**: Ensure `~/.local/bin` is in your `$PATH` to use the custom scripts.
+- **Monitor config (Linux)**: `just sync` auto-links the correct `monitors.conf` based on hostname (`home-desktop` or `matebook`).

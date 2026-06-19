@@ -1,5 +1,6 @@
 [tools]
 dagger = "latest"
+devcontainer-cli = "latest"
 editorconfig-checker = "latest"
 just = "latest"
 node = "latest"

@@ -6,6 +6,8 @@ if [[ "$(uname)" == "Darwin" ]]; then
 	afplay /System/Library/Sounds/Glass.aiff
 	osascript -e "display notification \"$TEXT\" with title \"$TITLE\""
 else
-	paplay /usr/share/sounds/freedesktop/stereo/window-attention.oga
-	notify-send "$TITLE" "$TEXT"
+  if [[ -z "$container" ]]; then
+      paplay /usr/share/sounds/freedesktop/stereo/window-attention.oga 2>/dev/null
+      notify-send "$TITLE" "$TEXT" 2>/dev/null
+  fi
 fi

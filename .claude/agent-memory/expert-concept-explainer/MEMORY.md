@@ -1,1 +1,0 @@
-- [Dotfiles project structure](project_dotfiles_structure.md) — GNU Stow symlink farm, three OS-layered dirs (_common/_linux/_mac), just+mise+dagger toolchain
