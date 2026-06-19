@@ -1,6 +1,8 @@
 # Dotfiles
 
-A portable, automated configuration suite managed with **Stow**, powered by **Mise**, and validated by **Dagger**.
+> Looking for the devcontainer setup? See [`.devcontainer/base/`](.devcontainer/base/README.md).
+
+A portable, automated configuration suite managed with **Stow**
 
 ```bash
 git clone git@github.com:petr-nazarov/dotfiles.git ~/dotfiles
@@ -38,6 +40,7 @@ Configs are split into layers to stay platform-agnostic:
 | `_common_gui/` | GUI configs that are cross-platform (e.g. `kitty`, `ghostty`). |
 | `_linux_gui/` | Linux-only configs (e.g. Hyprland, `rofi`). |
 | `_mac_gui/` | macOS-only configs (e.g. `yabai`, `skhd`). |
+| [`.devcontainer/`](.devcontainer/base/README.md) | Reusable devcontainer base — forwards dotfiles, Claude config, and SSH agent into the container. |
 
 ## Bootstrap (bare Arch system)
 
