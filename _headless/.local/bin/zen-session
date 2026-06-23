@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+tac ~/.secrets/pintabs.txt | xargs -I{} zen-browser {}
+

@@ -9,5 +9,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   rclone \
   fzf \
   btop \
-  tmuxinator \
+  tmuxinator 
 

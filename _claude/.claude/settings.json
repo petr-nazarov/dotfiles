@@ -21,11 +21,22 @@
       }
     ]
   },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
+  "skipDangerousModePermissionPrompt": true,
   "editorMode": "vim",
   "voiceEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
 }
