@@ -21,6 +21,9 @@
       }
     ]
   },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
@@ -34,9 +37,7 @@
     "mode": "hold"
   },
   "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
   "editorMode": "vim",
-  "voiceEnabled": true,
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true
-  }
+  "voiceEnabled": true
 }

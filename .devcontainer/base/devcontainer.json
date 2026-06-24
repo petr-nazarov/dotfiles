@@ -9,8 +9,14 @@
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
   ],
+  "runArgs": [
+    "--network=host"
+  ],
   "containerEnv": {
     "SSH_AUTH_SOCK": "/ssh-agent"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {  "moby": false }
   },
   "initializeCommand": "mkdir -p $HOME/dotfiles $HOME/.claude && touch $HOME/.claude.json",
   "postStartCommand": ".devcontainer/base/scripts/post-start.sh",
