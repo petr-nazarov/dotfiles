@@ -1,0 +1,2 @@
+#!/usr/bin/env zsh
+fusermount -uz ~/Projects/FrrCode

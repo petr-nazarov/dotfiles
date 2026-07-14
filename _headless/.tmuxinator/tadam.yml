@@ -1,0 +1,12 @@
+---
+name: Tadam 
+root: ~/Projects/FrrCode/clients/tadam
+
+startup_window: main
+windows:
+  - platform:
+      root: ~/Projects/FrrCode/clients/tadam/tadam
+      layout: main-horizontal
+      panes:
+        - editor:
+        - term:

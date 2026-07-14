@@ -1,0 +1,11 @@
+---
+name: FrrCode
+root: ~/Projects/FrrCode
+startup_window: main
+windows:
+  - platform:
+      root: ~/Projects/FrrCode/platform
+      layout: main-horizontal
+      panes:
+        - editor:
+        - term:

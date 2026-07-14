@@ -32,7 +32,5 @@
   ai = !git add . && ai_git
 [pull]
   rebase = false
-[includeIf "gitdir:~/Projects/Momentick/"]
-  path = ~/.secrets/git/momentick.gitconfig
 [init]
 	defaultBranch = main

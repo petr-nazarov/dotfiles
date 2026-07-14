@@ -22,7 +22,8 @@
     ]
   },
   "enabledPlugins": {
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "figma@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -32,6 +33,7 @@
       }
     }
   },
+  "tui": "fullscreen",
   "voice": {
     "enabled": true,
     "mode": "hold"

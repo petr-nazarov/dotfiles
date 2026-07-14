@@ -1,0 +1,2 @@
+#!/usr/bin/env zsh
+gocryptfs -allow_other /home/nazarov/.vault/frrcode-encrypted /home/nazarov/Projects/FrrCode

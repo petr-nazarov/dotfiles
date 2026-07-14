@@ -1,0 +1,12 @@
+---
+name: CardBook
+root: ~/Projects/FrrCode/clients/cardbook
+
+startup_window: main
+windows:
+  - platform:
+      root: ~/Projects/FrrCode/clients/cardbook
+      layout: main-horizontal
+      panes:
+        - editor:
+        - term:
