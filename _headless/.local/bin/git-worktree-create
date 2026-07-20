@@ -1,0 +1,27 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+NAME=$1
+
+if [[ -z "$NAME" ]]; then
+  echo "usage: $0 <branch-name>" >&2
+  exit 1
+fi
+
+WORKTREE_PATH="worktrees/$NAME"
+
+if git show-ref --verify --quiet "refs/heads/$NAME"; then
+  # Branch already exists locally -> just attach a worktree to it
+  git worktree add --relative-paths "$WORKTREE_PATH" "$NAME"
+else
+  # Branch doesn't exist -> create it from current HEAD
+  git worktree add --relative-paths -b "$NAME" "$WORKTREE_PATH"
+fi
+
+# copy everything git doesn't track (envs, node_modules, build output, etc.)
+git -C $REPO_ROOT status --porcelain --ignored -- . | while IFS= read -r line; do
+  path="${line:3}"
+  mkdir -p "$WORKTREE_PATH/$(dirname "$path")"
+  cp -r "$REPO_ROOT/$path" "$WORKTREE_PATH/$path"
+done
+
