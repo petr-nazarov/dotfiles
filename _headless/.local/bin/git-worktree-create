@@ -1,27 +1,32 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 set -euo pipefail
 
 NAME=$1
+REPO_ROOT=$(git rev-parse --show-toplevel)
+WORKTREE_PATH=worktrees/$NAME
+
 
 if [[ -z "$NAME" ]]; then
   echo "usage: $0 <branch-name>" >&2
   exit 1
 fi
 
+if git show-ref --verify --quiet refs/heads/$NAME; then
+  git worktree add $WORKTREE_PATH $NAME --relative-paths
+else
+  git worktree add $WORKTREE_PATH -b $NAME --relative-paths
+fi
+ 
+
+
 WORKTREE_PATH="worktrees/$NAME"
 
-if git show-ref --verify --quiet "refs/heads/$NAME"; then
-  # Branch already exists locally -> just attach a worktree to it
-  git worktree add --relative-paths "$WORKTREE_PATH" "$NAME"
-else
-  # Branch doesn't exist -> create it from current HEAD
-  git worktree add --relative-paths -b "$NAME" "$WORKTREE_PATH"
-fi
-
 # copy everything git doesn't track (envs, node_modules, build output, etc.)
-git -C $REPO_ROOT status --porcelain --ignored -- . | while IFS= read -r line; do
+# exclude worktrees/ itself so we don't copy the worktrees dir into the new worktree
+# (git's exclude pathspec doesn't prune collapsed ignored directories, so filter manually)
+git -C "$REPO_ROOT" status --porcelain --ignored | while IFS= read -r line; do
   path="${line:3}"
+  [[ "$path" == worktrees/* ]] && continue
   mkdir -p "$WORKTREE_PATH/$(dirname "$path")"
   cp -r "$REPO_ROOT/$path" "$WORKTREE_PATH/$path"
 done
-
