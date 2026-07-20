@@ -1,2 +1,6 @@
 #!/usr/bin/env zsh
+tmuxinator stop frrcode
+tmuxinator stop tadam
+tmuxinator stop cardbook
+tmuxinator stop personal 
 fusermount -uz ~/Projects/FrrCode

@@ -19,6 +19,7 @@ tmux = "latest"
 yazi = "latest"
 lazygit = "latest"
 lazydocker = "latest"
+helm = "latest"
 
 
 [settings]
