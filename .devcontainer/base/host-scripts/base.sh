@@ -29,6 +29,6 @@ for key in ~/.ssh/*; do
     ssh-add "$key" 2>/dev/null || true
 done
 docker context use default
-# devcontainer up --workspace-folder . 
-devcontainer up --remove-existing-container --workspace-folder . 
+devcontainer up --workspace-folder . 
+# devcontainer up --remove-existing-container --workspace-folder . 
 
