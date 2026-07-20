@@ -10,6 +10,25 @@ alias cdd="cd ~/dotfiles"
 alias cds="cd ~/.secrets"
 alias tx="tmuxinator"
 alias tt="tmuxinator list | tail -1 | tr ' ' '\n' | grep -v '^[[:space:]]*$' | fzf | xargs tmuxinator"
+# create git worktree 
+alias 'gwc'='git-worktree-create'
+# select git worktree
+gws() {
+  local dir
+  dir=$(git-worktree-select) && [[ -n "$dir" ]] && cd "$dir"
+}
+# delete git worktree
+gwd() {
+  local dir
+  dir=$(git-worktree-select)
+  [[ -n "$dir" ]] || return
+  read -q "REPLY?Remove worktree $dir? [y/N] "
+  echo
+  [[ "$REPLY" == [Yy] ]] || return
+  git worktree remove "$dir"
+}
+
+
 alias tmux="TERM=screen-256color-bce tmux"
 alias ls="eza -la --git -F --icons --group-directories-first"
 alias ps="procs"

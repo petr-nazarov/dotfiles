@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+SELECTED=$(git -C "$REPO_ROOT" worktree list | fzf | awk '{print $1}')
+
+[[ -n "$SELECTED" ]] && echo "$SELECTED"
