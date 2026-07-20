@@ -17,15 +17,30 @@ gws() {
   local dir
   dir=$(git-worktree-select) && [[ -n "$dir" ]] && cd "$dir"
 }
-# delete git worktree
+# delete git worktree (and its folder)
 gwd() {
-  local dir
+  local dir unpushed
   dir=$(git-worktree-select)
   [[ -n "$dir" ]] || return
+  if [[ "$dir" != */worktrees/* ]]; then
+    echo "refusing to remove the main worktree: $dir"
+    return 1
+  fi
+
+  # commits reachable from HEAD but on no remote-tracking branch
+  unpushed=$(git -C "$dir" rev-list --count HEAD --not --remotes)
+  if [[ "$unpushed" -gt 0 ]]; then
+    echo "refusing to remove $dir: $unpushed commit(s) not pushed to any remote"
+    return 1
+  fi
+
   read -q "REPLY?Remove worktree $dir? [y/N] "
   echo
   [[ "$REPLY" == [Yy] ]] || return
-  git worktree remove "$dir"
+  # --force: worktrees are created with untracked files (.env, node_modules, etc.)
+  # copied in, which git worktree remove otherwise refuses to delete
+  git worktree remove --force "$dir"
+  rm -rf "$dir"
 }
 
 

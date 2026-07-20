@@ -33,7 +33,42 @@ The `initializeCommand` in `devcontainer.json` creates `$HOME/dotfiles` and `$HO
 
 ## SSH Agent Forwarding
 
-`host-scripts/base.sh` ensures an SSH agent is running on a fixed socket (`$XDG_RUNTIME_DIR/ssh-agent.socket`) before bringing the container up. Keys are added interactively if none are loaded. The socket is then forwarded into the container.
+`host-scripts/base.sh` ensures an SSH agent is running on a fixed socket (`$XDG_RUNTIME_DIR/ssh-agent.socket`) before bringing the container up. Every private key under `~/.ssh/` (on the host) is added automatically, skipping any whose fingerprint is already loaded in the agent — so keys added in earlier sessions aren't re-prompted for their passphrase, but new keys still get picked up on the next start. The socket is then forwarded into the container as `/ssh-agent`; signing always happens on the host, so no private key material ever enters the container.
+
+### Multiple SSH/GitHub identities
+
+Since only the agent socket is forwarded, `ssh` inside the container still needs *some* file
+on disk at `IdentityFile` to know which key to request from the agent for a given `Host` — but
+only the **public** key is required for that (it's not secret, so mounting it isn't a security
+concern the way mounting a private key would be).
+
+To add an identity beyond your default key:
+
+1. Add a `Host` block to a `configs/ssh.config` in your project (bind-mounted to
+   `/home/vscode/.ssh/config` in the project's `devcontainer.json`), e.g.:
+
+   ```
+   Host example
+       HostName github.com
+       IdentityFile ~/.ssh/example
+       IdentitiesOnly yes
+   ```
+
+2. Bind-mount the matching `.pub` file explicitly in `devcontainer.json`'s `mounts`:
+
+   ```
+   "source=${localEnv:HOME}/.ssh/example.pub,target=/home/vscode/.ssh/example.pub,type=bind,consistency=cached"
+   ```
+
+Docker mount sources aren't glob-expanded, so there's no `*.pub` shortcut — each identity needs
+its own explicit mount line.
+
+### `~/.ssh` ownership and `known_hosts`
+
+Because only individual files under `~/.ssh` get bind-mounted (not the directory itself),
+Docker auto-creates `~/.ssh` owned by `root`. Left alone, `vscode` can't write `known_hosts`,
+so every session re-prompts to accept a host key. `scripts/post-create.sh` runs
+`sudo chown vscode:vscode ~/.ssh` after container creation to fix this.
 
 ## Git Worktree Integration
 

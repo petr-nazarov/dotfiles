@@ -1,6 +1,10 @@
 */**/.venv
 */**/.log
 */**/lazy-lock.json
+env
 .env
+*.env
+
+
 worktrees
 

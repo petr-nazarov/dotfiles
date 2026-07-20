@@ -2,6 +2,12 @@
 
 echo "🚀 Applying post-create scripts..."
 
+echo "🔑 Fixing ~/.ssh ownership..."
+# ~/.ssh is auto-created by docker (root-owned) since only individual files
+# inside it are bind-mounted, not the directory itself — without this,
+# vscode can't write known_hosts and gets re-prompted every session
+sudo chown vscode:vscode ~/.ssh
+
 echo "🔧 Applying dotfiles..."
 # apply dotfiles
 (

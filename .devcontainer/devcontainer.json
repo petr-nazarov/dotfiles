@@ -4,6 +4,7 @@
     "dockerfile": "base/Dockerfile"
   },
   "mounts": [
+    "source=${localWorkspaceFolder}/.devcontainer/configs/ssh.config,target=/home/vscode/.ssh/config,type=bind,consistency=cached",
     "source=${localEnv:HOME}/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude/,target=/home/vscode/.claude/,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",

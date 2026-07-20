@@ -1,0 +1,4 @@
+Host example 
+    HostName example
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/example
