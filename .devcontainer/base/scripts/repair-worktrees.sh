@@ -1,4 +1,5 @@
 #!/bin/bash
+# DEPRECATED
 set -e
 
 CONTAINER_GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "/workspaces/$(basename "$PWD")")
