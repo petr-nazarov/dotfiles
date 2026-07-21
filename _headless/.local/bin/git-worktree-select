@@ -3,6 +3,20 @@ set -euo pipefail
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
-SELECTED=$(git -C "$REPO_ROOT" worktree list | fzf | awk '{print $1}')
+# drop registrations for worktrees whose directory no longer exists
+git -C "$REPO_ROOT" worktree prune
 
-[[ -n "$SELECTED" ]] && echo "$SELECTED"
+SELECTED_LINE=$(git -C "$REPO_ROOT" worktree list | fzf)
+[[ -n "$SELECTED_LINE" ]] || exit 0
+
+RAW_PATH=$(awk '{print $1}' <<<"$SELECTED_LINE")
+
+# git bakes in the absolute path from when the worktree was added, which goes
+# stale if the repo is later mounted at a different absolute path (e.g. a
+# devcontainer). Rebuild the path relative to the current repo root instead
+# of trusting git's copy verbatim.
+if [[ "$RAW_PATH" == */worktrees/* ]]; then
+  echo "$REPO_ROOT/worktrees/${RAW_PATH#*/worktrees/}"
+else
+  echo "$REPO_ROOT"
+fi

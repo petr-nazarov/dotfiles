@@ -24,9 +24,11 @@ WORKTREE_PATH="worktrees/$NAME"
 # copy everything git doesn't track (envs, node_modules, build output, etc.)
 # exclude worktrees/ itself so we don't copy the worktrees dir into the new worktree
 # (git's exclude pathspec doesn't prune collapsed ignored directories, so filter manually)
+# git collapses fully untracked/ignored directories into a single "path/" entry, so
+# each rsync call below already clones a whole folder in one shot when applicable.
 git -C "$REPO_ROOT" status --porcelain --ignored | while IFS= read -r line; do
   path="${line:3}"
   [[ "$path" == worktrees/* ]] && continue
   mkdir -p "$WORKTREE_PATH/$(dirname "$path")"
-  cp -r "$REPO_ROOT/$path" "$WORKTREE_PATH/$path"
+  rsync -a "$REPO_ROOT/$path" "$WORKTREE_PATH/$path"
 done
