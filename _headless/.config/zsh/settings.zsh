@@ -3,6 +3,7 @@ if [ -z "$TMUX" ]; then
 	export TERM="xterm-256color"
 fi
 unsetopt NOMATCH
+setopt INTERACTIVE_COMMENTS # allow trailing "# comment" at the prompt
 
 # Location of your history file
 HISTFILE=~/.zsh_history
