@@ -68,4 +68,31 @@ function M.switch_to(entry)
   return true
 end
 
+function M.select()
+  local entries = M.list()
+  if #entries <= 1 then
+    vim.notify("No other worktrees", vim.log.levels.INFO)
+    return
+  end
+
+  local by_display = {}
+  local display_list = {}
+  for _, e in ipairs(entries) do
+    by_display[e.display] = e
+    table.insert(display_list, e.display)
+  end
+
+  require("fzf-lua").fzf_exec(display_list, {
+    prompt = "Worktree> ",
+    actions = {
+      ["default"] = function(selected)
+        local entry = by_display[selected[1]]
+        if entry then
+          M.switch_to(entry)
+        end
+      end,
+    },
+  })
+end
+
 return M
