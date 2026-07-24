@@ -6,10 +6,16 @@ function M.current_name()
 end
 
 function M.list()
-  local root = vim.trim(vim.fn.system("git rev-parse --show-toplevel"))
+  -- NOT `git rev-parse --show-toplevel`: from inside a linked worktree that
+  -- returns the worktree's own path, not the shared repo root, which corrupts
+  -- every rebuilt path below. `--git-common-dir` always points at the shared
+  -- .git dir regardless of which worktree we're run from; its parent is the
+  -- main worktree root.
+  local common_dir = vim.trim(vim.fn.system("git rev-parse --git-common-dir"))
   if vim.v.shell_error ~= 0 then
     return {}
   end
+  local root = vim.fn.fnamemodify(vim.fn.fnamemodify(common_dir, ":p"):gsub("/$", ""), ":h")
 
   local lines = vim.fn.systemlist(
     "git -C " .. vim.fn.shellescape(root) .. " worktree list --porcelain"
