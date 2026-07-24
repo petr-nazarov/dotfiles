@@ -46,4 +46,26 @@ function M.list()
   return entries
 end
 
+function M.switch_to(entry)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.bo[buf].modified then
+      vim.notify(
+        "Unsaved changes in " .. vim.api.nvim_buf_get_name(buf) .. " -- save or discard before switching worktrees",
+        vim.log.levels.WARN
+      )
+      return false
+    end
+  end
+
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.fn.buflisted(buf) == 1 then
+      vim.api.nvim_buf_delete(buf, { force = false })
+    end
+  end
+
+  vim.cmd.cd(entry.path)
+  vim.notify("Switched to worktree: " .. entry.display)
+  return true
+end
+
 return M
