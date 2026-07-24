@@ -97,6 +97,8 @@ wk.add(
     { "<leader>gn",  "<cmd>lua require 'gitsigns'.next_hunk({navigation_message = false})<cr>",                                                                                                  desc = "Next Hunk" },
     { "<leader>gp",  "<cmd>lua require 'gitsigns'.prev_hunk({navigation_message = false})<cr>",                                                                                                  desc = "Prev Hunk" },
     { "<leader>gs",  ":lua FzfLua.combine({ pickers = 'git_status' })<CR>",                                                                                                                      desc = "History" },
+    { "<leader>gw",  group = "Worktree" },
+    { "<leader>gws", function() require("git_worktree").select() end,                                                                                                                            desc = "Switch worktree" },
     { "<leader>h",   ":lua FzfLua.combine({ pickers = 'buffers;oldfiles;' })<CR>",                                                                                                               desc = "History" },
     { "<leader>m",   ":FzfLua marks<CR>",                                                                                                                                                        desc = "Marks" },
     { "<leader>O",   ":lua FzfLua.combine({ pickers = 'files' })<CR>",                                                                                                                           desc = "Open file" },
