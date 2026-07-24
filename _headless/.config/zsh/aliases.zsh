@@ -10,6 +10,11 @@ alias cdd="cd ~/dotfiles"
 alias cds="cd ~/.secrets"
 alias tx="tmuxinator"
 alias tt="tmuxinator list | tail -1 | tr ' ' '\n' | grep -v '^[[:space:]]*$' | fzf | xargs tmuxinator"
+# checkout branch
+gbs () {
+  git checkout $(git branch --format='%(refname:short)' | fzf)
+}
+
 # create git worktree 
 alias 'gwc'='git-worktree-create'
 # select git worktree
