@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT=$(git rev-parse --show-toplevel)
+# NOT `git rev-parse --show-toplevel`: from inside a linked worktree that
+# returns the worktree's own path, not the shared repo root, which corrupts
+# every rebuilt path below. `--git-common-dir` always points at the shared
+# .git dir regardless of which worktree we're run from; its parent is the
+# main worktree root.
+REPO_ROOT=$(dirname "$(cd "$(git rev-parse --git-common-dir)" && pwd -P)")
 
 # drop registrations for worktrees whose directory no longer exists
 git -C "$REPO_ROOT" worktree prune
