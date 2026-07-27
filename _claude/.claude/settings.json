@@ -21,6 +21,12 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "ccstatusline",
+    "padding": 0,
+    "refreshInterval": 10
+  },
   "enabledPlugins": {
     "figma@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
@@ -42,10 +48,5 @@
   "theme": "dark",
   "editorMode": "vim",
   "voiceEnabled": true,
-  "statusLine": {
-    "type": "command",
-    "command": "ccstatusline",
-    "padding": 0,
-    "refreshInterval": 10
-  }
+  "remoteControlAtStartup": true
 }

@@ -26,3 +26,6 @@ source $HOME/.config/zsh/bind-keys.zsh
 # opencode
 export PATH=/home/nazarov/.opencode/bin:$PATH
 export PATH=$PATH:$HOME/.maestro/bin
+
+# maestro-runner
+export PATH="$HOME/.maestro-runner/bin:$PATH"
