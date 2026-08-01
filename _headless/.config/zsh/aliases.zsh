@@ -10,6 +10,7 @@ alias cdd="cd ~/dotfiles"
 alias cds="cd ~/.secrets"
 alias tx="tmuxinator"
 alias tt="tmuxinator list | tail -1 | tr ' ' '\n' | grep -v '^[[:space:]]*$' | fzf | xargs tmuxinator"
+alias devshell=".devcontainer/base/host-scripts/shell.sh"
 # checkout branch
 gbs () {
   git checkout $(git branch --format='%(refname:short)' | fzf)

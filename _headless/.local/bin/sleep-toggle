@@ -1,0 +1,29 @@
+#!/usr/bin/env zsh
+
+## Report or toggle hypridle (auto-sleep).
+##   status  print waybar JSON (default)
+##   toggle  start/stop hypridle and refresh waybar
+
+sleep_enabled() { pgrep -x hypridle >/dev/null; }
+
+case "${1:-status}" in
+toggle)
+	if sleep_enabled; then
+		pkill -x hypridle
+		notify-send "Auto-sleep disabled"
+	else
+		uwsm app -- hypridle &
+		notify-send "Auto-sleep enabled"
+	fi
+	## let the daemon settle before waybar re-reads the state
+	sleep 0.3
+	pkill -RTMIN+8 waybar
+	;;
+status)
+	if sleep_enabled; then
+		print '{"text":"󰒲","class":"enabled","tooltip":"Auto-sleep enabled"}'
+	else
+		print '{"text":"󰒳","class":"inhibited","tooltip":"Auto-sleep disabled"}'
+	fi
+	;;
+esac

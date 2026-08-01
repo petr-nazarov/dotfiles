@@ -35,9 +35,18 @@
 #pulseaudio,
 #custom-omarchy,
 #custom-screenrecording-indicator,
+#custom-sleep,
 #custom-update {
   min-width: 12px;
   margin: 0 7.5px;
+}
+
+#custom-sleep.enabled {
+  opacity: 0.45;
+}
+
+#custom-sleep.inhibited {
+  color: #f9e2af;
 }
 
 #tray {

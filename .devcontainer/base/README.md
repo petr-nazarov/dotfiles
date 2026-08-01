@@ -27,9 +27,11 @@ The following must exist on the host before starting the container:
 | `$HOME/dotfiles/` | Dotfiles repo — mounted and applied inside the container via `install.sh`. |
 | `$HOME/.claude/` | Claude config directory — mounted into `/home/vscode/.claude/`. |
 | `$HOME/.claude.json` | Claude auth file — mounted into `/home/vscode/.claude.json`. |
+| `$HOME/.config/ccstatusline/` | Statusline widget layout — mounted into `/home/vscode/.config/ccstatusline/`. |
 | SSH agent socket | Forwarded via `$SSH_AUTH_SOCK` for git/SSH operations inside the container. |
 
-The `initializeCommand` in `devcontainer.json` creates `$HOME/dotfiles` and `$HOME/.claude` automatically if they are missing.
+The `initializeCommand` in `devcontainer.json` creates `$HOME/dotfiles`, `$HOME/.claude` and
+`$HOME/.config/ccstatusline` automatically if they are missing.
 
 ## SSH Agent Forwarding
 
@@ -70,6 +72,67 @@ Docker auto-creates `~/.ssh` owned by `root`. Left alone, `vscode` can't write `
 so every session re-prompts to accept a host key. `scripts/post-create.sh` runs
 `sudo chown vscode:vscode ~/.ssh` after container creation to fix this.
 
+## Claude Code Statusline (ccstatusline)
+
+The statusline is [`ccstatusline`](https://github.com/sirmalloc/ccstatusline), configured on the host
+with `npx -y ccstatusline@latest`. Two pieces have to reach the container: the **binary** and the
+**widget layout**.
+
+### The binary
+
+`ccstatusline` ships as an npm package only (no standalone release artifacts), so `devcontainer.json`
+declares the `ghcr.io/devcontainers/features/node` feature and `post-create.sh` runs
+`npm i -g ccstatusline@latest`.
+
+The node feature is used deliberately instead of the mise-managed node that the dotfiles install.
+`host-scripts/claude.sh` launches Claude via `devcontainer exec ... zsh -c "claude …"`, and `zsh -c`
+is **non-interactive** — it never sources `.zshrc`, so `mise activate` never runs and mise's shims
+are not on `PATH`. The feature instead exports its bin directory through `containerEnv`, which
+lifecycle scripts and `devcontainer exec` both inherit, so `ccstatusline` resolves in every shell.
+
+### The widget layout
+
+The layout lives in the dotfiles repo at `_claude/.config/ccstatusline/settings.json` and is stowed
+to the host by `just sync-claude`. `devcontainer.json` then bind-mounts the host directory in, so the
+host stays the single live source of truth:
+
+```
+repo   _claude/.config/ccstatusline/settings.json
+         │ stow --no-folding  (just sync-claude)
+         ▼
+host   ~/.config/ccstatusline/settings.json   (symlink)
+         │ bind mount
+         ▼
+cntr   /home/vscode/.config/ccstatusline/settings.json
+```
+
+Reconfiguring with `npx ccstatusline` on the host writes straight back into the repo — ccstatusline
+resolves symlinks before its atomic write (`lstat` → `realpath` → write-through), so the stow link
+survives and the change shows up as a normal git diff.
+
+Note this config deliberately lives in the `_claude` package, **not** `_headless`. `install.sh` runs
+`stow --no-folding -t $HOME _headless` *inside* the container; if the file were in that package, stow
+would see the bind-mounted `settings.json` as a foreign regular file, report a conflict, and abort
+the entire `_headless` run. The container never stows `_claude`, so there is nothing to collide with.
+
+### Running without the `~/.claude` mount
+
+To keep host Claude credentials out of a container, drop the `.claude/` and `.claude.json` mount
+lines from the project's `devcontainer.json`. `post-create.sh` then generates
+`~/.claude/settings.json` from `dotfiles/claude-settings.json`, preserving the parts of the host
+setup that aren't auth: statusline, `editorMode: vim`, `remoteControlAtStartup` and the default TUI
+renderer. It only writes when the file is absent — a mounted `~/.claude` is always authoritative.
+
+The same fallback applies to the layout: if the `ccstatusline` mount is omitted, `post-create.sh`
+seeds it from `~/dotfiles/_claude/.config/ccstatusline/settings.json` instead.
+
+### `~/.config` ownership
+
+Bind-mounting `~/.config/ccstatusline` makes Docker auto-create the `~/.config` parent as `root`,
+exactly like the `~/.ssh` case above. Left alone, the `_headless` stow run (which writes
+`~/.config/zsh`, `~/.config/mise`, …) fails. `post-create.sh` runs `sudo chown vscode:vscode
+~/.config` before applying dotfiles.
+
 ## Git Worktree Integration
 
 The repo must be cloned as a **non-bare** repository. Worktrees are expected to live under a `worktrees/` directory. On container start, `post-start.sh` runs `repair-worktrees.sh` to fix any stale worktree paths.
@@ -84,15 +147,25 @@ The repo must be cloned as a **non-bare** repository. Worktrees are expected to 
 | `.devcontainer/base/host-scripts/claude.sh` | Runs Claude CLI inside the container with `--dangerously-skip-permissions`. |
 | `.devcontainer/base/host-scripts/down.sh` | Stops and removes a running container (interactive picker via fzf). |
 
-To force-recreate the container:
+### `--recreate`
+
+`shell.sh` and `claude.sh` forward their arguments to `base.sh`, which understands a single flag:
 
 ```bash
-devcontainer up --remove-existing-container --workspace-folder .
+.devcontainer/base/host-scripts/shell.sh --recreate
 ```
+
+This runs `devcontainer up --remove-existing-container` instead of a plain `devcontainer up`, so the
+container is torn down and rebuilt from scratch — use it after changing the `Dockerfile`, `features`,
+`mounts`, or anything else that only takes effect on creation (`postCreateCommand` included). The
+workspace and every bind mount live on the host, so nothing there is lost; anything written *only*
+to the container filesystem is.
+
+To force-recreate the container, pass `--recreate` (see below).
 
 ## Lifecycle Scripts
 
 | Script | When it runs | What it does |
 | :--- | :--- | :--- |
-| `scripts/post-create.sh` | On container creation | Applies dotfiles via `apply-dotfiles.sh`, installs Claude CLI. |
+| `scripts/post-create.sh` | On container creation | Fixes `~/.ssh` and `~/.config` ownership, applies dotfiles via `apply-dotfiles.sh`, installs Claude CLI, installs `ccstatusline` and seeds Claude/ccstatusline settings if they aren't mounted. |
 | `scripts/post-start.sh` | On every container start | Repairs worktree paths, runs `mise install` for project deps. |

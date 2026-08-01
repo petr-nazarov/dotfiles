@@ -18,6 +18,7 @@
     "backlight",
     "bluetooth",
     "network",
+    "custom/sleep",
     "battery",
     "memory",
     "cpu",
@@ -134,6 +135,13 @@
       "warning": 20,
       "critical": 10
     }
+  },
+  "custom/sleep": {
+    "exec": "$HOME/.local/bin/sleep-toggle status",
+    "return-type": "json",
+    "interval": 5,
+    "signal": 8,
+    "on-click": "$HOME/.local/bin/sleep-toggle toggle"
   },
   "bluetooth": {
     "format": "",

@@ -1,0 +1,110 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "1",
+        "type": "model",
+        "color": "cyan"
+      },
+      {
+        "id": "37234d32-ee3a-4bfe-abd7-2fb1006ca39d",
+        "type": "separator"
+      },
+      {
+        "id": "acf17b49-19c2-4932-8986-78aca68dfcde",
+        "type": "worktree-name"
+      },
+      {
+        "id": "2",
+        "type": "separator"
+      },
+      {
+        "id": "3",
+        "type": "context-length",
+        "color": "brightBlack"
+      },
+      {
+        "id": "4",
+        "type": "separator"
+      },
+      {
+        "id": "553a17c3-cf2e-47c4-bca3-9ba2b96b976d",
+        "type": "claude-account-email"
+      },
+      {
+        "id": "6",
+        "type": "separator"
+      }
+    ],
+    [
+      {
+        "id": "cc16270f-d5d7-4b63-b73d-60d6df610b45",
+        "type": "session-usage"
+      },
+      {
+        "id": "8178143e-63c2-4995-b065-08af7a5bb350",
+        "type": "separator"
+      },
+      {
+        "id": "588c0b67-1730-414e-ab6d-36b662c0d9c0",
+        "type": "weekly-usage"
+      }
+    ],
+    [
+      {
+        "id": "3cfdcfa2-b435-4dd8-9013-301e48aea949",
+        "type": "git-root-dir"
+      },
+      {
+        "id": "fcf90f08-ce5e-4ac7-b4be-6b5ca5048001",
+        "type": "separator"
+      },
+      {
+        "id": "d187f5a6-d5dd-455e-a012-0625a93fdbb4",
+        "type": "git-worktree"
+      },
+      {
+        "id": "88b00dd7-940a-485b-b697-b4ca67082455",
+        "type": "separator"
+      },
+      {
+        "id": "6ab23216-acbd-4fb6-b276-c8c8522d7a71",
+        "type": "git-branch"
+      },
+      {
+        "id": "3d987a50-e4cb-4f61-8d65-050a5b8cf640",
+        "type": "separator"
+      },
+      {
+        "id": "ff89ba23-d264-4bb7-891a-0bf1a2e6b946",
+        "type": "git-changes"
+      }
+    ]
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60,
+  "colorLevel": 2,
+  "defaultPaddingSide": "both",
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "gitCacheTtlSeconds": 5,
+  "minimalistMode": false,
+  "powerline": {
+    "enabled": false,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [],
+    "autoAlign": false,
+    "continueThemeAcrossLines": false
+  },
+  "installation": {
+    "method": "pinned",
+    "installedVersion": "2.2.25"
+  }
+}

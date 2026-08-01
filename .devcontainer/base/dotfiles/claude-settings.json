@@ -1,0 +1,11 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "ccstatusline",
+    "padding": 0,
+    "refreshInterval": 10
+  },
+  "editorMode": "vim",
+  "remoteControlAtStartup": true,
+  "tui": "default"
+}

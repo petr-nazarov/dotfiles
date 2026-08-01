@@ -2,6 +2,6 @@
 
 echo "🔧 Applying default dotfils..."
 rm -f ~/.zshrc
-cp ./.devcontainer/dotfiles/.zshrc ~/.zshrc
+cp ./.devcontainer/base/dotfiles/.zshrc ~/.zshrc
 rm -f ~/.gitconfig
-cp ./.devcontainer/dotfiles/.gitconfig ~/.gitconfig
+cp ./.devcontainer/base/dotfiles/.gitconfig ~/.gitconfig

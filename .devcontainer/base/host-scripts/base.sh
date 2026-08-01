@@ -1,5 +1,20 @@
 #!/bin/zsh
 set -e
+
+# --recreate tears the container down and builds it again from scratch, instead
+# of reusing whatever is already running. Callers (shell.sh, claude.sh) forward
+# their own arguments here, so `./shell.sh --recreate` reaches this.
+RECREATE=0
+for arg in "$@"; do
+    case "$arg" in
+        --recreate) RECREATE=1 ;;
+        *)
+            echo "unknown option: $arg (expected --recreate)" >&2
+            exit 1
+            ;;
+    esac
+done
+
 # Ensure ssh-agent is running with a fixed socket
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 
@@ -29,6 +44,10 @@ for key in ~/.ssh/*; do
     ssh-add "$key" 2>/dev/null || true
 done
 docker context use default
-devcontainer up --workspace-folder . 
-# devcontainer up --remove-existing-container --workspace-folder . 
+if [[ "$RECREATE" -eq 1 ]]; then
+    echo "♻️  Recreating devcontainer from scratch (existing container will be removed)..."
+    devcontainer up --remove-existing-container --workspace-folder .
+else
+    devcontainer up --workspace-folder .
+fi
 

@@ -26,13 +26,7 @@ case $SELECTION in
 	systemctl poweroff
 	;;
 *"Toggle sleep")
-	if pgrep -x hypridle >/dev/null; then
-		pkill hypridle
-		notify-send "hypridle stopped"
-	else
-		uwsm app -- hypridle &
-		notify-send "hypridle started"
-	fi
+	$HOME/.local/bin/sleep-toggle toggle
 	;;
 *"Network restart")
   $HOME/.local/bin/network-restart-menu

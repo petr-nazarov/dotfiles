@@ -8,6 +8,7 @@
     "source=${localEnv:HOME}/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude/,target=/home/vscode/.claude/,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.config/ccstatusline/,target=/home/vscode/.config/ccstatusline/,type=bind,consistency=cached",
     "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
   ],
   "runArgs": [
@@ -17,9 +18,11 @@
     "SSH_AUTH_SOCK": "/ssh-agent"
   },
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {  "moby": false }
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {  "moby": false },
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" }
   },
-  "initializeCommand": "mkdir -p $HOME/dotfiles $HOME/.claude && touch $HOME/.claude.json",
+  "initializeCommand": "mkdir -p $HOME/dotfiles $HOME/.claude $HOME/.config/ccstatusline && touch $HOME/.claude.json",
   "postStartCommand": ".devcontainer/base/scripts/post-start.sh",
   "postCreateCommand": ".devcontainer/base/scripts/post-create.sh"
 }
+
