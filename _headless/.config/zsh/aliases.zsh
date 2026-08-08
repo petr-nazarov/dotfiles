@@ -16,8 +16,11 @@ gbs () {
   git checkout $(git branch --format='%(refname:short)' | fzf)
 }
 
-# create git worktree 
-alias 'gwc'='git-worktree-create'
+# create git worktree (and cd into it)
+gwc() {
+  local dir
+  dir=$(git-worktree-create "$@") && [[ -n "$dir" ]] && cd "$dir"
+}
 # select git worktree
 gws() {
   local dir

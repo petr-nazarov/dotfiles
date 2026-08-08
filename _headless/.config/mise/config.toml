@@ -20,6 +20,7 @@ yazi = "latest"
 lazygit = "latest"
 lazydocker = "latest"
 helm = "latest"
+java = "temurin-21"
 
 
 [settings]
