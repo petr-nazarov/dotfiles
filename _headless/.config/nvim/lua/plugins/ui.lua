@@ -6,6 +6,11 @@ return {
     config = function()
       require("catppuccin").setup({
         flavour = "macchiato",
+        -- Let the terminal/tmux paint the background so tmux's window-style
+        -- dimming reaches nvim panes. Terminal bg is macchiato base (#24273a)
+        -- and tmux's window-active-style matches it, so nothing looks different
+        -- while nvim is focused -- inactive panes go dark.
+        transparent_background = true,
         integrations = {
           aerial = true,
           alpha = true,
