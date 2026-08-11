@@ -9,20 +9,21 @@ return {
     "hrsh7th/vim-vsnip",
     "hrsh7th/cmp-vsnip",
     "nvim-lua/plenary.nvim",
+
     -- Copilot
-    {
-      "zbirenbaum/copilot.lua",
-      cmd = "Copilot",
-      config = function()
-        require("copilot").setup({
-          suggestion = { enabled = false },
-          panel = { enabled = false },
-          filetypes = {
-            ["*"] = true,
-          },
-        })
-      end,
-    },
+    -- {
+    --   "zbirenbaum/copilot.lua",
+    --   cmd = "Copilot",
+    --   config = function()
+    --     require("copilot").setup({
+    --       suggestion = { enabled = false },
+    --       panel = { enabled = false },
+    --       filetypes = {
+    --         ["*"] = true,
+    --       },
+    --     })
+    --   end,
+    -- },
     {
       "zbirenbaum/copilot-cmp",
       config = function()
@@ -78,11 +79,11 @@ return {
     })
 
     -- Copilot
-    require("copilot").setup({
-      -- It is recommended to disable copilot.lua's suggestion and panel modules, as they can interfere with completions properly appearing in copilot-cmp. To do so, simply place the following in your copilot.lua config:
-      suggestion = { enabled = false },
-      panel = { enabled = false },
-    })
-    require("copilot_cmp").setup()
+    -- require("copilot").setup({
+    --   -- It is recommended to disable copilot.lua's suggestion and panel modules, as they can interfere with completions properly appearing in copilot-cmp. To do so, simply place the following in your copilot.lua config:
+    --   suggestion = { enabled = false },
+    --   panel = { enabled = false },
+    -- })
+    -- require("copilot_cmp").setup()
   end,
 }
