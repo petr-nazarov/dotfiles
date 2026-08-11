@@ -9,6 +9,7 @@ alias cdpp="cd ~/Projects/Personal"
 alias cdd="cd ~/dotfiles"
 alias cds="cd ~/.secrets"
 alias tx="tmuxinator"
+alias fd="fd --hidden"
 alias tt="tmuxinator list | tail -1 | tr ' ' '\n' | grep -v '^[[:space:]]*$' | fzf | xargs tmuxinator"
 alias devshell=".devcontainer/base/host-scripts/shell.sh"
 # checkout branch
