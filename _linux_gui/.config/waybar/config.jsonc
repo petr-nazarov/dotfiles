@@ -66,7 +66,7 @@
     "interval": 30,
     "format": "",
     "max-length": 10,
-    "on-click": "tofi-drun | xargs hyprctl dispatch exec --"
+    "on-click": "tofi-drun | ifne xargs uwsm app --"
   },
   "clock": {
     "format": "{:%d.%m.%Y %H:%M %a}",

@@ -36,12 +36,12 @@ link-monitors:
   #!/usr/bin/env sh
   [ -z "${DISPLAY}${WAYLAND_DISPLAY}" ] && exit 0
   case "$(hostname)" in
-    home-desktop) cfg="monitors.desktop.conf" ;;
-    matebook)     cfg="monitors.laptop.conf" ;;
+    home-desktop) cfg="monitors.desktop.lua" ;;
+    matebook)     cfg="monitors.laptop.lua" ;;
     *)            exit 0 ;;
   esac
-  ln -sf "$HOME/.config/hypr/$cfg" "$HOME/.config/hypr/monitors.conf"
-  echo "monitors.conf -> $cfg"
+  ln -sf "$HOME/.config/hypr/$cfg" "$HOME/.config/hypr/monitors.lua"
+  echo "monitors.lua -> $cfg"
 
 # Run all linters and formatters
 lint:

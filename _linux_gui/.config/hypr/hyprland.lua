@@ -162,7 +162,7 @@ hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
 
 -- Launchers and menus
-hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("tofi-drun | xargs hyprctl dispatch exec --"))
+hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("tofi-drun | ifne xargs uwsm app --"))
 hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(bin .. "/scripts-menu"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd(bin .. "/powermenu"))
 
