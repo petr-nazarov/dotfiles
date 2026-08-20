@@ -1,11 +1,11 @@
 ---
 name: Tetrisponse
-root: ~/Projects/FrrCode/clients/tetrisponse
+root: ~/Projects/FrrCode/clients/tetrisponse/repos
 
 startup_window: main
 windows:
   - platform:
-      root: ~/Projects/FrrCode/clients/tetrisponse/tetrisponse-monorepo
+      root: ~/Projects/FrrCode/clients/tetrisponse/repos
       layout: main-horizontal
       panes:
         - editor:
