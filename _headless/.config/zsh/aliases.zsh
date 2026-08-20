@@ -12,7 +12,7 @@ alias tx="tmuxinator"
 alias fd="fd --hidden --unrestricted"
 alias rg="rg --hidden --unrestricted"
 alias tt="tmuxinator list | tail -1 | tr ' ' '\n' | grep -v '^[[:space:]]*$' | fzf | xargs tmuxinator"
-alias devshell=".devcontainer/base/host-scripts/shell.sh"
+# devshell now lives in ~/.local/bin/devshell
 # checkout branch
 gbs () {
   git checkout $(git branch --format='%(refname:short)' | fzf)

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Open a shell in the project's devcontainer, from anywhere in the repo.
+#
+# The container is always brought up against the main worktree root, because
+# that's the only mount that contains both worktrees/ and the shared .git dir;
+# a linked worktree mounted on its own has a .git pointing outside the mount.
+# The shell then lands back in whatever subfolder we were launched from.
+#
+# NOT `git rev-parse --show-toplevel`: from inside a linked worktree that
+# returns the worktree's own path. `--git-common-dir` always points at the
+# shared .git dir; its parent is the main worktree root.
+if COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null); then
+  REPO_ROOT=$(dirname "$(cd "$COMMON_DIR" && pwd -P)")
+else
+  REPO_ROOT=$(pwd -P)
+fi
+
+HERE=$(pwd -P)
+# Path to cd into inside the container, relative to the mounted root.
+if [[ "$HERE" == "$REPO_ROOT" ]]; then
+  REL="."
+elif [[ "$HERE" == "$REPO_ROOT"/* ]]; then
+  REL="${HERE#"$REPO_ROOT"/}"
+else
+  echo "$HERE is outside $REPO_ROOT, starting at the workspace root instead" >&2
+  REL="."
+fi
+
+if [[ ! -x "$REPO_ROOT/.devcontainer/base/host-scripts/base.sh" ]]; then
+  echo "no devcontainer host scripts in $REPO_ROOT" >&2
+  exit 1
+fi
+
+# base.sh uses paths relative to the workspace folder, so run it from there
+cd "$REPO_ROOT"
+./.devcontainer/base/host-scripts/base.sh "$@"
+
+# `zsh -c '...' name arg` passes $REL as $1, keeping the path out of the quoting
+devcontainer exec --workspace-folder . zsh -c 'cd "$1" && exec zsh' devshell "$REL"
