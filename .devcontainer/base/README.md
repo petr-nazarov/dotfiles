@@ -5,7 +5,12 @@ A reusable devcontainer base that forwards your dotfiles, Claude config, and SSH
 ## Using This as a Template (degit)
 
 Copy this base into any project with [degit](https://github.com/Rich-Harris/degit):
+Install:
+```bash
+npx degit petr-nazarov/dotfiles/.devcontainer .devcontainer
+```
 
+Update:
 ```bash
 npx degit petr-nazarov/dotfiles/.devcontainer/base .devcontainer/base
 ```
