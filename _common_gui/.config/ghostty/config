@@ -23,3 +23,13 @@ keybind = super+shift+]=unbind
 window-save-state = "never"
 # Optional: Make it even cleaner
 window-decoration = false
+
+bell-features = system,audio,attention,title,border
+# `audio` does nothing without an explicit file; `system` alone is a
+# GTK beep that Hyprland has no sound theme for.
+# The file carries 2s of leading silence on purpose: pipewire suspends idle
+# sinks and the default one is bluetooth, so a bare 0.14s bell plays entirely
+# into an A2DP link that hasn't woken up yet and is never heard.
+bell-audio-path = bell-attention.oga
+bell-audio-volume = 0.4
+
