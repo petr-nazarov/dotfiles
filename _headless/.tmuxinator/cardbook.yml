@@ -10,3 +10,4 @@ windows:
       panes:
         - editor:
         - term:
+            - clauded
