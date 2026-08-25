@@ -69,6 +69,17 @@ git_context() {
   print -r -- "${repo}${wt:+:$wt} · ${branch}"
 }
 
+# Ring the pane Claude is in, so tmux raises window_bell_flag on the right
+# window. The hook's stdout belongs to Claude, not the terminal, so we have to
+# write the BEL into the pane's tty directly.
+sleep 4
+ring_pane() {
+  [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )) || return
+  local tty
+  tty=$(tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#{pane_tty}' 2>/dev/null)
+  [[ -w $tty ]] && printf '\a' >$tty
+}
+
 tmux_context() {
   [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )) || return
   tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#S:#I' 2>/dev/null
@@ -81,6 +92,7 @@ if [[ -n $event ]]; then
   # whatever static string settings.json passed us
   [[ -n $hook_msg ]] && TEXT=$hook_msg
   [[ -n $TEXT ]] || TEXT=$event
+  ring_pane
   where=${cwd/#$HOME/\~}
   tm=$(tmux_context)
   TEXT="${TEXT}"$'\n'"${where}${tm:+ · tmux ${tm}}"
