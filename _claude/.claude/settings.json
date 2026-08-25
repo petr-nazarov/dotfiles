@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.local/bin/notify-attention Notification"
+            "command": "~/.local/bin/notify-attention 'ClaudeCode' 'Needs your input'"
           }
         ]
       }

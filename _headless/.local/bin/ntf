@@ -1,3 +1,254 @@
 #!/usr/bin/env zsh
+#
+# ntf — send a Pushover notification
+#
+#   ntf "Build done" "all tests passed"     # title + message
+#   ntf "just a message"                    # message only
+#   ntf --title Build --message done        # explicit flags
+#   echo "output" | ntf                     # message from stdin
+#   make 2>&1 | ntf "Build finished"        # title from arg, body from stdin
+#
+# Tokens come from the environment:
+#   PUSHOVER_USER_KEY               (required)
+#   PUSHOVER_GENERAL_API_KEY        channel: general (default)
+#   PUSHOVER_CLAUDE_API_KEY         channel: claude
+#   PUSHOVER_HOME_NETWORK_API_KEY   channel: home-server
 
-xargs -I{} curl -d {} $NTFY_AUTH_URL/general
+emulate -L zsh
+setopt pipe_fail
+
+typeset -g PROG=${0:t}
+typeset -g API=https://api.pushover.net/1
+
+die() { print -ru2 -- "$PROG: $*"; exit 1; }
+
+usage() {
+  cat <<'EOF'
+ntf — send a Pushover notification
+
+USAGE
+  ntf <title> <message>
+  ntf <message>
+  ntf --title <title> --message <message>
+  <command> | ntf [title]
+
+OPTIONS
+  -t, --title TEXT        notification title
+  -m, --message TEXT      notification body ("-" reads stdin)
+  -c, --channel NAME      general (default) | claude | home-server
+                          aliases: gen, cc, home, home-network, server
+  -d, --device NAME       all (default) | pixel8 | browser
+                          aliases: android, phone -> pixel8;  web -> browser
+                          comma-separated lists are allowed: -d pixel8,browser
+  -p, --priority LEVEL    lowest|-2  low|-1  normal|0  high|1  emergency|2
+      --retry SECONDS     emergency only: re-alert interval  (default 60)
+      --expire SECONDS    emergency only: stop retrying after (default 3600)
+  -u, --url URL           supplementary URL
+      --url-title TEXT    label for --url
+  -s, --sound NAME        pushover sound (e.g. pushover, magic, none)
+      --ttl SECONDS       auto-delete the notification after N seconds
+      --html              render the message as HTML
+      --monospace         render the message in a monospace font
+  -n, --dry-run           print what would be sent, send nothing
+  -v, --verbose           print the raw API response
+  -q, --quiet             suppress the success line
+      --devices           list the devices registered on the account
+  -h, --help              this help
+
+ENVIRONMENT
+  NTF_CHANNEL   default channel (overrides "general")
+  NTF_DEVICE    default device  (overrides "all")
+
+EXAMPLES
+  ntf "Deploy" "prod is live" -c home-server -p high
+  ntf -c claude "Claude" "task finished" -d phone
+  tail -n 20 /var/log/build.log | ntf "Build failed" -p high
+EOF
+}
+
+# ---------------------------------------------------------------- lookup tables
+typeset -A CHANNELS=(
+  general      PUSHOVER_GENERAL_API_KEY
+  gen          PUSHOVER_GENERAL_API_KEY
+  default      PUSHOVER_GENERAL_API_KEY
+  claude       PUSHOVER_CLAUDE_API_KEY
+  cc           PUSHOVER_CLAUDE_API_KEY
+  ai           PUSHOVER_CLAUDE_API_KEY
+  home-server  PUSHOVER_HOME_NETWORK_API_KEY
+  homeserver   PUSHOVER_HOME_NETWORK_API_KEY
+  home         PUSHOVER_HOME_NETWORK_API_KEY
+  home-network PUSHOVER_HOME_NETWORK_API_KEY
+  network      PUSHOVER_HOME_NETWORK_API_KEY
+  server       PUSHOVER_HOME_NETWORK_API_KEY
+)
+
+typeset -A DEVICES=(
+  all     ''
+  any     ''
+  pixel8  pixel8
+  android pixel8
+  phone   pixel8
+  mobile  pixel8
+  browser browser
+  web     browser
+  desktop browser
+)
+
+typeset -A PRIORITIES=(
+  lowest -2  silent -2  -2 -2
+  low    -1  quiet  -1  -1 -1
+  normal  0  default 0   0  0
+  high    1  loud    1   1  1
+  emergency 2  urgent 2  2  2
+)
+
+# ---------------------------------------------------------------------- parsing
+typeset title='' message='' channel='' device='' priority=0
+typeset url='' url_title='' sound='' ttl='' retry=60 expire=3600
+typeset -i html=0 monospace=0 dry_run=0 verbose=0 quiet=0 list_devices=0
+typeset -i have_message=0
+typeset -a positional
+
+# bare `ntf` (no args, nothing piped in) -> show the help
+if (( ! ARGC )) && [[ -t 0 ]]; then usage; exit 0; fi
+
+need() { [[ -n ${2-} ]] || die "option $1 requires a value"; }
+
+while (( $# )); do
+  case $1 in
+    -t|--title)      need $1 ${2-}; title=$2; shift 2 ;;
+    -m|--message|--msg) need $1 ${2-}; message=$2; have_message=1; shift 2 ;;
+    -c|--channel|--chanel) need $1 ${2-}; channel=$2; shift 2 ;;
+    -d|--device)     need $1 ${2-}; device=$2; shift 2 ;;
+    -p|--priority)   need $1 ${2-}; priority=$2; shift 2 ;;
+    --retry)         need $1 ${2-}; retry=$2; shift 2 ;;
+    --expire)        need $1 ${2-}; expire=$2; shift 2 ;;
+    -u|--url)        need $1 ${2-}; url=$2; shift 2 ;;
+    --url-title)     need $1 ${2-}; url_title=$2; shift 2 ;;
+    -s|--sound)      need $1 ${2-}; sound=$2; shift 2 ;;
+    --ttl)           need $1 ${2-}; ttl=$2; shift 2 ;;
+    --html)          html=1; shift ;;
+    --monospace)     monospace=1; shift ;;
+    -n|--dry-run)    dry_run=1; shift ;;
+    -v|--verbose)    verbose=1; shift ;;
+    -q|--quiet)      quiet=1; shift ;;
+    --devices)       list_devices=1; shift ;;
+    -h|--help)       usage; exit 0 ;;
+    --)              shift; positional+=("$@"); break ;;
+    -?*)             die "unknown option: $1 (try --help)" ;;
+    *)               positional+=("$1"); shift ;;
+  esac
+done
+
+# ------------------------------------------------------------------ credentials
+[[ -n ${PUSHOVER_USER_KEY-} ]] || die "PUSHOVER_USER_KEY is not set"
+
+channel=${channel:-${NTF_CHANNEL:-general}}
+channel=${channel:l}
+typeset token_var=${CHANNELS[$channel]-}
+[[ -n $token_var ]] || die "unknown channel: $channel (general | claude | home-server)"
+typeset token=${(P)token_var-}
+[[ -n $token ]] || die "$token_var is not set (needed for channel '$channel')"
+
+if (( list_devices )); then
+  curl -sS -X POST $API/users/validate.json \
+    --form-string "token=$token" \
+    --form-string "user=$PUSHOVER_USER_KEY" |
+    sed -n 's/.*"devices":\[\([^]]*\)\].*/\1/p' | tr -d '"' | tr ',' '\n' | awk 'NF'
+  exit 0
+fi
+
+# ---------------------------------------------------------------------- devices
+device=${device:-${NTF_DEVICE:-all}}
+typeset -a resolved
+typeset d
+for d in ${(s:,:)device}; do
+  d=${${d##[[:space:]]#}%%[[:space:]]#}
+  [[ -n $d ]] || continue
+  typeset name=${DEVICES[${d:l}]-__unset__}
+  [[ $name == __unset__ ]] && die "unknown device: $d (all | pixel8 | browser)"
+  [[ -n $name ]] && resolved+=($name)
+done
+# "all" anywhere in the list means: don't restrict at all
+[[ ${(j:,:)${(s:,:)device:l}} == *(all|any)* ]] && resolved=()
+device=${(j:,:)${(u)resolved}}
+
+# --------------------------------------------------------------------- priority
+typeset p=${PRIORITIES[${priority:l}]-}
+[[ -n $p ]] || die "unknown priority: $priority (lowest|low|normal|high|emergency or -2..2)"
+priority=$p
+
+# ------------------------------------------------------- title / message / stdin
+typeset stdin_text=''
+if [[ $message == '-' ]] || { (( ! have_message )) && [[ ! -t 0 ]] }; then
+  stdin_text=$(cat)
+  if [[ $message == '-' ]]; then message=$stdin_text; stdin_text=''; fi
+fi
+
+if (( have_message )) || [[ -n $stdin_text ]]; then
+  # body already decided; every positional is the title
+  [[ -n $stdin_text ]] && message=$stdin_text
+  (( ${#positional} )) && title=${title:-${(j: :)positional}}
+else
+  case ${#positional} in
+    0) ;;
+    1) message=$positional[1] ;;
+    *) title=${title:-$positional[1]}; message=${(j: :)positional[2,-1]} ;;
+  esac
+fi
+
+message=${message%%$'\n'##}
+if [[ -z $message ]]; then
+  print -ru2 -- "$PROG: nothing to send (give a message, or pipe one in)"
+  print -ru2 --
+  usage >&2
+  exit 1
+fi
+
+# Pushover caps: title 250 chars, message 1024 chars
+(( ${#title}   > 250  )) && title=${title[1,247]}...
+(( ${#message} > 1024 )) && message=${message[1,1021]}...
+
+# ------------------------------------------------------------------ send it off
+typeset -a args=(
+  --form-string "token=$token"
+  --form-string "user=$PUSHOVER_USER_KEY"
+  --form-string "message=$message"
+)
+[[ -n $title     ]] && args+=(--form-string "title=$title")
+[[ -n $device    ]] && args+=(--form-string "device=$device")
+(( priority != 0 )) && args+=(--form-string "priority=$priority")
+(( priority == 2 )) && args+=(--form-string "retry=$retry" --form-string "expire=$expire")
+[[ -n $url       ]] && args+=(--form-string "url=$url")
+[[ -n $url_title ]] && args+=(--form-string "url_title=$url_title")
+[[ -n $sound     ]] && args+=(--form-string "sound=$sound")
+[[ -n $ttl       ]] && args+=(--form-string "ttl=$ttl")
+(( html ))          && args+=(--form-string "html=1")
+(( monospace ))     && args+=(--form-string "monospace=1")
+
+if (( dry_run )); then
+  print -r -- "POST $API/messages.json"
+  typeset -i i
+  for (( i = 2; i <= ${#args}; i += 2 )); do
+    case $args[i] in
+      token=*) printf '  %-9s = %s\n' token "<\$$token_var>" ;;
+      user=*)  printf '  %-9s = %s\n' user  "<\$PUSHOVER_USER_KEY>" ;;
+      *)       printf '  %-9s = %s\n' "${args[i]%%=*}" "${args[i]#*=}" ;;
+    esac
+  done
+  exit 0
+fi
+
+typeset response
+response=$(curl -sS --max-time 20 -X POST $API/messages.json "${args[@]}") \
+  || die "request failed (network error)"
+
+(( verbose )) && print -r -- "$response"
+
+if [[ $response != *'"status":1'* ]]; then
+  print -ru2 -- "$PROG: pushover rejected the request:"
+  print -ru2 -- "$response"
+  exit 1
+fi
+
+(( quiet )) || print -r -- "sent -> ${channel}${device:+ (}${device}${device:+)}${title:+ : }${title}"

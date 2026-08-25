@@ -1,13 +1,105 @@
 #!/usr/bin/env zsh
-TITLE=$1
-TEXT=$2
+#
+# notify-attention <title> <message>
+#
+# Sends a Pushover push through ntf.
+#
+# Claude Code hands its hooks a JSON payload on stdin. When we detect one we
+# ignore the caller's title and build our own from where Claude is actually
+# working — repo, worktree, branch, path, tmux session — so a phone full of
+# "needs your input" pings still tells you *which* session wants you.
+# Called by hand (or by the sunshine scripts) the plain title/message wins.
 
-if [[ "$(uname)" == "Darwin" ]]; then
-	afplay /System/Library/Sounds/Glass.aiff
-	osascript -e "display notification \"$TEXT\" with title \"$TITLE\""
-else
-  if [[ -z "$container" ]]; then
-      paplay /usr/share/sounds/freedesktop/stereo/window-attention.oga 2>/dev/null
-      notify-send "$TITLE" "$TEXT" 2>/dev/null
+emulate -L zsh
+
+TITLE=${1:-Notification}
+TEXT=${2:-}
+
+LOG=${NOTIFY_ATTENTION_LOG:-$HOME/.local/state/notify-attention.log}
+
+logline() {
+  [[ -d ${LOG:h} ]] || mkdir -p ${LOG:h} 2>/dev/null
+  print -r -- "$(date '+%F %T') $*" >>$LOG 2>/dev/null
+}
+
+# if [[ "$(uname)" == "Darwin" ]]; then
+# 	afplay /System/Library/Sounds/Glass.aiff
+# 	osascript -e "display notification \"$TEXT\" with title \"$TITLE\""
+# else
+#   if [[ -z "$container" ]]; then
+#       paplay /usr/share/sounds/freedesktop/stereo/window-attention.oga 2>/dev/null
+#       notify-send "$TITLE" "$TEXT" 2>/dev/null
+#   fi
+# fi
+
+# --------------------------------------------------------------- hook payload
+# timeout: never let an inherited-but-idle stdin wedge a notification.
+payload=''
+[[ -t 0 ]] || payload=$(timeout 1 cat 2>/dev/null)
+
+event='' hook_msg='' cwd=''
+if [[ -n $payload ]] && (( ${+commands[jq]} )); then
+  # one field per jq call on purpose: a single delimited read would either
+  # collapse empty fields (tab is IFS whitespace) or choke on a multi-line
+  # .message
+  jq_get() { print -r -- "$payload" | jq -r "$1 // empty" 2>/dev/null }
+  event=$(jq_get .hook_event_name)
+  hook_msg=$(jq_get .message)
+  cwd=$(jq_get .cwd)
+fi
+
+# ------------------------------------------------------------------- context
+# "repo · branch", or "repo:worktree · branch" inside a linked worktree.
+git_context() {
+  local dir=$1 top gitdir common repo branch wt
+  git -C $dir rev-parse --is-inside-work-tree &>/dev/null || { print -r -- ${dir:t}; return }
+
+  top=$(git -C $dir rev-parse --show-toplevel 2>/dev/null)
+  gitdir=$(git -C $dir rev-parse --absolute-git-dir 2>/dev/null)
+  common=$(git -C $dir rev-parse --git-common-dir 2>/dev/null)
+  [[ $common == /* ]] || common=$dir/$common
+  common=${common:A}
+
+  # <repo>/.git -> <repo>; a worktree's common dir still points at the main one
+  repo=${${common:h}:t}
+  branch=$(git -C $dir branch --show-current 2>/dev/null)
+  [[ -n $branch ]] || branch="detached@$(git -C $dir rev-parse --short HEAD 2>/dev/null)"
+  [[ ${gitdir:A} != $common ]] && wt=${top:t}
+
+  print -r -- "${repo}${wt:+:$wt} · ${branch}"
+}
+
+tmux_context() {
+  [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )) || return
+  tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#S:#I' 2>/dev/null
+}
+
+if [[ -n $event ]]; then
+  [[ -n $cwd && -d $cwd ]] || cwd=$PWD
+  TITLE=$(git_context $cwd)
+  # the hook's own message ("Claude needs your permission to use Bash") beats
+  # whatever static string settings.json passed us
+  [[ -n $hook_msg ]] && TEXT=$hook_msg
+  [[ -n $TEXT ]] || TEXT=$event
+  where=${cwd/#$HOME/\~}
+  tm=$(tmux_context)
+  TEXT="${TEXT}"$'\n'"${where}${tm:+ · tmux ${tm}}"
+fi
+
+# ---------------------------------------------------------------------- send
+if (( ${+commands[ntf]} )); then
+  ntf_args=(-q -c "${NTF_CHANNEL:-claude}" -d "${NTF_DEVICE:-browser}")
+  if [[ -n $TEXT ]]; then
+    ntf_args+=(-t "$TITLE" -m "$TEXT")
+  else
+    ntf_args+=(-m "$TITLE")
   fi
+  logline "sent: $TITLE | ${TEXT%%$'\n'*}"
+  # </dev/null: we already drained stdin, and ntf would read whatever is left
+  # as its message body. Failures land in $LOG instead of /dev/null.
+  {
+    ntf "${ntf_args[@]}" </dev/null 2>>$LOG || logline "ntf failed (exit $?): $TITLE / ${TEXT%%$'\n'*}"
+  } &!
+else
+  logline "ntf not found in PATH; dropped: $TITLE / ${TEXT%%$'\n'*}"
 fi
