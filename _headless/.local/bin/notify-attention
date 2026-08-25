@@ -73,11 +73,29 @@ git_context() {
 # window. The hook's stdout belongs to Claude, not the terminal, so we have to
 # write the BEL into the pane's tty directly.
 sleep 4
+# Claude spawns hooks with no controlling terminal (tty_nr is 0), so /dev/tty
+# is never an option. Walk up to the nearest ancestor that does own one -
+# claude itself - and ring its stdout. In a devcontainer there is no tmux
+# socket either, but claude's stdout is the docker exec pty whose far end is
+# the host pane, so the BEL still reaches tmux.
+ancestor_tty() {
+  local pid=$PPID depth=0 fd
+  while (( depth++ < 12 )) && [[ -r /proc/$pid/stat ]]; do
+    fd=/proc/$pid/fd/1
+    [[ -c $fd && -w $fd ]] && { print -r -- $fd; return }
+    # strip "pid (comm) " first: comm may contain spaces or parens
+    pid=$(sed -E 's/^[0-9]+ \(.*\) //' /proc/$pid/stat 2>/dev/null | awk '{print $2}')
+    [[ -n $pid && $pid != 0 && $pid != 1 ]] || return
+  done
+}
+
 ring_pane() {
-  [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )) || return
-  local tty
-  tty=$(tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#{pane_tty}' 2>/dev/null)
-  [[ -w $tty ]] && printf '\a' >$tty
+  local tty=''
+  if [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )); then
+    tty=$(tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#{pane_tty}' 2>/dev/null)
+  fi
+  [[ -n $tty && -w $tty ]] || tty=$(ancestor_tty)
+  [[ -n $tty && -w $tty ]] && printf '\a' >$tty
 }
 
 tmux_context() {
@@ -93,6 +111,8 @@ if [[ -n $event ]]; then
   [[ -n $hook_msg ]] && TEXT=$hook_msg
   [[ -n $TEXT ]] || TEXT=$event
   ring_pane
+  # a push from a container otherwise looks identical to one from the host
+  [[ -f /.dockerenv ]] && TITLE="\U1F433 $TITLE"
   where=${cwd/#$HOME/\~}
   tm=$(tmux_context)
   TEXT="${TEXT}"$'\n'"${where}${tm:+ · tmux ${tm}}"

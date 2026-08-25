@@ -18,6 +18,14 @@
   "containerEnv": {
     "SSH_AUTH_SOCK": "/ssh-agent"
   },
+  // Claude's notification hooks run non-interactively, so they never source
+  // ~/.secrets/secrets.zsh the way a login shell does. Hand the keys in
+  // directly; devshell runs from an interactive shell that already has them.
+  "remoteEnv": {
+    "PUSHOVER_USER_KEY": "${localEnv:PUSHOVER_USER_KEY}",
+    "PUSHOVER_CLAUDE_API_KEY": "${localEnv:PUSHOVER_CLAUDE_API_KEY}",
+    "PUSHOVER_GENERAL_API_KEY": "${localEnv:PUSHOVER_GENERAL_API_KEY}"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {  "moby": false },
     "ghcr.io/devcontainers/features/node:1": { "version": "lts" }
