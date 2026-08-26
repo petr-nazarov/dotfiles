@@ -9,3 +9,4 @@ windows:
         - editor:
             - nvim
         - term:
+            - source .venv/bin/activate
