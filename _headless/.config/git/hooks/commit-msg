@@ -1,0 +1,13 @@
+#!/bin/sh
+# Strip Claude Code attribution trailers from commit messages, whoever wrote them.
+msg="$1"
+
+sed -i -E \
+  -e '/^[[:space:]]*Co-[Aa]uthored-[Bb]y:.*[Cc]laude/d' \
+  -e '/^[[:space:]]*Claude-Session:/d' \
+  -e '/[Gg]enerated with \[?Claude Code/d' \
+  -e '\#^[[:space:]]*https://claude\.ai/code/session_#d' \
+  "$msg"
+
+# Collapse the blank lines left behind at the end of the message.
+printf '%s\n' "$(cat "$msg")" > "$msg"

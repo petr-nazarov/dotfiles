@@ -3,6 +3,7 @@
 	email = petr.tzur.nazarov@gmail.com
 [core]
     pager = delta
+	hooksPath = ~/.config/git/hooks
 
 [interactive]
     diffFilter = delta --color-only
