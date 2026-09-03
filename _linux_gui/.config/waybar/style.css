@@ -37,6 +37,7 @@
 #custom-screenrecording-indicator,
 #custom-sleep,
 #custom-tailscale,
+#custom-netbird,
 #custom-update {
   min-width: 12px;
   margin: 0 7.5px;
@@ -59,6 +60,18 @@
 }
 
 #custom-tailscale.connecting {
+  color: #f9e2af;
+}
+
+#custom-netbird.connected {
+  color: #f38ba8;
+}
+
+#custom-netbird.disconnected {
+  opacity: 0.45;
+}
+
+#custom-netbird.connecting {
   color: #f9e2af;
 }
 

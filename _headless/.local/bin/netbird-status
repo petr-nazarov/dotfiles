@@ -1,0 +1,80 @@
+#!/usr/bin/env zsh
+
+## Report or toggle the netbird connection.
+##   status  print waybar JSON (default)
+##   toggle  bring netbird up/down and refresh waybar
+##
+## Prints an empty module (waybar hides it) when netbird is not installed
+## or the daemon cannot be reached.
+
+hide() {
+	print -r -- '{"text":""}'
+	exit 0
+}
+
+report() {
+	## $1 glyph, $2 css class, $3 tooltip
+	print -r -- "{\"text\":\"$1\",\"class\":\"$2\",\"tooltip\":\"$3\"}"
+	exit 0
+}
+
+## echo the daemonStatus, or nothing when netbird is unavailable
+daemon_status() {
+	command -v netbird >/dev/null || return 1
+	## bail out rather than stall the bar if the daemon is wedged
+	local json
+	json=$(timeout 2 netbird status --json 2>/dev/null) || return 1
+	print -r -- "$json" |
+		grep -o '"daemonStatus"[[:space:]]*:[[:space:]]*"[^"]*"' |
+		head -n1 |
+		sed 's/.*"\([^"]*\)"$/\1/'
+}
+
+## the daemon socket is usually world-writable, so only escalate when it is not
+run_netbird() {
+	local out
+	if out=$(netbird "$1" 2>&1); then
+		print -r -- "$out"
+		return 0
+	fi
+	if [[ "$out" == *[Pp]ermission* || "$out" == *denied* ]]; then
+		pkexec "$(command -v netbird)" "$1" 2>&1
+	else
+		print -r -- "$out"
+	fi
+}
+
+case "${1:-status}" in
+toggle)
+	state=$(daemon_status) || exit 0
+	if [[ "$state" == "Connected" ]]; then
+		out=$(run_netbird down)
+	else
+		out=$(run_netbird up)
+	fi
+	## surface auth URLs and failures, which are otherwise invisible
+	[[ -n "$out" ]] && notify-send "NetBird" "$out"
+	pkill -RTMIN+10 waybar
+	;;
+status)
+	state=$(daemon_status) || hide
+
+	case "$state" in
+	Connected)
+		ip=$(timeout 2 netbird status 2>/dev/null | sed -n 's|^NetBird IP:[[:space:]]*\([^/]*\).*|\1|p' | head -n1)
+		report "󱗆" "connected" "NetBird connected${ip:+\\n$ip}\\nClick to disconnect"
+		;;
+	Connecting)
+		report "󱗆" "connecting" "NetBird connecting…"
+		;;
+	NeedsLogin | LoginFailed | SessionExpired)
+		report "󱗆" "disconnected" "NetBird needs login\\nClick to connect"
+		;;
+	Idle | Disconnected)
+		report "󱗆" "disconnected" "NetBird disconnected\\nClick to connect"
+		;;
+	esac
+
+	hide
+	;;
+esac

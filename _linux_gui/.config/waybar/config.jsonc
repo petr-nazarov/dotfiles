@@ -19,6 +19,7 @@
     "bluetooth",
     "network",
     "custom/tailscale",
+    "custom/netbird",
     "custom/sleep",
     "battery",
     "memory",
@@ -143,6 +144,13 @@
     "interval": 10,
     "signal": 9,
     "on-click": "$HOME/.local/bin/tailscale-status toggle"
+  },
+  "custom/netbird": {
+    "exec": "$HOME/.local/bin/netbird-status status",
+    "return-type": "json",
+    "interval": 10,
+    "signal": 10,
+    "on-click": "$HOME/.local/bin/netbird-status toggle"
   },
   "custom/sleep": {
     "exec": "$HOME/.local/bin/sleep-toggle status",
