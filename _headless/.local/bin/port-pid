@@ -1,0 +1,281 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+## Find what is bound to a port, pick it in fzf, kill it.
+##
+## No single tool answers this everywhere: macOS has lsof but no `ss`, and its
+## netstat refuses to print PIDs at all; a slim Debian/Ubuntu/Arch box (or a
+## container) usually has `ss` but no lsof. So probe for what is installed and
+## use the first backend that can answer.
+##
+## Sockets owned by another user are invisible without root, so :80 and friends
+## come up empty. We can still see *that* the port is taken (ss and BSD netstat
+## both list unattributable sockets), so in that case we ask for a sudo password
+## and redo the lookup elevated. Same on the way out: a kill that gets EPERM is
+## retried under sudo.
+##
+## Piped or redirected (no tty) it degrades to printing bare PIDs and never
+## kills anything, so `port-pid 3000 | xargs ...` stays usable.
+
+OS=$(uname -s)
+PROTO=tcp
+ALL=0
+LIST_ONLY=0
+SIGNAL=TERM
+ESCALATED=0
+
+usage() {
+	cat >&2 <<'EOF'
+usage: port-pid [-u] [-a] [-l] [-9] <port>
+
+Shows everything bound to <port> in fzf; the selection gets SIGTERM.
+Tab marks several rows, Esc kills nothing.
+
+  -u  look at UDP instead of TCP
+  -a  match any socket on the port, not just listeners
+  -l  list only, never kill
+  -9  send SIGKILL instead of SIGTERM
+
+Exits 1 when nothing is bound to the port, 130 when the picker is cancelled.
+EOF
+}
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+## run a lookup command, elevated once we know the port hides from us
+priv() {
+	if ((ESCALATED)); then sudo "$@"; else "$@"; fi
+}
+
+while getopts ':ual9h' opt; do
+	case "$opt" in
+	u) PROTO=udp ;;
+	a) ALL=1 ;;
+	l) LIST_ONLY=1 ;;
+	9) SIGNAL=KILL ;;
+	h)
+		usage
+		exit 0
+		;;
+	*)
+		echo "port-pid: unknown option -$OPTARG" >&2
+		usage
+		exit 2
+		;;
+	esac
+done
+shift $((OPTIND - 1))
+
+PORT=${1:-}
+if [[ ! $PORT =~ ^[0-9]+$ ]] || ((PORT < 1 || PORT > 65535)); then
+	echo "port-pid: expected a port between 1 and 65535" >&2
+	usage
+	exit 2
+fi
+
+## listeners are the interesting case; UDP has no listening state to filter on
+LISTENERS_ONLY=0
+if ((ALL == 0)) && [[ $PROTO == tcp ]]; then LISTENERS_ONLY=1; fi
+
+## --- backends -------------------------------------------------------------
+## Each prints candidate PIDs, one per line; duplicates and junk are filtered
+## by the caller.
+
+via_ss() {
+	local -a f=(-H -n -p)
+	if [[ $PROTO == tcp ]]; then f+=(-t); else f+=(-u); fi
+	if ((ALL)); then f+=(-a); else f+=(-l); fi
+	## the `sport` filter is exact; grepping the text output would also match
+	## a remote peer that happens to use the port as an ephemeral source
+	priv ss "${f[@]}" "sport = :$PORT" | grep -o 'pid=[0-9]*' | cut -d= -f2
+}
+
+## -w silences the "can't stat()" chatter without a blanket 2>/dev/null, which
+## would also eat sudo's password prompt
+via_lsof() {
+	if ((LISTENERS_ONLY)); then
+		priv lsof -wnP "-iTCP:$PORT" -sTCP:LISTEN -t
+	elif [[ $PROTO == tcp ]]; then
+		priv lsof -wnP "-iTCP:$PORT" -t
+	else
+		priv lsof -wnP "-iUDP:$PORT" -t
+	fi
+}
+
+## last resort: fuser knows nothing about socket state, so -a is implied
+via_fuser() {
+	priv fuser -n "$PROTO" "$PORT" 2>/dev/null | tr -s '[:space:]' '\n'
+}
+
+via_netstat() {
+	local -a f=(-n -p)
+	if [[ $PROTO == tcp ]]; then f+=(--tcp); else f+=(--udp); fi
+	if ((ALL)); then f+=(-a); else f+=(-l); fi
+	## local address is column 4 ("0.0.0.0:3000", ":::3000"); PID/Program is
+	## last, since the tcp and udp tables differ in column count
+	priv netstat "${f[@]}" 2>/dev/null |
+		awk -v p="$PORT" '{ n = split($4, a, "[:]"); if (a[n] == p) print $NF }' | cut -d/ -f1
+}
+
+## macOS ships a BSD netstat that never prints PIDs, and no ss, so lsof is the
+## only usable backend there regardless of what else is on PATH
+if [[ $OS != Darwin ]] && have ss; then
+	BACKEND=ss
+elif have lsof; then
+	BACKEND=lsof
+elif have fuser; then
+	BACKEND=fuser
+elif have netstat; then
+	BACKEND=netstat
+else
+	echo "port-pid: need one of ss (iproute2), lsof, fuser (psmisc) or netstat" >&2
+	exit 127
+fi
+
+lookup() {
+	local pids
+	## backends exit non-zero on "no match"; that is not an error here. stderr
+	## is deliberately left alone so a sudo prompt or failure stays visible.
+	pids=$(
+		case "$BACKEND" in
+		ss) via_ss ;;
+		lsof) via_lsof ;;
+		fuser) via_fuser ;;
+		netstat) via_netstat ;;
+		esac || true
+	)
+	printf '%s' "$pids" | grep -E '^[0-9]+$' | sort -un || true
+}
+
+## a lingering TIME_WAIT/FIN_WAIT socket has no owning process, so it must not
+## count as "busy" - otherwise -a would ask for a sudo password to go looking
+## for a process that cannot exist (states differ across ss/netstat/BSD)
+strip_orphans() {
+	grep -viE 'TIME.WAIT|FIN.WAIT' || true
+}
+
+## Is anything bound to the port at all, even if we cannot see whose it is?
+## Both ss and BSD netstat list such sockets without root, which is how "port
+## is free" is told apart from "port is hidden from you".
+port_busy() {
+	local out=""
+	if [[ $OS != Darwin ]] && have ss; then
+		local -a f=(-H -n)
+		if [[ $PROTO == tcp ]]; then f+=(-t); else f+=(-u); fi
+		if ((ALL)); then f+=(-a); else f+=(-l); fi
+		out=$(ss "${f[@]}" "sport = :$PORT" 2>/dev/null || true)
+		out=$(strip_orphans <<<"$out")
+	elif have netstat; then
+		local -a f=(-a -n)
+		local sep='[:]'
+		if [[ $OS == Darwin ]]; then
+			f+=(-p "$PROTO")
+			sep='[.]' # BSD writes 127.0.0.1.3000, not 127.0.0.1:3000
+		else
+			f+=(--"$PROTO")
+		fi
+		out=$(netstat "${f[@]}" 2>/dev/null |
+			awk -v p="$PORT" -v sep="$sep" -v listen="$LISTENERS_ONLY" '
+				$1 ~ /^(tcp|udp)/ {
+					n = split($4, a, sep)
+					if (a[n] != p) next
+					if (listen && $6 != "LISTEN") next
+					print
+				}' | strip_orphans || true)
+	fi
+	[[ -n $out ]]
+}
+
+PIDS=$(lookup)
+
+## nothing visible: either the port is free, or it belongs to someone else
+BUSY=0
+if [[ -z $PIDS ]] && port_busy; then
+	BUSY=1
+	if ((EUID != 0)) && have sudo; then
+		echo "port-pid: :$PORT is held by another user's process, elevating..." >&2
+		sudo -v || exit 1
+		ESCALATED=1
+		PIDS=$(lookup)
+	fi
+fi
+
+if [[ -z $PIDS ]]; then
+	if ((BUSY)); then
+		echo "port-pid: :$PORT is in use but its process is not visible from here" \
+			"(another user and no sudo, or another netns/container)" >&2
+	else
+		echo "port-pid: nothing bound to :$PORT" >&2
+	fi
+	exit 1
+fi
+
+## --- present --------------------------------------------------------------
+
+table() {
+	printf '%-8s %-12s %s\n' PID USER COMMAND
+	while IFS= read -r pid; do
+		user='?'
+		args='?'
+		info=$(ps -p "$pid" -o user=,args= 2>/dev/null || true)
+		if [[ -n $info ]]; then
+			read -r user args <<<"$info"
+		fi
+		printf '%-8s %-12s %s\n' "$pid" "$user" "$args"
+	done <<<"$PIDS"
+}
+
+## no terminal (piped, cron, $(...)): behave like a plain lookup and never kill
+if [[ ! -t 1 ]] || [[ ! -t 2 ]]; then
+	printf '%s\n' "$PIDS"
+	exit 0
+fi
+
+if ((LIST_ONLY)); then
+	table
+	exit 0
+fi
+
+if ! have fzf; then
+	table
+	echo "port-pid: fzf not installed, nothing killed" >&2
+	exit 0
+fi
+
+SELECTED=$(table | fzf --header-lines=1 --multi --prompt="SIG$SIGNAL on :$PORT > ") || {
+	## Esc / ctrl-c: deliberate cancel, not a failure to find anything
+	exit 130
+}
+[[ -n $SELECTED ]] || exit 130
+
+VICTIMS=$(awk '{ print $1 }' <<<"$SELECTED")
+
+## --- kill -----------------------------------------------------------------
+
+RC=0
+while IFS= read -r pid; do
+	[[ -n $pid ]] || continue
+	if kill -s "$SIGNAL" "$pid" 2>/dev/null; then
+		echo "port-pid: SIG$SIGNAL -> $pid" >&2
+		continue
+	fi
+	## still alive means EPERM (someone else's process), gone means it exited
+	## between the picker and here
+	if ! kill -0 "$pid" 2>/dev/null; then
+		echo "port-pid: $pid already gone" >&2
+		continue
+	fi
+	if ! have sudo; then
+		echo "port-pid: cannot signal $pid (not yours) and sudo is not installed" >&2
+		RC=1
+		continue
+	fi
+	if sudo kill -s "$SIGNAL" "$pid"; then
+		echo "port-pid: SIG$SIGNAL -> $pid (as root)" >&2
+	else
+		echo "port-pid: failed to kill $pid" >&2
+		RC=1
+	fi
+done <<<"$VICTIMS"
+
+exit "$RC"

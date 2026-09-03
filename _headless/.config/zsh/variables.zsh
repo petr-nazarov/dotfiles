@@ -1,6 +1,8 @@
 export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
-export SHELL=zsh
+# Must be an absolute path: tools that exec $SHELL on a remote (e.g. `netbird ssh`)
+# fail with `Shell "zsh" is not executable` when this is a bare name.
+export SHELL="$(command -v zsh)"
 export EDITOR=nvim
 export BROWSER=zen-browser
 
