@@ -18,6 +18,7 @@
     "backlight",
     "bluetooth",
     "network",
+    "custom/tailscale",
     "custom/sleep",
     "battery",
     "memory",
@@ -135,6 +136,13 @@
       "warning": 20,
       "critical": 10
     }
+  },
+  "custom/tailscale": {
+    "exec": "$HOME/.local/bin/tailscale-status status",
+    "return-type": "json",
+    "interval": 10,
+    "signal": 9,
+    "on-click": "$HOME/.local/bin/tailscale-status toggle"
   },
   "custom/sleep": {
     "exec": "$HOME/.local/bin/sleep-toggle status",

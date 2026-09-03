@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Default tmux window name for a directory.
+#
+#   inside a git worktree    -> the worktree's directory name
+#   inside a plain git repo  -> the repo root's directory name
+#   anywhere else            -> the directory name ("~" for $HOME)
+#
+# Usage:
+#   tmux-window-name [dir]              print the name for dir (default $PWD)
+#   tmux-window-name --apply [target]   rename that tmux window, unless the
+#                                       name was chosen explicitly
+#
+# --apply is what .tmux.conf's hooks and the zsh chpwd hook call.
+set -uo pipefail
+
+name_for() {
+  local dir=$1 root
+  cd "$dir" 2>/dev/null || { basename "$dir"; return; }
+
+  # --show-toplevel is already worktree-aware: from a linked worktree it
+  # returns that worktree's root, from the main one it returns the repo root.
+  # Both are exactly the name we want, so worktrees need no special casing.
+  if root=$(git rev-parse --show-toplevel 2>/dev/null) && [[ -n $root ]]; then
+    basename "$root"
+    return
+  fi
+
+  if [[ $dir == "$HOME" ]]; then
+    echo '~'
+  else
+    basename "$dir"
+  fi
+}
+
+if [[ ${1:-} != --apply ]]; then
+  name_for "${1:-$PWD}"
+  exit 0
+fi
+
+target=${2:-${TMUX_PANE:-}}
+[[ -n ${TMUX:-} && -n $target ]] || exit 0
+
+# automatic-rename is tmux's own "this window has never been named explicitly"
+# bit: it is cleared by rename-window (prefix + `,`) and by `new-window -n`,
+# which is how tmuxinator names its windows. Honouring it means we never fight
+# a name a human or a tmuxinator project picked. Only the active pane gets a
+# say, matching how tmux's built-in automatic renaming behaves.
+IFS='|' read -r auto active path < <(
+  tmux display -p -t "$target" '#{automatic-rename}|#{pane_active}|#{pane_current_path}' 2>/dev/null
+) || exit 0
+[[ $auto == 1 && $active == 1 && -n $path ]] || exit 0
+
+name=$(name_for "$path")
+[[ -n $name ]] || exit 0
+
+# rename-window clears automatic-rename, so put it straight back: here it is a
+# lock bit, not a request for tmux to do its own renaming.
+tmux rename-window -t "$target" "$name" \; set-window-option -t "$target" automatic-rename on

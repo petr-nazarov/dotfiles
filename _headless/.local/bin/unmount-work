@@ -4,3 +4,4 @@ tmuxinator stop tadam
 tmuxinator stop cardbook
 tmuxinator stop personal 
 fusermount -uz ~/Projects/FrrCode
+sudo tailscale down

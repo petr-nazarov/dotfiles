@@ -21,6 +21,9 @@ fi
 ### Key Binds ###
 source $HOME/.config/zsh/bind-keys.zsh
 
+### tmux ###
+source $HOME/.config/zsh/tmux.zsh
+
 
 
 # opencode

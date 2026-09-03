@@ -36,6 +36,7 @@
 #custom-omarchy,
 #custom-screenrecording-indicator,
 #custom-sleep,
+#custom-tailscale,
 #custom-update {
   min-width: 12px;
   margin: 0 7.5px;
@@ -46,6 +47,18 @@
 }
 
 #custom-sleep.inhibited {
+  color: #f9e2af;
+}
+
+#custom-tailscale.connected {
+  color: #f38ba8;
+}
+
+#custom-tailscale.disconnected {
+  opacity: 0.45;
+}
+
+#custom-tailscale.connecting {
   color: #f9e2af;
 }
 
