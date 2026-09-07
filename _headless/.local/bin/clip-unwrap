@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# clip-unwrap — clipboard filter that undoes Claude Code's hard wrapping.
+#
+# Claude Code breaks a long line at the pane edge with a real newline and
+# indents what follows, so a selection spanning those lines yields
+# "...code_cha\n  llenge_method..." — a token split in half plus stray indent.
+#
+# Two modes:
+#
+#   clip-unwrap                 aggressive. Joins EVERY newline. Correct when
+#                               you know the selection is one logical line
+#                               (a URL); wrong for code blocks. Bound to `Y`.
+#
+#   clip-unwrap --width <cols>  smart. Joins a line to the next only when it
+#                               reached the pane's content column, which is
+#                               what a hard wrap looks like. A short line ended
+#                               in a real newline and is left alone, so code
+#                               blocks survive. Bound to mouse-drag-end, which
+#                               passes tmux's #{pane_width}.
+#
+# The width is the whole point. Once text is on the clipboard a wrap and a real
+# newline are indistinguishable, which is why clipboard-only cleaners (e.g.
+# unwrap-terminal-text on PyPI) must guess, and join with a space that corrupts
+# a URL. tmux still knows the pane width at copy time, so this does not guess.
+#
+# Claude renders to pane_width - 2 (measured: 212 content columns in a
+# 214-column pane). The threshold allows 4 columns of slack so the check does
+# not turn brittle if that padding changes.
+#
+# Both modes dedent by the common leading indent, since Claude indents every
+# line of a block. Removing it from the first line alone would leave the rest
+# of a code block hanging two columns to the right.
+set -uo pipefail
+
+width=0
+if [ "${1:-}" = "--width" ]; then
+  width=${2:-0}
+fi
+
+CLIP_UNWRAP_WIDTH=$width perl -0777 -e '
+  my $t = do { local $/; <STDIN> };
+  $t =~ s/\r//g;
+  $t =~ s/\s+\z//;
+  my $w = $ENV{CLIP_UNWRAP_WIDTH} + 0;
+
+  my @lines = split /\n/, $t, -1;
+
+  # Wrap detection must use the width as drawn, before any dedent.
+  my @wrapped;
+  for my $l (@lines) {
+    (my $vis = $l) =~ s/\e\[[0-9;]*m//g;
+    push @wrapped, (length($vis) >= $w - 4);
+  }
+
+  # Dedent by the common indent of the non-blank lines.
+  my $indent;
+  for my $l (@lines) {
+    next if $l =~ /^\s*$/;
+    my ($lead) = $l =~ /^([ \t]*)/;
+    $indent = length($lead) if !defined $indent || length($lead) < $indent;
+  }
+  $indent //= 0;
+  s/^[ \t]{0,$indent}// for @lines;
+
+  my $out = "";
+  for my $i (0 .. $#lines) {
+    $out .= $lines[$i];
+    last if $i == $#lines;
+    if ($w > 0 ? $wrapped[$i] : 1) {
+      $lines[$i + 1] =~ s/^[ \t]+//;   # drop the continuation indent
+    } else {
+      $out .= "\n";
+    }
+  }
+
+  print $out;
+' | clip

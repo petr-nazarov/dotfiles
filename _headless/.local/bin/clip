@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# clip — put text on the host clipboard from anywhere in the
+# ghostty -> tmux -> devcontainer -> program stack.
+#
+# Why this exists: Claude Code's renderer hard-wraps its own output. It writes
+# a real newline at the pane edge and indents the continuation, so a long URL
+# selected with the mouse comes back with newlines and stray spaces baked into
+# it (an OAuth callback port gets split clean in half). tmux cannot undo that -
+# the line carries no soft-wrap flag, so there is nothing for it to rejoin.
+#
+# clip sidesteps the whole problem: the text is handed to the terminal as an
+# OSC 52 clipboard write instead of being drawn, so it is never laid out and
+# therefore never wrapped. Length is irrelevant.
+#
+# Usage:
+#   clip "some text"
+#   echo "$URL" | clip
+#   clip < file
+#
+# Requires `set -g set-clipboard on` in tmux. The tmux default is 'external',
+# which forwards tmux's OWN copies outward but silently ignores OSC 52 arriving
+# from a program inside the pane - exactly the case this script is.
+set -uo pipefail
+
+# Walk up the process tree for a writable pty. Needed inside a devcontainer,
+# where /dev/tty is not openable from a program started by an agent and the
+# host's tmux socket is out of reach.
+find_pty() {
+  local pid=$$ fd tgt ppid
+  for _ in $(seq 1 20); do
+    for fd in 1 2 0; do
+      tgt=$(readlink "/proc/$pid/fd/$fd" 2>/dev/null) || continue
+      case $tgt in
+        /dev/pts/*) if [ -w "$tgt" ]; then printf '%s' "$tgt"; return 0; fi ;;
+      esac
+    done
+    ppid=$(awk '/^PPid:/{print $2}' "/proc/$pid/status" 2>/dev/null)
+    case $ppid in ''|0|1) return 1 ;; esac
+    pid=$ppid
+  done
+  return 1
+}
+
+if [ "$#" -gt 0 ]; then
+  payload=$(printf '%s' "$*")
+else
+  payload=$(cat)
+fi
+
+b64=$(printf '%s' "$payload" | base64 | tr -d '\n')
+
+# Terminals cap the length of an OSC 52 payload; warn rather than truncate
+# silently, since a half-written clipboard is worse than a visible complaint.
+if [ "${#b64}" -gt 74994 ]; then
+  printf 'clip: %s base64 bytes may exceed the terminal OSC 52 limit\n' "${#b64}" >&2
+fi
+
+seq=$(printf '\033]52;c;%s\007' "$b64")
+
+# Preference order: a real tty, then tmux's own clipboard plumbing, then a pty
+# borrowed from an ancestor process.
+if (exec 3<>/dev/tty) 2>/dev/null; then
+  printf '%s' "$seq" > /dev/tty
+elif [ -n "${TMUX:-}" ] && command -v tmux >/dev/null 2>&1; then
+  printf '%s' "$payload" | tmux load-buffer -w -
+elif pty=$(find_pty); then
+  printf '%s' "$seq" > "$pty"
+else
+  printf 'clip: no tty, no tmux and no ancestor pty to write to\n' >&2
+  exit 1
+fi
