@@ -47,6 +47,19 @@ if [ ! -f ~/.config/ccstatusline/settings.json ]; then
 	fi
 fi
 
+# The Claude hooks ring the pane so tmux on the host flags the window. The hook
+# script normally arrives via the ~/dotfiles mount (stowed to ~/.local/bin by
+# install.sh). Without that mount there is nothing at ~/.local/bin, so drop in
+# the bell-only fallback. Never overwrite: a stowed script is authoritative.
+# -L as well as -e: a *dangling* stow symlink would otherwise make cp write
+# straight through it into the mounted dotfiles repo.
+if [ ! -e ~/.local/bin/notify-attention ] && [ ! -L ~/.local/bin/notify-attention ]; then
+	echo "🔔 Installing fallback notify-attention (no dotfiles mount)"
+	mkdir -p ~/.local/bin
+	cp .devcontainer/base/dotfiles/notify-attention ~/.local/bin/notify-attention
+	chmod +x ~/.local/bin/notify-attention
+fi
+
 # ~/.claude is normally bind-mounted from the host, which brings the real
 # settings.json with it. When that mount is omitted (e.g. to keep host auth
 # out of the container), generate a minimal settings.json so the statusline,
