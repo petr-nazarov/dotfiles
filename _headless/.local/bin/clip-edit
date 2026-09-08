@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# clip-edit — pick an entry from the clipboard history, edit it in nvim, and put
+# the result back on the clipboard.
+#
+# Same picker as the plain SUPER+SHIFT+V binding, except the selected entry is
+# opened in an editor first instead of being copied straight back. Saving and
+# quitting copies; quitting unchanged leaves the clipboard alone.
+set -euo pipefail
+
+# Dismissing the picker with Escape makes tofi exit non-zero and print nothing;
+# an empty selection is the reliable signal, since pipefail also surfaces a
+# SIGPIPE from cliphist when the picker closes its stdin early.
+entry=$(cliphist list | tofi --prompt-text "Edit clipboard entry: ") || true
+[ -n "$entry" ] || exit 0
+
+tmp=$(mktemp "${TMPDIR:-/tmp}/clip-edit.XXXXXXXX")
+trap 'rm -f "$tmp"' EXIT
+
+printf '%s\n' "$entry" | cliphist decode >"$tmp"
+
+# cliphist also stores images; there is nothing to edit in those.
+if [ -s "$tmp" ] && ! grep -qI '' "$tmp"; then
+	notify-send "clip-edit" "Selected entry is not text"
+	exit 0
+fi
+
+before=$(sha256sum <"$tmp")
+
+# nofixeol: nvim would otherwise append a trailing newline to an entry that had
+# none, which is enough to submit a form when the result is later pasted.
+ghostty --title="clip-edit" -e nvim -c 'setlocal nofixeol' "$tmp"
+
+[ "$before" = "$(sha256sum <"$tmp")" ] && exit 0
+
+wl-copy <"$tmp"

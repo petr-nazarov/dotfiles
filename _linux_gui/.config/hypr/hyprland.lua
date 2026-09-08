@@ -179,6 +179,7 @@ hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(bin .. "/bookmarks-menu | ifn
 -- Clipboard history
 hl.bind(mainMod .. " + SHIFT + V",
     hl.dsp.exec_cmd('cliphist list | tofi --prompt-text "Clipboard history: " | cliphist decode | wl-copy'))
+hl.bind(mainMod .. " + CTRL + SHIFT + V", hl.dsp.exec_cmd(bin .. "/clip-edit"))
 
 -- Misc
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(bin .. "/align_workspaces"))
