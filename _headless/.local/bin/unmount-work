@@ -3,5 +3,6 @@ tmuxinator stop frrcode
 tmuxinator stop tadam
 tmuxinator stop cardbook
 tmuxinator stop personal 
+tmuxinator stop tlv-agency
 fusermount -uz ~/Projects/FrrCode
 sudo tailscale down
