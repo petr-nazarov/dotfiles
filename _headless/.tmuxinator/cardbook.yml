@@ -6,8 +6,9 @@ startup_window: main
 windows:
   - platform:
       root: ~/Projects/FrrCode/clients/cardbook/cardbook-monorepo
-      layout: main-horizontal
+      layout: main-vertical
       panes:
-        - editor:
-        - term:
+        - claude:
             - clauded
+        - term:
+            - devshell

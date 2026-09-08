@@ -1,13 +1,15 @@
 ---
-name: Tadam 
+name: Tadam
 root: ~/Projects/FrrCode/clients/tadam
 
 startup_window: main
 windows:
   - platform:
       root: ~/Projects/FrrCode/clients/tadam/tadam
-      layout: main-horizontal
+      layout: main-vertical
       panes:
-        - editor:
+        - claude:
+            - devshell
+            - clauded
         - term:
             - devshell

@@ -4,8 +4,8 @@ root: ~/Sync/Notes
 startup_window: home-server
 windows:
   - home-server:
-      layout: main-horizontal
+      layout: main-vertical
       panes:
-        - editor:
-            - nvim
+        - claude:
+            - clauded
         - term:

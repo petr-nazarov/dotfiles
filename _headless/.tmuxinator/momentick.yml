@@ -4,11 +4,14 @@ root: ~/Projects/Momentick/momentick-monorepo
 startup_window: monorepo
 windows:
   - ai:
-      layout: main-horizontal
+      layout: main-vertical
       panes:
-        - run:
+        - claude:
+            - clauded
+        - term:
   - monorepo:
-      layout: main-horizontal
+      layout: main-vertical
       panes:
-        - main:
-        - run:
+        - claude:
+            - clauded
+        - term:

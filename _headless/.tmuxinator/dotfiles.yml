@@ -3,9 +3,9 @@ name: dotfiles
 startup_window: dotfiles
 windows:
   - dotfiles:
-      layout: main-horizontal
+      layout: main-vertical
       root: ~/dotfiles
       panes:
-        - editor:
-            - nvim
+        - claude:
+            - clauded
         - term:

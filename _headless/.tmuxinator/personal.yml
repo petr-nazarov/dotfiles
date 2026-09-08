@@ -4,14 +4,14 @@ root: ~/Projects/Personal
 startup_window: personal
 windows:
   - personal:
-      layout: main-horizontal
+      layout: main-vertical
       panes:
         - editor:
   - personal1:
-      layout: main-horizontal
+      layout: main-vertical
       panes:
         - editor:
   - personal2:
-      layout: main-horizontal
+      layout: main-vertical
       panes:
         - editor:

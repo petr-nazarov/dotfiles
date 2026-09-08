@@ -4,9 +4,9 @@ root: ~/infrastructure
 startup_window: infrastructure
 windows:
   - home-server:
-      layout: main-horizontal
+      layout: main-vertical
       panes:
-        - editor:
-            - nvim
+        - claude:
+            - clauded
         - term:
             - source .venv/bin/activate
