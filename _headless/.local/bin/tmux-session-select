@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# fzf session switcher, bound to prefix + s in .tmux.conf.
+#
+# Written to be run inside `display-popup -E`: it prints nothing and switches
+# the client that opened the popup itself. .tmux.conf keeps choose-tree on the
+# same key wherever fzf is missing (plain containers), so this script may
+# assume fzf exists.
+set -uo pipefail
+
+current=$(tmux display-message -p '#{client_session}')
+
+# Most recently used first, with the current session dropped: switching to it
+# is a no-op, and it would otherwise always be the row under the cursor.
+# Enter on an untouched list therefore means "back to the last session".
+sessions=$(
+  tmux list-sessions -F '#{session_last_attached}	#{session_name}	#{session_windows}	#{session_attached}	#{session_alerts}' |
+    sort -rn |
+    awk -F'\t' -v cur="$current" '$2 != cur'
+)
+
+if [[ -z $sessions ]]; then
+  tmux display-message "no other session"
+  exit 0
+fi
+
+# Field 1 stays the bare session name for fzf to hand to --preview and to us;
+# field 2 is the decorated line the user actually sees (--with-nth 2). Names
+# can contain spaces, hence tabs rather than whitespace splitting.
+rows=$(
+  awk -F'\t' '{
+    bell     = ($5 != "") ? "\033[31m\033[1m󰂚\033[0m " : "  "
+    attached = ($4 != "0") ? "  \033[90m(attached)\033[0m" : ""
+    printf "%s\t%s%-24s \033[90m%s windows\033[0m%s\n", $2, bell, $2, $3, attached
+  }' <<<"$sessions"
+)
+
+# {1} arrives shell-quoted from fzf, so it needs no quotes of its own.
+# `-t {1}:` is the session's current window, i.e. what you would land on.
+preview='tmux list-windows -t {1} -F "#{?window_active,▸,·} #{window_index}: #{window_name}#{?window_bell_flag, 󰂚,}"; echo; tmux capture-pane -ep -t {1}:'
+
+selected=$(
+  fzf --ansi --no-multi \
+    --delimiter=$'\t' --with-nth=2 \
+    --height=100% --border=none --info=inline \
+    --prompt='session ' --pointer='▸' \
+    --preview="$preview" --preview-window='right:60%:wrap' \
+    --color='bg+:#363a4f,fg+:#cad3f5,hl:#8aadf4,hl+:#8aadf4,prompt:#c6a0f6,pointer:#f5a97f,border:#5b6078,info:#5b6078' \
+    <<<"$rows"
+) || exit 0
+
+name=${selected%%$'\t'*}
+[[ -n $name ]] || exit 0
+
+# `=` anchors the match: without it tmux treats the target as a prefix and a
+# session named "dot" would steal a switch aimed at "dotfiles".
+tmux switch-client -t "=$name"
