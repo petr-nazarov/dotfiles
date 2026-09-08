@@ -7,25 +7,44 @@
 #
 # Two modes:
 #
-#   clip-unwrap                 aggressive. Joins EVERY newline. Correct when
+#   clip-unwrap --width <cols> --all
+#                               aggressive. Joins EVERY newline. Correct when
 #                               you know the selection is one logical line
-#                               (a URL); wrong for code blocks. Bound to `Y`.
+#                               (a URL, a shell command); wrong for code
+#                               blocks. Bound to `Y`.
 #
 #   clip-unwrap --width <cols>  smart. Joins a line to the next only when it
 #                               reached the pane's content column, which is
 #                               what a hard wrap looks like. A short line ended
 #                               in a real newline and is left alone, so code
-#                               blocks survive. Bound to mouse-drag-end, which
-#                               passes tmux's #{pane_width}.
+#                               blocks survive. Bound to mouse-drag-end.
 #
-# The width is the whole point. Once text is on the clipboard a wrap and a real
+# The width is the whole point, twice over.
+#
+# First, for *whether* to join: once text is on the clipboard a wrap and a real
 # newline are indistinguishable, which is why clipboard-only cleaners (e.g.
-# unwrap-terminal-text on PyPI) must guess, and join with a space that corrupts
-# a URL. tmux still knows the pane width at copy time, so this does not guess.
+# unwrap-terminal-text on PyPI) must guess. tmux still knows the pane width at
+# copy time, so this does not guess.
+#
+# Second, for *how* to join. Two different breaks reach the clipboard looking
+# identical:
+#
+#   character wrap — a single token was longer than the line, so it was cut
+#                    mid-token and the line is filled right up to the content
+#                    column. Rejoining must NOT insert a space, or a presigned
+#                    URL comes back corrupted.
+#   word wrap      — the next word did not fit, so the renderer broke at a
+#                    space and ate it. The line therefore stops SHORT of the
+#                    content column. Rejoining must insert a space back, or
+#                    `--bucket\nmy-bucket` returns as `--bucketmy-bucket`.
+#
+# So the space is decided per join by how close the line came to the edge, and
+# both modes need the width for it — `Y` included.
 #
 # Claude renders to pane_width - 2 (measured: 212 content columns in a
-# 214-column pane). The threshold allows 4 columns of slack so the check does
-# not turn brittle if that padding changes.
+# 214-column pane). A line within 2 columns of that filled it: character wrap,
+# no space. The join test itself keeps 4 columns of slack, so a line can count
+# as wrapped and still get its space back — which is exactly the word-wrap case.
 #
 # Both modes dedent by the common leading indent, since Claude indents every
 # line of a block. Removing it from the first line alone would leave the rest
@@ -33,23 +52,37 @@
 set -uo pipefail
 
 width=0
-if [ "${1:-}" = "--width" ]; then
-  width=${2:-0}
-fi
+join_all=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --width) width=${2:-0}; shift 2 ;;
+    --all)   join_all=1; shift ;;
+    *)       shift ;;
+  esac
+done
 
-CLIP_UNWRAP_WIDTH=$width perl -0777 -e '
+# Bare `clip-unwrap` (no width) keeps its historical meaning: join everything,
+# and — having no width to judge by — join bare.
+[ "$width" = 0 ] && join_all=1
+
+CLIP_UNWRAP_WIDTH=$width CLIP_UNWRAP_ALL=$join_all perl -0777 -e '
   my $t = do { local $/; <STDIN> };
   $t =~ s/\r//g;
   $t =~ s/\s+\z//;
-  my $w = $ENV{CLIP_UNWRAP_WIDTH} + 0;
+  my $w   = $ENV{CLIP_UNWRAP_WIDTH} + 0;
+  my $all = $ENV{CLIP_UNWRAP_ALL} + 0;
 
   my @lines = split /\n/, $t, -1;
 
-  # Wrap detection must use the width as drawn, before any dedent.
-  my @wrapped;
+  # Both tests must use the width as drawn, before any dedent.
+  #   $wrapped — did this line wrap at all?         (join it to the next)
+  #   $filled  — did it reach the content column?   (mid-token: join bare)
+  my (@wrapped, @filled);
   for my $l (@lines) {
     (my $vis = $l) =~ s/\e\[[0-9;]*m//g;
+    $vis =~ s/[ \t]+$//;
     push @wrapped, (length($vis) >= $w - 4);
+    push @filled,  (length($vis) >= $w - 2);
   }
 
   # Dedent by the common indent of the non-blank lines.
@@ -66,8 +99,13 @@ CLIP_UNWRAP_WIDTH=$width perl -0777 -e '
   for my $i (0 .. $#lines) {
     $out .= $lines[$i];
     last if $i == $#lines;
-    if ($w > 0 ? $wrapped[$i] : 1) {
+    if ($all || ($w > 0 && $wrapped[$i])) {
       $lines[$i + 1] =~ s/^[ \t]+//;   # drop the continuation indent
+      # A word wrap ate the space it broke on; put it back. Only a line that
+      # ran right to the content column was cut mid-token and must stay bare.
+      # With no width we cannot tell, so keep the old bare join.
+      $out .= " " if $w > 0 && !$filled[$i]
+                  && $lines[$i] =~ /\S/ && $lines[$i + 1] =~ /\S/;
     } else {
       $out .= "\n";
     }
