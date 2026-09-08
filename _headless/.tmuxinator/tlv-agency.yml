@@ -1,0 +1,11 @@
+---
+name: TLV Agency
+root: ~/Projects/FrrCode/clients/tlv-agency
+startup_window: main
+windows:
+  - root:
+      root: ~/Projects/FrrCode/clients/tlv-agency
+      layout: main-vertical
+      panes:
+        - editor:
+        - term:
