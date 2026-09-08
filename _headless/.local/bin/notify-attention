@@ -2,7 +2,9 @@
 #
 # notify-attention <title> <message>
 #
-# Sends a Pushover push through ntf.
+# Rings the tmux pane Claude is working in, so its window gets the red bell
+# badge. The Pushover push is commented out for now (see "send" at the bottom);
+# the title/message plumbing is kept intact so it can be switched back on.
 #
 # Claude Code hands its hooks a JSON payload on stdin. When we detect one we
 # ignore the caller's title and build our own from where Claude is actually
@@ -72,7 +74,7 @@ git_context() {
 # Ring the pane Claude is in, so tmux raises window_bell_flag on the right
 # window. The hook's stdout belongs to Claude, not the terminal, so we have to
 # write the BEL into the pane's tty directly.
-sleep 4
+#
 # Claude spawns hooks with no controlling terminal (tty_nr is 0), so /dev/tty
 # is never an option. Walk up to the nearest ancestor that does own one -
 # claude itself - and ring its stdout. In a devcontainer there is no tmux
@@ -110,6 +112,9 @@ if [[ -n $event ]]; then
   # whatever static string settings.json passed us
   [[ -n $hook_msg ]] && TEXT=$hook_msg
   [[ -n $TEXT ]] || TEXT=$event
+  # grace period: ringing the window you are still staring at just clears the
+  # flag again, so give yourself a moment to tab away first
+  sleep 4
   ring_pane
   # a push from a container otherwise looks identical to one from the host
   [[ -f /.dockerenv ]] && TITLE="\U1F433 $TITLE"
@@ -119,19 +124,24 @@ if [[ -n $event ]]; then
 fi
 
 # ---------------------------------------------------------------------- send
-if (( ${+commands[ntf]} )); then
-  ntf_args=(-q -c "${NTF_CHANNEL:-claude}" -d "${NTF_DEVICE:-browser}")
-  if [[ -n $TEXT ]]; then
-    ntf_args+=(-t "$TITLE" -m "$TEXT")
-  else
-    ntf_args+=(-m "$TITLE")
-  fi
-  logline "sent: $TITLE | ${TEXT%%$'\n'*}"
-  # </dev/null: we already drained stdin, and ntf would read whatever is left
-  # as its message body. Failures land in $LOG instead of /dev/null.
-  {
-    ntf "${ntf_args[@]}" </dev/null 2>>$LOG || logline "ntf failed (exit $?): $TITLE / ${TEXT%%$'\n'*}"
-  } &!
-else
-  logline "ntf not found in PATH; dropped: $TITLE / ${TEXT%%$'\n'*}"
-fi
+logline "bell: $TITLE | ${TEXT%%$'\n'*}"
+
+# Pushover disabled for now — the tmux bell above carries the signal. Uncomment
+# to start pushing to the phone/browser again.
+#
+# if (( ${+commands[ntf]} )); then
+#   ntf_args=(-q -c "${NTF_CHANNEL:-claude}" -d "${NTF_DEVICE:-browser}")
+#   if [[ -n $TEXT ]]; then
+#     ntf_args+=(-t "$TITLE" -m "$TEXT")
+#   else
+#     ntf_args+=(-m "$TITLE")
+#   fi
+#   logline "sent: $TITLE | ${TEXT%%$'\n'*}"
+#   # </dev/null: we already drained stdin, and ntf would read whatever is left
+#   # as its message body. Failures land in $LOG instead of /dev/null.
+#   {
+#     ntf "${ntf_args[@]}" </dev/null 2>>$LOG || logline "ntf failed (exit $?): $TITLE / ${TEXT%%$'\n'*}"
+#   } &!
+# else
+#   logline "ntf not found in PATH; dropped: $TITLE / ${TEXT%%$'\n'*}"
+# fi
