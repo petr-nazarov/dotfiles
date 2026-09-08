@@ -7,6 +7,14 @@
 # assume fzf exists.
 set -uo pipefail
 
+# The interactive shell exports FZF_DEFAULT_OPTS (zinit's fzf plugin), the tmux
+# server inherits it, and so does this popup - including its
+# `--preview-window=:hidden`. fzf MERGES --preview-window rather than replacing
+# it, so `hidden` from the environment would survive the geometry passed below
+# and the preview would be built but never drawn. Every option this picker
+# wants is spelled out on the command line, so drop the ambient ones entirely.
+unset FZF_DEFAULT_OPTS FZF_DEFAULT_OPTS_FILE
+
 current=$(tmux display-message -p '#{client_session}')
 
 # Most recently used first, with the current session dropped: switching to it
@@ -41,9 +49,10 @@ preview='tmux list-windows -t {1} -F "#{?window_active,▸,·} #{window_index}: 
 selected=$(
   fzf --ansi --no-multi \
     --delimiter=$'\t' --with-nth=2 \
-    --height=100% --border=none --info=inline \
+    --layout=reverse --height=100% --border=none --info=inline \
     --prompt='session ' --pointer='▸' \
-    --preview="$preview" --preview-window='right:60%:wrap' \
+    --preview="$preview" --preview-window='right:60%:wrap:nohidden' \
+    --bind='alt-p:toggle-preview' \
     --color='bg+:#363a4f,fg+:#cad3f5,hl:#8aadf4,hl+:#8aadf4,prompt:#c6a0f6,pointer:#f5a97f,border:#5b6078,info:#5b6078' \
     <<<"$rows"
 ) || exit 0
