@@ -126,8 +126,9 @@ the entire `_headless` run. The container never stows `_claude`, so there is not
 To keep host Claude credentials out of a container, drop the `.claude/` and `.claude.json` mount
 lines from the project's `devcontainer.json`. `post-create.sh` then generates
 `~/.claude/settings.json` from `dotfiles/claude-settings.json`, preserving the parts of the host
-setup that aren't auth: statusline, `editorMode: vim`, `remoteControlAtStartup` and the default TUI
-renderer. It only writes when the file is absent — a mounted `~/.claude` is always authoritative.
+setup that aren't auth: statusline, `editorMode: vim`, `remoteControlAtStartup`, the default TUI
+renderer and the attention hooks (see below). It only writes when the file is absent — a mounted
+`~/.claude` is always authoritative.
 
 The same fallback applies to the layout: if the `ccstatusline` mount is omitted, `post-create.sh`
 seeds it from `~/dotfiles/_claude/.config/ccstatusline/settings.json` instead.
@@ -138,6 +139,33 @@ Bind-mounting `~/.config/ccstatusline` makes Docker auto-create the `~/.config` 
 exactly like the `~/.ssh` case above. Left alone, the `_headless` stow run (which writes
 `~/.config/zsh`, `~/.config/mise`, …) fails. `post-create.sh` runs `sudo chown vscode:vscode
 ~/.config` before applying dotfiles.
+
+## The tmux attention bell
+
+When Claude stops or needs input it runs `~/.local/bin/notify-attention`, which writes a BEL into
+the terminal Claude is attached to. `monitor-bell` in the dotfiles' `.tmux.conf` turns that into the
+red 󰂚 badge on the window, so a session waiting on you is visible from any other window.
+
+The hook has no controlling terminal of its own (Claude spawns it with `tty_nr` 0), so the script
+walks up the process tree to the nearest ancestor that owns one — Claude itself — and rings its
+stdout. Inside a container that stdout is the `devcontainer exec` pty, whose far end is the host's
+tmux pane, so the BEL still reaches tmux even though the container has no tmux socket, no `$TMUX`
+and (usually) no tmux binary. Three arrangements are covered, all verified:
+
+| | `~/.claude` | `~/dotfiles` | hooks come from | script comes from |
+| :--- | :--- | :--- | :--- | :--- |
+| **A** host tmux → Claude | host | host | host `settings.json` | stow (`_headless`) |
+| **B** host tmux → devcontainer → Claude | mounted | mounted | mounted `settings.json` | stow, via the mount |
+| **C** host tmux → devcontainer → Claude | not mounted | not mounted | generated `claude-settings.json` | `dotfiles/notify-attention` fallback |
+
+In case C nothing from the host is available, so `post-create.sh` copies the bell-only
+`dotfiles/notify-attention` into `~/.local/bin/`, and the generated `~/.claude/settings.json`
+carries the `Stop` / `Notification` hooks that call it. The copy is skipped whenever
+`~/.local/bin/notify-attention` already exists (case B), so a stowed script always wins.
+
+`ring_pane()` and `ancestor_tty()` are duplicated between the fallback and the real script in the
+dotfiles repo (`_headless/.local/bin/notify-attention`) — the fallback has to stand alone with no
+mounts, so keep those two functions in sync.
 
 ## Git Worktree Integration
 
@@ -173,5 +201,5 @@ To force-recreate the container, pass `--recreate` (see below).
 
 | Script | When it runs | What it does |
 | :--- | :--- | :--- |
-| `scripts/post-create.sh` | On container creation | Fixes `~/.ssh` and `~/.config` ownership, applies dotfiles via `apply-dotfiles.sh`, installs Claude CLI, installs `ccstatusline` and seeds Claude/ccstatusline settings if they aren't mounted. |
+| `scripts/post-create.sh` | On container creation | Fixes `~/.ssh` and `~/.config` ownership, applies dotfiles via `apply-dotfiles.sh`, installs Claude CLI, installs `ccstatusline`, and seeds `notify-attention` / Claude / ccstatusline settings if they aren't mounted. |
 | `scripts/post-start.sh` | On every container start | Repairs worktree paths, runs `mise install` for project deps. |

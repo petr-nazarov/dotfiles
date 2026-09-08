@@ -1,0 +1,59 @@
+#!/usr/bin/env zsh
+#
+# notify-attention — fallback copy, installed to ~/.local/bin/notify-attention
+# by post-create.sh *only* when the dotfiles repo hasn't already stowed the real
+# one (i.e. when ~/dotfiles is not bind-mounted into the container).
+#
+# The real script (dotfiles: _headless/.local/bin/notify-attention) also builds
+# repo/branch context for a Pushover push. This one does the single thing that
+# has to keep working with nothing mounted: ring the pane Claude is running in,
+# so tmux on the *host* raises the red bell badge on that window.
+#
+# Keep the ancestor_tty()/ring_pane() pair below in sync with the real script.
+
+emulate -L zsh
+
+LOG=${NOTIFY_ATTENTION_LOG:-$HOME/.local/state/notify-attention.log}
+
+logline() {
+  [[ -d ${LOG:h} ]] || mkdir -p ${LOG:h} 2>/dev/null
+  print -r -- "$(date '+%F %T') $*" >>$LOG 2>/dev/null
+}
+
+# Claude pipes a JSON payload in; drain it so it doesn't sit in the pipe.
+# timeout: never let an inherited-but-idle stdin wedge the hook.
+payload=''
+[[ -t 0 ]] || payload=$(timeout 1 cat 2>/dev/null)
+
+# Claude spawns hooks with no controlling terminal (tty_nr is 0), so /dev/tty is
+# never an option. Walk up to the nearest ancestor that does own one — claude
+# itself — and ring its stdout. A devcontainer has no tmux socket and no tmux
+# binary, but claude's stdout is the `devcontainer exec` pty whose far end is the
+# host's tmux pane, so the BEL still reaches tmux.
+ancestor_tty() {
+  local pid=$PPID depth=0 fd
+  while (( depth++ < 12 )) && [[ -r /proc/$pid/stat ]]; do
+    fd=/proc/$pid/fd/1
+    [[ -c $fd && -w $fd ]] && { print -r -- $fd; return }
+    # strip "pid (comm) " first: comm may contain spaces or parens
+    pid=$(sed -E 's/^[0-9]+ \(.*\) //' /proc/$pid/stat 2>/dev/null | awk '{print $2}')
+    [[ -n $pid && $pid != 0 && $pid != 1 ]] || return
+  done
+}
+
+ring_pane() {
+  local tty=''
+  if [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )); then
+    tty=$(tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#{pane_tty}' 2>/dev/null)
+  fi
+  [[ -n $tty && -w $tty ]] || tty=$(ancestor_tty)
+  [[ -n $tty && -w $tty ]] || { logline "no writable tty found; bell dropped"; return 1 }
+  printf '\a' >$tty
+}
+
+# grace period: ringing the window you are still staring at just clears the flag
+# again, so give yourself a moment to tab away first
+sleep 4
+if ring_pane; then
+  logline "bell: ${1:-Notification} | ${2:-}"
+fi
