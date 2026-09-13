@@ -82,7 +82,7 @@ cmd - m : # do nothing
 
 cmd - return : open -n /Applications/Ghostty.app
 
-cmd - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | /opt/homebrew/bin/ifne awk '{print \$NF}' | xargs /Applications/Zen\\ Browser.app/Contents/MacOS/zen --new-tab " 
+cmd - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | /opt/homebrew/bin/ifne awk '{print \$NF}' | xargs /Applications/Zen.app/Contents/MacOS/zen --new-tab " 
 cmd + shift - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | awk '{print \$NF}'  |  pbcopy"
 
 # # enter fullscreen mode for the focused container
