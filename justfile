@@ -1,7 +1,7 @@
 init:
   pre-commit install
 sync-headless:
-  rm $HOME/.zshrc
+  rm -f $HOME/.zshrc
   stow --no-folding -t "$HOME" _headless
 unsync-headless:
   stow -D -t "$HOME" _headless
@@ -12,7 +12,8 @@ unsync-claude:
 
 sync-common-gui:
   #!/usr/bin/env sh
-  [ -z "${DISPLAY}${WAYLAND_DISPLAY}" ] && exit 0
+  # macOS never sets DISPLAY / WAYLAND_DISPLAY, so only headless linux gets skipped
+  [ "$(uname -s)" != Darwin ] && [ -z "${DISPLAY}${WAYLAND_DISPLAY}" ] && exit 0
   stow -t "$HOME" _common_gui
 unsync-common-gui:
   stow -D -t "$HOME" _common_gui

@@ -52,6 +52,18 @@ cd ~/dotfiles
 just sync
 ```
 
+## Bootstrap (bare macOS)
+
+Needs Homebrew, see the "Managed node macOS" section of the infrastructure README.
+
+```bash
+brew install gh just stow mise
+gh auth login -s admin:public_key
+gh repo clone dotfiles ~/dotfiles
+cd ~/dotfiles
+just sync
+```
+
 ## Gotchas
 
 - **Tmux plugins**: After syncing, open tmux and press `Ctrl+a` then `I` (capital I) to fetch plugins.
