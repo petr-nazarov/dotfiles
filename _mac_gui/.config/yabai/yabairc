@@ -15,6 +15,15 @@ sudo yabai --load-sa
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 yabai -m signal --add event=space_changed action='yabai -m window --focus $(yabai -m query --windows --space | jq -r "map(select(.[\"is-visible\"])) | .[0].id")'
 
+# Keep 10 spaces on the main display, recreated on every start if some were closed.
+# Their order stays fixed because com.apple.dock mru-spaces is off (infrastructure repo).
+# Creating spaces needs the scripting addition, so this does nothing while SIP is fully on.
+spaces=$(yabai -m query --spaces --display 1 | jq length)
+while [ "$spaces" -lt 10 ]; do
+  yabai -m space --create 1 || break
+  spaces=$((spaces + 1))
+done
+
 #!/usr/bin/env sh
 
 # bar settings
