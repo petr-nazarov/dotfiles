@@ -1,9 +1,11 @@
 ---
 name: dotfiles
 startup_window: dotfiles
+startup_pane: 2
 windows:
   - dotfiles:
       layout: main-vertical
+      focused_pane: term
       root: ~/dotfiles
       panes:
         - claude:

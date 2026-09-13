@@ -3,10 +3,12 @@ name: CardBook
 root: ~/Projects/FrrCode/clients/cardbook
 
 startup_window: main
+startup_pane: 2
 windows:
   - platform:
       root: ~/Projects/FrrCode/clients/cardbook/cardbook-monorepo
       layout: main-vertical
+      focused_pane: term
       panes:
         - claude:
             - clauded

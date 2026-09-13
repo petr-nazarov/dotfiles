@@ -2,10 +2,12 @@
 name: TLV Agency
 root: ~/Projects/FrrCode/clients/tlv-agency
 startup_window: main
+startup_pane: 2
 windows:
   - root:
       root: ~/Projects/FrrCode/clients/tlv-agency
       layout: main-vertical
+      focused_pane: term
       panes:
         - editor:
         - term:

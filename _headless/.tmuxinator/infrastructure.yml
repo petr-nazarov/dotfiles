@@ -2,9 +2,11 @@
 name: infrastructure
 root: ~/infrastructure
 startup_window: infrastructure
+startup_pane: 2
 windows:
   - home-server:
       layout: main-vertical
+      focused_pane: term
       panes:
         - claude:
             - clauded

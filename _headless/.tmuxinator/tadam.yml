@@ -3,10 +3,12 @@ name: Tadam
 root: ~/Projects/FrrCode/clients/tadam
 
 startup_window: main
+startup_pane: 2
 windows:
   - platform:
       root: ~/Projects/FrrCode/clients/tadam/tadam
       layout: main-vertical
+      focused_pane: term
       panes:
         - claude:
             - devshell

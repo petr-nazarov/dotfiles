@@ -2,10 +2,12 @@
 name: FrrCode
 root: ~/Projects/FrrCode
 startup_window: main
+startup_pane: 2
 windows:
   - platform:
       root: ~/Projects/FrrCode/platform
       layout: main-vertical
+      focused_pane: term
       panes:
         - editor:
         - term:

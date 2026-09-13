@@ -2,15 +2,18 @@
 name: momentick
 root: ~/Projects/Momentick/momentick-monorepo
 startup_window: monorepo
+startup_pane: 2
 windows:
   - ai:
       layout: main-vertical
+      focused_pane: term
       panes:
         - claude:
             - clauded
         - term:
   - monorepo:
       layout: main-vertical
+      focused_pane: term
       panes:
         - claude:
             - clauded

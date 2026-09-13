@@ -2,9 +2,11 @@
 name: Notes
 root: ~/Sync/Notes
 startup_window: home-server
+startup_pane: 2
 windows:
   - home-server:
       layout: main-vertical
+      focused_pane: term
       panes:
         - claude:
             - clauded
