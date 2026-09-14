@@ -73,7 +73,13 @@ cmd + shift - 0 : yabai -m space --balance
 # cmd - s : yabai -m space --layout stack
 
 # # close focused window
-cmd + shift - q : yabai -m window --close
+# yabai closes a window by pressing its close button. Ghostty has none (window-decoration = false),
+# so it gets a spare combo it binds to close_window. Passing cmd+shift+q itself through would
+# reach the macOS Log Out shortcut.
+cmd + shift - q [
+    "ghostty" : skhd -k "cmd + ctrl + alt - w"
+    *         : yabai -m window --close
+]
 cmd - w : # do nothing
 cmd - q : # do nothing
 cmd - m : # do nothing

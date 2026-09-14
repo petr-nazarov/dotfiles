@@ -20,6 +20,8 @@ keybind = super+shift+d=unbind
 keybind = super+t=unbind
 keybind = super+shift+[=unbind
 keybind = super+shift+]=unbind
+# macOS: skhd sends this on cmd+shift+q, yabai can't close a window without decorations
+keybind = super+ctrl+alt+w=close_window
 window-save-state = "never"
 # Optional: Make it even cleaner
 window-decoration = false
