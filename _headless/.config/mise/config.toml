@@ -26,4 +26,4 @@ shellcheck = "latest"
 
 [settings]
 experimental = true
-python_compile = false
+python.compile = false
