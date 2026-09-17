@@ -44,7 +44,9 @@ tmux set -g @remote "$remote" \; \
   set -gF @window-style "#{@$theme-window-style}" \; \
   set -gF @window-active-style "#{@$theme-window-active-style}" \; \
   set -gF pane-active-border-style "#{@$theme-pane-active-border-style}" \; \
-  set -gF status-left "#{@$theme-status-left}"
+  set -gF status-left "#{@$theme-status-left}" \; \
+  set -gF @status-bg "#{@$theme-status-bg}" \; \
+  set -gF status-style "#{@$theme-status-style}"
 
 # Leave pane dimming off if prefix + P turned it off
 if [ "$(tmux show -gv window-style)" != default ]; then
