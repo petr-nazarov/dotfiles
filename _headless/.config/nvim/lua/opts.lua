@@ -3,6 +3,27 @@ local opt = vim.opt
 
 -- [[ Context ]]
 opt.clipboard = "unnamedplus" -- Sync with system clipboard
+
+-- Inside a devcontainer there is no wl-copy/xclip/pbcopy and no tmux binary,
+-- so the provider lookup finds nothing, and Nvim refuses to auto-pick OSC 52
+-- while 'clipboard' is set. Force OSC 52 for copy; the sequence travels
+-- through the host tmux (set-clipboard on) to the terminal. Paste stays local:
+-- OSC 52 reads are blocked or prompt in most terminals.
+local has_native_clipboard = vim.env.WAYLAND_DISPLAY
+  or vim.env.DISPLAY
+  or vim.fn.executable("pbcopy") == 1
+  or (vim.env.TMUX and vim.fn.executable("tmux") == 1)
+if not has_native_clipboard then
+  local osc52 = require("vim.ui.clipboard.osc52")
+  local function paste()
+    return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+  end
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+    paste = { ["+"] = paste, ["*"] = paste },
+  }
+end
 opt.confirm = true -- Confirm to save changes before exiting modified buffer
 opt.cursorline = true -- Enable highlighting of the current line
 opt.expandtab = true -- Use spaces instead of tabs
