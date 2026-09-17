@@ -1,0 +1,53 @@
+#!/bin/sh
+# Switch tmux between its local and remote (red) palette.
+#
+# Remote means at least one attached client came in over SSH: its process
+# ancestry contains sshd (or mosh-server). The decision is per client rather
+# than per server, so a machine that is both a workstation and an SSH target
+# goes red while you are logged in from elsewhere and returns to normal on its
+# own monitor once that client detaches. `touch ~/.tmux-remote` forces red.
+#
+# .tmux.conf calls this from the attach/detach hooks and defines both palettes
+# as @local-* / @remote-* user options; this script only picks one.
+
+over_ssh() {
+  pid=$1
+  while [ -n "$pid" ] && [ "$pid" -gt 1 ]; do
+    case $(ps -o comm= -p "$pid" 2>/dev/null) in
+      sshd* | */sshd* | mosh-server | */mosh-server) return 0 ;;
+    esac
+    pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+  done
+  return 1
+}
+
+theme=local
+if [ -e "$HOME/.tmux-remote" ]; then
+  theme=remote
+else
+  # A client-detached hook can still list the leaving client, so skip the one
+  # the hook names.
+  leaving=${1:-}
+  for pid in $(tmux list-clients -F '#{client_pid}'); do
+    [ "$pid" = "$leaving" ] && continue
+    if over_ssh "$pid"; then
+      theme=remote
+      break
+    fi
+  done
+fi
+
+[ "$theme" = remote ] && remote=1 || remote=0
+[ "$(tmux show -gv @remote 2>/dev/null)" = "$remote" ] && exit 0
+
+tmux set -g @remote "$remote" \; \
+  set -gF @window-style "#{@$theme-window-style}" \; \
+  set -gF @window-active-style "#{@$theme-window-active-style}" \; \
+  set -gF pane-active-border-style "#{@$theme-pane-active-border-style}" \; \
+  set -gF status-left "#{@$theme-status-left}"
+
+# Leave pane dimming off if prefix + P turned it off
+if [ "$(tmux show -gv window-style)" != default ]; then
+  tmux set -gF window-style "#{@window-style}" \; \
+    set -gF window-active-style "#{@window-active-style}"
+fi
