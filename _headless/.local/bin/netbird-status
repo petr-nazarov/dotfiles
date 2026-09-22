@@ -4,6 +4,7 @@
 ##   status  print waybar JSON (default)
 ##   toggle  bring netbird up/down and refresh waybar
 ##   profile pick a profile with tofi, switch to it and reconnect
+##   default switch back to the default profile (run at login)
 ##
 ## Prints an empty module (waybar hides it) when netbird is not installed
 ## or the daemon cannot be reached.
@@ -62,6 +63,16 @@ run_netbird() {
 	fi
 }
 
+## switch to profile $1, reconnecting if netbird was up ($2 is the state)
+switch_profile() {
+	local out
+	[[ "$2" == "Connected" || "$2" == "Connecting" ]] && run_netbird down >/dev/null
+	out=$(run_netbird profile select "$1") &&
+		out+=$'\n'$(run_netbird up)
+	notify-send "NetBird ($1)" "$out"
+	pkill -RTMIN+10 waybar
+}
+
 case "${1:-status}" in
 toggle)
 	json=$(status_json) || exit 0
@@ -85,11 +96,18 @@ profile)
 		tofi --prompt-text "NetBird profile: ") || exit 0
 	choice=${choice#??}
 	[[ -z "$choice" ]] && exit 0
-	[[ "$state" == "Connected" || "$state" == "Connecting" ]] && run_netbird down >/dev/null
-	out=$(run_netbird profile select "$choice") &&
-		out+=$'\n'$(run_netbird up)
-	notify-send "NetBird ($choice)" "$out"
-	pkill -RTMIN+10 waybar
+	switch_profile "$choice" "$state"
+	;;
+default)
+	command -v netbird >/dev/null || exit 0
+	## the daemon may still be starting right after boot
+	for _ in {1..30}; do
+		json=$(status_json) && break
+		sleep 1
+	done
+	[[ -n "$json" ]] || exit 0
+	[[ "$(active_profile "$json")" == "default" ]] && exit 0
+	switch_profile default "$(daemon_status "$json")"
 	;;
 status)
 	json=$(status_json) || hide

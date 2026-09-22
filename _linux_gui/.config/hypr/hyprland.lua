@@ -39,6 +39,9 @@ hl.on("hyprland.start", function()
     -- Screen sharing.
     hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
 
+    -- NetBird always starts on the default profile.
+    hl.exec_cmd(home .. "/.local/bin/netbird-status default")
+
     -- Homerow mods.
     hl.exec_cmd(home .. "/.config/kmonad/activate.sh")
 end)
