@@ -6,7 +6,7 @@
 #   ai_git sync       accept the generated message as-is, then pull && push
 #   ai_git -y         accept the generated message as-is, commit only
 #
-# A Pushover notification (via ntf) is sent when the run finishes.
+# notify-attention rings the tmux pane (and logs) when the run finishes.
 
 set -uo pipefail
 
@@ -34,14 +34,16 @@ done
 REPO=$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
 
 notify() {
-	# notify <priority> <title> <message>
-	command -v ntf >/dev/null 2>&1 || return 0
-	ntf -q -c general -p "$1" -t "$2" -m "$3" >/dev/null 2>&1 || true
+	# notify <title> <message>
+	command -v notify-attention >/dev/null 2>&1 || return 0
+	# </dev/null: notify-attention drains stdin looking for a Claude hook
+	# payload, and would otherwise wait on whatever it inherited from us.
+	notify-attention "$1" "$2" </dev/null >/dev/null 2>&1 || true
 }
 
 fail() {
 	echo "$1" >&2
-	notify high "git ai: $REPO" "$1"
+	notify "git ai failed: $REPO" "$1"
 	exit 1
 }
 
@@ -87,7 +89,7 @@ SUBJECT=$(git log -1 --pretty=%s)
 if [ "$SYNC" -eq 1 ]; then
 	git pull || fail "pull failed after committing: $SUBJECT"
 	git push || fail "push failed after committing: $SUBJECT"
-	notify normal "git ai sync: $REPO ($BRANCH)" "pushed: $SUBJECT"
+	notify "git ai sync: $REPO · $BRANCH" "pushed: $SUBJECT"
 else
-	notify normal "git ai: $REPO ($BRANCH)" "committed: $SUBJECT"
+	notify "git ai: $REPO · $BRANCH" "committed: $SUBJECT"
 fi
