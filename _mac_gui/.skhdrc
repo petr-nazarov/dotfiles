@@ -80,13 +80,18 @@ cmd + shift - q [
     "ghostty" : skhd -k "cmd + ctrl + alt - w"
     *         : yabai -m window --close
 ]
-cmd - w : # do nothing
+cmd - w : open -a /Applications/Zen.app
 cmd - q : # do nothing
 cmd - m : # do nothing
 
 #cmd - return : alacritty msg create-window || open /Applications/Alacritty.app
 
 cmd - return : open -n /Applications/Ghostty.app
+
+# Raycast clipboard history, whose default action pastes into the app that was focused.
+# Raycast keeps its per-command hotkeys in its local database, out of reach of `defaults`,
+# so the binding lives here. No `open -g`: Raycast has to come to the front to take input.
+cmd + shift - v : open raycast://extensions/raycast/clipboard-history/clipboard-history
 
 cmd - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | /opt/homebrew/bin/ifne awk '{print \$NF}' | xargs /Applications/Zen.app/Contents/MacOS/zen --new-tab " 
 cmd + shift - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | awk '{print \$NF}'  |  pbcopy"
