@@ -4,10 +4,31 @@ root: ~/Projects/FrrCode
 startup_window: main
 startup_pane: 2
 windows:
+  - main:
+      root: ~/Projects/FrrCode
+      layout: main-vertical
+      focused_pane: editor
+      panes:
+        - editor:
+        - term:
   - platform:
       root: ~/Projects/FrrCode/platform
       layout: main-vertical
-      focused_pane: term
+      focused_pane: editor
+      panes:
+        - editor:
+        - term:
+  - frrcard:
+      root: ~/Projects/FrrCode/frrcard
+      layout: main-vertical
+      focused_pane: editor
+      panes:
+        - editor:
+        - term:
+  - timeinator:
+      root: ~/Projects/FrrCode/timeinator
+      layout: main-vertical
+      focused_pane: editor
       panes:
         - editor:
         - term:

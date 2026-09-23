@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Start the work day on Hyprland: mount the vault and start the tmux sessions,
+# then open Zen on workspace 1, Ghostty (FrrCode tmux session) on workspace 2
+# and Ferdium on workspace 9. Anything already running is left alone.
+set -euo pipefail
+
+vault=~/Projects/FrrCode
+
+# gocryptfs prompts for the vault password, so it needs a terminal. When started
+# without one (scripts-menu, a keybind), rerun in Ghostty.
+if ! mountpoint -q "$vault" && [ ! -t 0 ]; then
+	exec ghostty -e "$0"
+fi
+
+mountpoint -q "$vault" || mount-work
+
+# A broken project config shouldn't stop the rest of the day from starting.
+for project in tadam tetrisponse cardbook tlv-agency frrcode personal dotfiles secrets; do
+	tmuxinator start "$project" --no-attach || echo "start-day: tmuxinator $project failed" >&2
+done
+
+addresses() {
+	hyprctl clients -j | jq -r --arg class "$1" '.[] | select(.class == $class) | .address'
+}
+
+# Launch a command and move its first new window of the given class to a workspace
+# without following it. Launched apps are detached so they outlive this terminal.
+open_on() {
+	local workspace=$1 class=$2
+	shift 2
+	local before addr
+	before=$(addresses "$class")
+	setsid -f uwsm app -- "$@" >/dev/null 2>&1
+	for _ in $(seq 100); do
+		addr=$(addresses "$class" | grep -vxF -- "$before" | head -n1 || true)
+		if [ -n "$addr" ]; then
+			hyprctl dispatch "hl.dsp.window.move({workspace=$workspace, follow=false, window=\"address:$addr\"})" >/dev/null
+			return
+		fi
+		sleep 0.2
+	done
+	echo "start-day: no $class window appeared" >&2
+}
+
+[ -n "$(addresses zen)" ] || open_on 1 zen zen-browser
+tmux list-clients -t FrrCode 2>/dev/null | grep -q . ||
+	open_on 2 com.mitchellh.ghostty ghostty -e tmux attach -t FrrCode
+[ -n "$(addresses ferdium)" ] || open_on 9 ferdium ferdium

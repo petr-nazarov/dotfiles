@@ -2,7 +2,7 @@
 name: CardBook
 root: ~/Projects/FrrCode/clients/cardbook
 
-startup_window: main
+startup_window: platform
 startup_pane: 2
 windows:
   - platform:

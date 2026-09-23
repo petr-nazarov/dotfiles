@@ -1,8 +1,11 @@
 #!/usr/bin/env zsh
 
-SELECTION="$(printf "1 - Lock\n2 - Suspend\n3 - Log out\n4 - Reboot\n5 - Reboot to UEFI\n6 - Hard reboot\n7 - Shutdown\n8 - Toggle sleep\n9 - Network restart" | tofi --prompt-text "Power Menu: ")"
+SELECTION="$(printf "0 - Start day\n1 - Lock\n2 - Suspend\n3 - Log out\n4 - Reboot\n5 - Reboot to UEFI\n6 - Hard reboot\n7 - Shutdown\n8 - Toggle sleep\n9 - Network restart" | tofi --prompt-text "Power Menu: ")"
 
 case $SELECTION in
+*"Start day")
+	$HOME/.local/bin/start-day
+	;;
 *"Lock")
 	hyprlock
 	;;

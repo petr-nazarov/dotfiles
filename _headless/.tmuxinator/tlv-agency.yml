@@ -1,7 +1,7 @@
 ---
 name: TLV Agency
 root: ~/Projects/FrrCode/clients/tlv-agency/jewrvis
-startup_window: main
+startup_window: root
 startup_pane: 2
 windows:
   - root:

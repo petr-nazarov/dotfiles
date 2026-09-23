@@ -81,6 +81,7 @@ cmd + shift - q [
     *         : yabai -m window --close
 ]
 cmd - w : open -a /Applications/Zen.app
+cmd - s : open -a /Applications/Ferdium.app
 cmd - q : # do nothing
 cmd - m : # do nothing
 

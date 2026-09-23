@@ -2,7 +2,7 @@
 name: Tadam
 root: ~/Projects/FrrCode/clients/tadam
 
-startup_window: main
+startup_window: platform
 startup_pane: 2
 windows:
   - platform:

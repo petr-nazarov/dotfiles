@@ -7,11 +7,17 @@ windows:
       layout: main-vertical
       panes:
         - editor:
-  - personal1:
+  - finance:
+      root: ~/Projects/Personal/finance-monorepo
       layout: main-vertical
+      focused_pane: editor
       panes:
         - editor:
-  - personal2:
+        - term:
+  - blog:
+      root: ~/Projects/Personal/blog
       layout: main-vertical
+      focused_pane: editor
       panes:
         - editor:
+        - term:
