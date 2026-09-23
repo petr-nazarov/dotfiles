@@ -3,6 +3,7 @@ gocryptfs -allow_other /home/nazarov/.vault/frrcode-encrypted /home/nazarov/Proj
 tmuxinator start tadam --no-attach
 tmuxinator start tetrisponse --no-attach
 tmuxinator start cardbook --no-attach
+tmuxinator start tlv-agency --no-attach
 tmuxinator start frrcode --no-attach
 tmuxinator start personal --no-attach
 tmuxinator start dotfiles --no-attach

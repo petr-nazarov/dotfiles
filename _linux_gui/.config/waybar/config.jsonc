@@ -150,7 +150,8 @@
     "return-type": "json",
     "interval": 10,
     "signal": 10,
-    "on-click": "$HOME/.local/bin/netbird-status toggle"
+    "on-click": "$HOME/.local/bin/netbird-status toggle",
+    "on-click-right": "$HOME/.local/bin/netbird-status profile"
   },
   "custom/sleep": {
     "exec": "$HOME/.local/bin/sleep-toggle status",

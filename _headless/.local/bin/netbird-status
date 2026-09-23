@@ -3,6 +3,8 @@
 ## Report or toggle the netbird connection.
 ##   status  print waybar JSON (default)
 ##   toggle  bring netbird up/down and refresh waybar
+##   profile pick a profile with tofi, switch to it and reconnect
+##   default switch back to the default profile (run at login)
 ##
 ## Prints an empty module (waybar hides it) when netbird is not installed
 ## or the daemon cannot be reached.
@@ -13,19 +15,36 @@ hide() {
 }
 
 report() {
-	## $1 glyph, $2 css class, $3 tooltip
-	print -r -- "{\"text\":\"$1\",\"class\":\"$2\",\"tooltip\":\"$3\"}"
+	## $1 glyph, $2 css class, $3 tooltip; non-default profiles get an extra class
+	local class="\"$2\"" tooltip="$3"
+	if [[ -n "$profile" ]]; then
+		tooltip+="\\nProfile: $profile"
+		[[ "$profile" != "default" ]] && class="[$class,\"alt-profile\"]"
+	fi
+	tooltip+="\\nRight-click to switch profile"
+	print -r -- "{\"text\":\"$1\",\"class\":$class,\"tooltip\":\"$tooltip\"}"
 	exit 0
 }
 
-## echo the daemonStatus, or nothing when netbird is unavailable
-daemon_status() {
+## echo the raw status JSON, or nothing when netbird is unavailable
+status_json() {
 	command -v netbird >/dev/null || return 1
 	## bail out rather than stall the bar if the daemon is wedged
-	local json
-	json=$(timeout 2 netbird status --json 2>/dev/null) || return 1
-	print -r -- "$json" |
+	timeout 2 netbird status --json 2>/dev/null
+}
+
+## echo the daemonStatus from the status JSON in $1
+daemon_status() {
+	print -r -- "$1" |
 		grep -o '"daemonStatus"[[:space:]]*:[[:space:]]*"[^"]*"' |
+		head -n1 |
+		sed 's/.*"\([^"]*\)"$/\1/'
+}
+
+## echo the active profile name
+active_profile() {
+	print -r -- "$1" |
+		grep -o '"profileName"[[:space:]]*:[[:space:]]*"[^"]*"' |
 		head -n1 |
 		sed 's/.*"\([^"]*\)"$/\1/'
 }
@@ -33,31 +52,67 @@ daemon_status() {
 ## the daemon socket is usually world-writable, so only escalate when it is not
 run_netbird() {
 	local out
-	if out=$(netbird "$1" 2>&1); then
+	if out=$(netbird "$@" 2>&1); then
 		print -r -- "$out"
 		return 0
 	fi
 	if [[ "$out" == *[Pp]ermission* || "$out" == *denied* ]]; then
-		pkexec "$(command -v netbird)" "$1" 2>&1
+		pkexec "$(command -v netbird)" "$@" 2>&1
 	else
 		print -r -- "$out"
 	fi
 }
 
+## switch to profile $1, reconnecting if netbird was up ($2 is the state)
+switch_profile() {
+	local out
+	[[ "$2" == "Connected" || "$2" == "Connecting" ]] && run_netbird down >/dev/null
+	out=$(run_netbird profile select "$1") &&
+		out+=$'\n'$(run_netbird up)
+	notify-send "NetBird ($1)" "$out"
+	pkill -RTMIN+10 waybar
+}
+
 case "${1:-status}" in
 toggle)
-	state=$(daemon_status) || exit 0
+	json=$(status_json) || exit 0
+	state=$(daemon_status "$json")
 	if [[ "$state" == "Connected" ]]; then
 		out=$(run_netbird down)
 	else
 		out=$(run_netbird up)
 	fi
 	## surface auth URLs and failures, which are otherwise invisible
-	[[ -n "$out" ]] && notify-send "NetBird" "$out"
+	profile=$(active_profile "$(status_json)")
+	notify-send "NetBird${profile:+ ($profile)}" "${out:-done}"
 	pkill -RTMIN+10 waybar
 	;;
+profile)
+	json=$(status_json) || exit 0
+	state=$(daemon_status "$json")
+	## `netbird profile list` prints a NAME/ACTIVE table; mark the active row
+	choice=$(timeout 2 netbird profile list 2>/dev/null |
+		awk 'NR > 1 && NF { print ($2 == "✓" ? "✓ " : "  ") $1 }' |
+		tofi --prompt-text "NetBird profile: ") || exit 0
+	choice=${choice#??}
+	[[ -z "$choice" ]] && exit 0
+	switch_profile "$choice" "$state"
+	;;
+default)
+	command -v netbird >/dev/null || exit 0
+	## the daemon may still be starting right after boot
+	for _ in {1..30}; do
+		json=$(status_json) && break
+		sleep 1
+	done
+	[[ -n "$json" ]] || exit 0
+	[[ "$(active_profile "$json")" == "default" ]] && exit 0
+	switch_profile default "$(daemon_status "$json")"
+	;;
 status)
-	state=$(daemon_status) || hide
+	json=$(status_json) || hide
+	state=$(daemon_status "$json")
+	profile=$(active_profile "$json")
 
 	case "$state" in
 	Connected)
