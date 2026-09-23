@@ -1,4 +1,9 @@
 {
+  // earlier includes win: the hidden-tray override (if present) beats the default
+  "include": [
+    "~/.cache/waybar/tray-hidden.jsonc",
+    "~/.config/waybar/tray-shown.jsonc"
+  ],
   "reload_style_on_change": true,
   "layer": "top",
   "position": "top",
@@ -212,20 +217,12 @@
       // "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
     }
   },
+  // "modules" and the icon "format" come from the tray-shown / tray-hidden includes
   "group/tray-expander": {
-    "orientation": "inherit",
-    "drawer": {
-      "transition-duration": 600,
-      "children-class": "tray-group-item"
-    },
-    "modules": [
-      "custom/expand-icon",
-      "tray"
-    ]
+    "orientation": "inherit"
   },
   "custom/expand-icon": {
-    "format": "",
-    "tooltip": false
+    "on-click": "tray-toggle"
   },
   "tray": {
     "icon-size": 12,

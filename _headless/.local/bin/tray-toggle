@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+## Show/hide the waybar system tray (shown by default).
+## Hiding writes a config override that waybar includes; showing removes it.
+
+state=${XDG_CACHE_HOME:-$HOME/.cache}/waybar/tray-hidden.jsonc
+
+if [[ -f $state ]]; then
+	rm -f $state
+else
+	mkdir -p ${state:h}
+	cat >$state <<'JSON'
+{
+  "group/tray-expander": { "modules": ["custom/expand-icon"] },
+  "custom/expand-icon": { "format": "", "tooltip-format": "Show tray" }
+}
+JSON
+fi
+
+pkill -SIGUSR2 -x waybar

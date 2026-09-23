@@ -1,0 +1,14 @@
+// Default (expanded) tray state. tray-toggle writes an override to
+// ~/.cache/waybar/tray-hidden.jsonc, which is included first and wins.
+{
+  "group/tray-expander": {
+    "modules": [
+      "custom/expand-icon",
+      "tray"
+    ]
+  },
+  "custom/expand-icon": {
+    "format": "",
+    "tooltip-format": "Hide tray"
+  }
+}
