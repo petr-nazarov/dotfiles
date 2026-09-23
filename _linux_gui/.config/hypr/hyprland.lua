@@ -192,9 +192,10 @@ hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("uwsm app -- hyprshot -m region -f"))
 
 -- Voxtype push-to-talk: hold SUPER + M to record, release to transcribe and type.
--- Same key as cmd+m on the macs; voxtype's own hotkey is off (infrastructure, arch/gui_apps).
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("voxtype record start"))
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("voxtype record stop"), { release = true })
+-- Same key as cmd+m on the macs. ~/.local/bin/voxtype-ptt reads the keys from evdev and
+-- drives the recording: release binds here miss the release when SUPER comes up first.
+-- This bind only swallows the key so apps never see it.
+hl.bind(mainMod .. " + M", function() end)
 hl.bind(mainMod .. " + SHIFT + B",
     hl.dsp.exec_cmd("uwsm app -- swww img -t none --transition-duration 0.1 wallpapers/$(\\ls ~/wallpapers | shuf -n 1)"))
 

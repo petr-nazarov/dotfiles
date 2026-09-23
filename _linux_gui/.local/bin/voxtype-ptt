@@ -1,0 +1,94 @@
+#!/usr/bin/python3
+"""Push-to-talk for voxtype: record exactly while SUPER + M is held.
+
+Reads the keyboards straight from /dev/input (needs the `input` group), because
+compositor release binds miss the release when SUPER comes up before M, and
+voxtype's own evdev hotkey has the same gap. Recording starts when M goes down
+with either SUPER held and stops as soon as M or the last SUPER comes up, in
+whichever order.
+
+Hyprland keeps a no-op SUPER + M bind so apps never see the key. Run by the
+voxtype-ptt user service (infrastructure repo, arch/gui_apps).
+"""
+
+import os
+import re
+import select
+import struct
+import subprocess
+import time
+
+KEY_M, KEY_LEFTMETA, KEY_RIGHTMETA = 50, 125, 126
+META = {KEY_LEFTMETA, KEY_RIGHTMETA}
+EV_KEY = 1
+EVENT = struct.Struct("llHHi")
+RESCAN_SECONDS = 3
+
+
+def keyboards():
+    """/dev/input/event* nodes that can send KEY_M, from /proc/bus/input/devices."""
+    found = set()
+    with open("/proc/bus/input/devices") as f:
+        for block in f.read().split("\n\n"):
+            handler = re.search(r"H: Handlers=.*\b(event\d+)\b", block)
+            keys = re.search(r"B: KEY=([0-9a-f ]+)", block)
+            if not handler or not keys:
+                continue
+            # The bitmap is printed as space-separated longs, most significant first
+            bits = int("".join(f"{int(w, 16):016x}" for w in keys.group(1).split()), 16)
+            if bits >> KEY_M & 1:
+                found.add(f"/dev/input/{handler.group(1)}")
+    return found
+
+
+def record(action):
+    subprocess.Popen(["voxtype", "record", action], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def main():
+    devices = {}  # path -> fd
+    held_meta = set()  # (path, code)
+    failed = set()  # paths already reported, so a missing `input` group logs once
+    recording = False
+    last_scan = 0.0
+
+    while True:
+        if time.monotonic() - last_scan > RESCAN_SECONDS:
+            last_scan = time.monotonic()
+            for path in keyboards() - devices.keys():
+                try:
+                    devices[path] = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+                except OSError as e:
+                    if path not in failed:
+                        failed.add(path)
+                        print(f"voxtype-ptt: {path}: {e}", flush=True)
+
+        ready, _, _ = select.select(list(devices.values()), [], [], RESCAN_SECONDS)
+        for path, fd in list(devices.items()):
+            if fd not in ready:
+                continue
+            try:
+                data = os.read(fd, EVENT.size * 64)
+            except BlockingIOError:
+                continue
+            except OSError:  # unplugged
+                os.close(fd)
+                del devices[path]
+                held_meta = {m for m in held_meta if m[0] != path}
+                continue
+            for i in range(0, len(data) - EVENT.size + 1, EVENT.size):
+                _, _, typ, code, value = EVENT.unpack_from(data, i)
+                if typ != EV_KEY or value == 2:  # skip autorepeat
+                    continue
+                if code in META:
+                    (held_meta.add if value else held_meta.discard)((path, code))
+                if not recording and code == KEY_M and value == 1 and held_meta:
+                    recording = True
+                    record("start")
+                elif recording and ((code == KEY_M and value == 0) or not held_meta):
+                    recording = False
+                    record("stop")
+
+
+if __name__ == "__main__":
+    main()
