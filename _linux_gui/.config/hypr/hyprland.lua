@@ -190,6 +190,11 @@ hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(bin .. "/align_workspaces"))
 hl.bind(mainMod .. " + o", hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
 hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("uwsm app -- hyprshot -m region -f"))
+
+-- Voxtype push-to-talk: hold SUPER + M to record, release to transcribe and type.
+-- Same key as cmd+m on the macs; voxtype's own hotkey is off (infrastructure, arch/gui_apps).
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("voxtype record start"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("voxtype record stop"), { release = true })
 hl.bind(mainMod .. " + SHIFT + B",
     hl.dsp.exec_cmd("uwsm app -- swww img -t none --transition-duration 0.1 wallpapers/$(\\ls ~/wallpapers | shuf -n 1)"))
 
