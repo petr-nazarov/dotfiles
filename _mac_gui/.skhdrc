@@ -83,7 +83,8 @@ cmd + shift - q [
 cmd - w : open -a /Applications/Zen.app
 cmd - s : open -a /Applications/Ferdium.app
 cmd - q : # do nothing
-cmd - m : # do nothing
+# cmd - m is voxtype push-to-talk in ~/.hammerspoon/init.lua. skhd must not bind it:
+# it would swallow the key before Hammerspoon sees it.
 
 #cmd - return : alacritty msg create-window || open /Applications/Alacritty.app
 
