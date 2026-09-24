@@ -165,7 +165,29 @@ carries the `Stop` / `Notification` hooks that call it. The copy is skipped when
 
 `ring_pane()` and `ancestor_tty()` are duplicated between the fallback and the real script in the
 dotfiles repo (`_headless/.local/bin/notify-attention`) — the fallback has to stand alone with no
-mounts, so keep those two functions in sync.
+mounts, so keep those two functions in sync (along with `pane_tty()`, `mark_pane()` and the
+`--busy` / `--idle` handling below).
+
+### The yellow "working" badge
+
+While Claude is thinking or running tools, the window shows a yellow 󰔟 instead. The
+`UserPromptSubmit`, `PreToolUse` and `PostToolUse` hooks call `notify-attention --busy`, which
+writes an OSC 7 ("current directory") report down the same pty the bell uses, so it crosses
+`devcontainer exec` and ssh the same way. Host tmux keeps it in `#{pane_path}` — a field nothing
+else reads; splits and new windows follow `#{pane_current_path}`, which OSC 7 does not touch — and
+`.tmux.conf` paints any pane whose `pane_path` carries the `claude-busy` tag.
+
+It goes away when:
+
+- `Stop` / `Notification` fire: `notify-attention` clears it at once, the bell follows 4 s later;
+- `SessionEnd` fires (`--idle`);
+- you interrupt with C-c: no hook runs for that, so tmux's root `C-c` binding remembers the pane's
+  tag as done (each `--busy` stamps a fresh one, so the next prompt shows yellow again);
+- a shell prompt comes back in that pane (zsh `precmd`), in case Claude died mid-turn.
+
+A question or plan awaiting your answer (`AskUserQuestion`, `ExitPlanMode`) counts as idle.
+Limitation: a tmux running *inside* the ssh session or container keeps the OSC 7 to itself, so the
+badge only reaches a tmux on the host side of the pty.
 
 ## Git Worktree Integration
 

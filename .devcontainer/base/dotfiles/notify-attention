@@ -7,9 +7,11 @@
 # The real script (dotfiles: _headless/.local/bin/notify-attention) also builds
 # repo/branch context for a Pushover push. This one does the single thing that
 # has to keep working with nothing mounted: ring the pane Claude is running in,
-# so tmux on the *host* raises the red bell badge on that window.
+# so tmux on the *host* raises the red bell badge on that window, and with
+# --busy / --idle set or clear the yellow "Claude is working" badge.
 #
-# Keep the ancestor_tty()/ring_pane() pair below in sync with the real script.
+# Keep ancestor_tty()/pane_tty()/ring_pane()/mark_pane() and the --busy/--idle
+# handling below in sync with the real script.
 
 emulate -L zsh
 
@@ -41,16 +43,45 @@ ancestor_tty() {
   done
 }
 
-ring_pane() {
+pane_tty() {
   local tty=''
   if [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )); then
     tty=$(tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#{pane_tty}' 2>/dev/null)
   fi
   [[ -n $tty && -w $tty ]] || tty=$(ancestor_tty)
-  [[ -n $tty && -w $tty ]] || { logline "no writable tty found; bell dropped"; return 1 }
+  [[ -n $tty && -w $tty ]] && print -r -- $tty
+}
+
+ring_pane() {
+  local tty=$(pane_tty)
+  [[ -n $tty ]] || { logline "no writable tty found; bell dropped"; return 1 }
   printf '\a' >$tty
 }
 
+# --busy / --idle: the yellow "Claude is working" badge. An OSC 7 report that
+# host tmux keeps in #{pane_path}; the real script explains the choice.
+mark_pane() {
+  local tty=$(pane_tty)
+  [[ -n $tty ]] || return
+  if [[ $1 == busy ]]; then
+    # a fresh stamp per mark, so tmux can tell this turn from an interrupted one
+    zmodload -F zsh/datetime p:EPOCHREALTIME 2>/dev/null
+    printf '\e]7;file://claude-busy/%s\e\\' ${EPOCHREALTIME:-$RANDOM} >$tty
+  else
+    printf '\e]7;\e\\' >$tty
+  fi
+}
+
+if [[ $1 == --busy || $1 == --idle ]]; then
+  # a question or a plan to approve is Claude waiting on you, not working
+  mode=${1#--}
+  [[ $payload == *'"tool_name":'(|' ')'"'(AskUserQuestion|ExitPlanMode)'"'* ]] && mode=idle
+  mark_pane $mode
+  exit 0
+fi
+
+# done or blocked on you: drop the busy badge now, ring after the grace period
+mark_pane idle
 # grace period: ringing the window you are still staring at just clears the flag
 # again, so give yourself a moment to tab away first
 sleep 4

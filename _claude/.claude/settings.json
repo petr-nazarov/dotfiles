@@ -1,6 +1,36 @@
 {
   "model": "opus[1m]",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/bin/notify-attention --busy"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/bin/notify-attention --busy"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/bin/notify-attention --busy"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
@@ -17,6 +47,16 @@
           {
             "type": "command",
             "command": "~/.local/bin/notify-attention 'ClaudeCode' 'Needs your input'"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/bin/notify-attention --idle"
           }
         ]
       }

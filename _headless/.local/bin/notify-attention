@@ -1,9 +1,11 @@
 #!/usr/bin/env zsh
 #
 # notify-attention <title> <message>
+# notify-attention --busy | --idle
 #
 # Rings the tmux pane Claude is working in, so its window gets the red bell
-# badge. The Pushover push is commented out for now (see "send" at the bottom);
+# badge. --busy / --idle instead set or clear the yellow "Claude is working"
+# badge (see mark_pane below), without the bell's grace period. The Pushover push is commented out for now (see "send" at the bottom);
 # the title/message plumbing is kept intact so it can be switched back on.
 #
 # Claude Code hands its hooks a JSON payload on stdin. When we detect one we
@@ -13,6 +15,9 @@
 # Called by hand (or by the sunshine scripts) the plain title/message wins.
 
 emulate -L zsh
+
+MODE=''
+[[ $1 == --busy || $1 == --idle ]] && { MODE=${1#--}; shift }
 
 TITLE=${1:-Notification}
 TEXT=${2:-}
@@ -91,13 +96,35 @@ ancestor_tty() {
   done
 }
 
-ring_pane() {
+pane_tty() {
   local tty=''
   if [[ -n ${TMUX-} ]] && (( ${+commands[tmux]} )); then
     tty=$(tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#{pane_tty}' 2>/dev/null)
   fi
   [[ -n $tty && -w $tty ]] || tty=$(ancestor_tty)
-  [[ -n $tty && -w $tty ]] && printf '\a' >$tty
+  [[ -n $tty && -w $tty ]] && print -r -- $tty
+}
+
+ring_pane() {
+  local tty=$(pane_tty)
+  [[ -n $tty ]] && printf '\a' >$tty
+}
+
+# The busy badge rides the same pty as the bell, so it crosses docker exec and
+# ssh too. It is an OSC 7 ("current directory") report: tmux keeps the last one
+# in #{pane_path}, which nothing else here uses - new panes and splits follow
+# #{pane_current_path}, which OSC 7 leaves alone. .tmux.conf paints any pane
+# whose pane_path mentions claude-busy; an empty report clears it again.
+mark_pane() {
+  local tty=$(pane_tty)
+  [[ -n $tty ]] || return
+  if [[ $1 == busy ]]; then
+    # a fresh stamp per mark, so tmux can tell this turn from an interrupted one
+    zmodload -F zsh/datetime p:EPOCHREALTIME 2>/dev/null
+    printf '\e]7;file://claude-busy/%s\e\\' ${EPOCHREALTIME:-$RANDOM} >$tty
+  else
+    printf '\e]7;\e\\' >$tty
+  fi
 }
 
 tmux_context() {
@@ -105,7 +132,18 @@ tmux_context() {
   tmux display-message -p ${TMUX_PANE:+-t} ${TMUX_PANE:-} '#S:#I' 2>/dev/null
 }
 
+if [[ -n $MODE ]]; then
+  # A question or a plan waiting for approval is Claude waiting on you, not
+  # working, even though it arrives as a PreToolUse like any other tool.
+  [[ $payload == *'"tool_name":'(|' ')'"'(AskUserQuestion|ExitPlanMode)'"'* ]] && MODE=idle
+  mark_pane $MODE
+  exit 0
+fi
+
 if [[ -n $event ]]; then
+  # Claude is done or blocked on you: drop the busy badge at once, the bell
+  # follows after the grace period
+  mark_pane idle
   [[ -n $cwd && -d $cwd ]] || cwd=$PWD
   TITLE=$(git_context $cwd)
   # the hook's own message ("Claude needs your permission to use Bash") beats

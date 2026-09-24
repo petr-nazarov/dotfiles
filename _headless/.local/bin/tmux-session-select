@@ -21,7 +21,7 @@ current=$(tmux display-message -p '#{client_session}')
 # is a no-op, and it would otherwise always be the row under the cursor.
 # Enter on an untouched list therefore means "back to the last session".
 sessions=$(
-  tmux list-sessions -F '#{session_last_attached}	#{session_name}	#{session_windows}	#{session_attached}	#{session_alerts}' |
+  tmux list-sessions -F '#{session_last_attached}	#{session_name}	#{session_windows}	#{session_attached}	#{session_alerts}	#{W:#{P:#{?#{E:@claude-busy-pane},1,}}}' |
     sort -rn |
     awk -F'\t' -v cur="$current" '$2 != cur'
 )
@@ -36,7 +36,8 @@ fi
 # can contain spaces, hence tabs rather than whitespace splitting.
 rows=$(
   awk -F'\t' '{
-    bell     = ($5 != "") ? "\033[31m\033[1m󰂚\033[0m " : "  "
+    # red bell: wants you; yellow 󰔟: Claude still working (see .tmux.conf)
+    bell     = ($5 != "") ? "\033[31m\033[1m󰂚\033[0m " : ($6 != "") ? "\033[33m󰔟\033[0m " : "  "
     attached = ($4 != "0") ? "  \033[90m(attached)\033[0m" : ""
     printf "%s\t%s%-24s \033[90m%s windows\033[0m%s\n", $2, bell, $2, $3, attached
   }' <<<"$sessions"
@@ -44,7 +45,7 @@ rows=$(
 
 # {1} arrives shell-quoted from fzf, so it needs no quotes of its own.
 # `-t {1}:` is the session's current window, i.e. what you would land on.
-preview='tmux list-windows -t {1} -F "#{?window_active,▸,·} #{window_index}: #{window_name}#{?window_bell_flag, 󰂚,}"; echo; tmux capture-pane -ep -t {1}:'
+preview='tmux list-windows -t {1} -F "#{?window_active,▸,·} #{window_index}: #{window_name}#{?window_bell_flag, 󰂚,#{?#{P:#{?#{E:@claude-busy-pane},1,}}, 󰔟,}}"; echo; tmux capture-pane -ep -t {1}:'
 
 selected=$(
   fzf --ansi --no-multi \
