@@ -38,7 +38,9 @@
 #custom-sleep,
 #custom-tailscale,
 #custom-netbird,
-#custom-update {
+#custom-update,
+#custom-voxtype,
+#custom-voxtype-cleanup {
   min-width: 12px;
   margin: 0 7.5px;
 }
@@ -77,6 +79,24 @@
 
 #custom-netbird.alt-profile {
   color: #f9e2af;
+}
+
+#custom-voxtype.idle,
+#custom-voxtype-cleanup.raw {
+  opacity: 0.45;
+}
+
+#custom-voxtype.recording {
+  color: #f38ba8;
+}
+
+#custom-voxtype.transcribing,
+#custom-voxtype-cleanup.degraded {
+  color: #f9e2af;
+}
+
+#custom-voxtype.stopped {
+  opacity: 0.25;
 }
 
 #tray {

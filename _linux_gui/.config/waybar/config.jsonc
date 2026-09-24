@@ -19,6 +19,8 @@
   ],
   "modules-right": [
     "group/tray-expander",
+    "custom/voxtype",
+    "custom/voxtype-cleanup",
     "pulseaudio",
     "backlight",
     "bluetooth",
@@ -142,6 +144,28 @@
       "warning": 20,
       "critical": 10
     }
+  },
+  // Voxtype dictation state; the tooltip names the speech model. --follow streams changes.
+  "custom/voxtype": {
+    "exec": "voxtype status --follow --format json --extended",
+    "return-type": "json",
+    "format": "{icon}",
+    "format-icons": {
+      "idle": "󰍬",
+      "recording": "󰍬",
+      "transcribing": "󰔟",
+      "stopped": "󰍭"
+    },
+    "restart-interval": 10
+  },
+  // LLM cleanup of dictations on or off; click to switch (arch_voxtype_llm_enabled in
+  // infrastructure decides whether the LLM is set up at all)
+  "custom/voxtype-cleanup": {
+    "exec": "$HOME/.local/bin/voxtype-cleanup-status status",
+    "return-type": "json",
+    "interval": 30,
+    "signal": 11,
+    "on-click": "$HOME/.local/bin/voxtype-cleanup-status toggle"
   },
   "custom/tailscale": {
     "exec": "$HOME/.local/bin/tailscale-status status",

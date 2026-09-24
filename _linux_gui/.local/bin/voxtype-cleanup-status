@@ -1,0 +1,96 @@
+#!/usr/bin/python3
+"""Waybar module for voxtype's LLM cleanup: whether dictations go through the local model.
+
+  status  print waybar JSON (default)
+  toggle  switch the cleanup off or back on and refresh waybar
+
+The infrastructure repo (arch_voxtype_llm_enabled / arch_voxtype_llm_model) decides whether
+the LLM is set up at all: it passes --llm to voxtype-postprocess in voxtype's config. The
+toggle only flips voxtype-postprocess's runtime off switch, so it applies from the next
+dictation without a restart and survives Ansible runs. Status also checks that Ollama serves
+the model, since voxtype-postprocess types the raw transcript whenever it is unreachable.
+Prints an empty module (waybar hides it) when voxtype is not set up.
+"""
+
+import json
+import os
+import re
+import subprocess
+import sys
+import tomllib
+import urllib.request
+from pathlib import Path
+
+CONFIG = Path.home() / ".config/voxtype/config.toml"
+OLLAMA = "http://127.0.0.1:11434/api/tags"
+# Same path voxtype-postprocess reads
+OFF_SWITCH = Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state") / "voxtype/llm-off"
+SIGNAL = 11
+
+CLEANUP = "\U000f0068"  # nf-md-auto_fix
+RAW = "\U000f09a8"  # nf-md-text
+
+
+def report(text, css, tooltip):
+    print(json.dumps({"text": text, "class": css, "tooltip": tooltip}, ensure_ascii=False))
+
+
+def ollama_models():
+    try:
+        with urllib.request.urlopen(OLLAMA, timeout=1) as resp:
+            return {m["name"] for m in json.load(resp)["models"]}
+    except Exception:  # noqa: BLE001 - any failure means the model can't be used
+        return None
+
+
+def read_config():
+    """(whisper model, llm model or None), or None when voxtype is not set up."""
+    try:
+        config = tomllib.loads(CONFIG.read_text())
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+    whisper = config.get("whisper", {}).get("model", "?")
+    command = config.get("output", {}).get("post_process", {}).get("command", "")
+    match = re.search(r"--llm\s+(\S+)", command)
+    return whisper, match and match.group(1)
+
+
+def status():
+    config = read_config()
+    if config is None:
+        report("", "", "")
+        return
+    whisper, llm = config
+
+    if not llm:
+        report(RAW, "raw", f"Raw transcript: typed as spoken\nSpeech: {whisper}\nLLM: not set up (arch_voxtype_llm_enabled)")
+        return
+    if OFF_SWITCH.exists():
+        report(RAW, "raw", f"Raw transcript: typed as spoken\nSpeech: {whisper}\nLLM: {llm}, off\nClick to turn LLM cleanup on")
+        return
+    models = ollama_models()
+    if models is None:
+        problem = "Ollama is not running"
+    elif llm not in models and f"{llm}:latest" not in models:
+        problem = f"{llm} is not pulled"
+    else:
+        report(CLEANUP, "cleanup", f"LLM cleanup: on\nSpeech: {whisper}\nLLM: {llm}\nClick to type raw transcripts")
+        return
+    report(CLEANUP, "degraded", f"LLM cleanup: on, but {problem}, so the raw transcript is typed\nSpeech: {whisper}\nLLM: {llm}\nClick to type raw transcripts")
+
+
+def toggle():
+    config = read_config()
+    if config is None or not config[1]:
+        subprocess.run(["notify-send", "Voxtype", "No LLM is set up: turn on arch_voxtype_llm_enabled and run the playbook"], check=False)
+        return
+    if OFF_SWITCH.exists():
+        OFF_SWITCH.unlink()
+    else:
+        OFF_SWITCH.parent.mkdir(parents=True, exist_ok=True)
+        OFF_SWITCH.touch()
+    subprocess.run(["pkill", f"-RTMIN+{SIGNAL}", "waybar"], check=False)
+
+
+if __name__ == "__main__":
+    {"status": status, "toggle": toggle}[sys.argv[1] if len(sys.argv) > 1 else "status"]()
