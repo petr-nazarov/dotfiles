@@ -6,6 +6,9 @@ set -euo pipefail
 
 vault=~/Projects/FrrCode
 
+# Ghostty's systemd service PATH lacks ~/.local/bin, where mount-work lives.
+PATH="$HOME/.local/bin:$PATH"
+
 # gocryptfs prompts for the vault password, so it needs a terminal. When started
 # without one (scripts-menu, a keybind), rerun in Ghostty.
 if ! mountpoint -q "$vault" && [ ! -t 0 ]; then
