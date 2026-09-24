@@ -6,7 +6,7 @@ startup_window: platform
 startup_pane: 2
 windows:
   - platform:
-      root: ~/Projects/FrrCode/clients/tadam/tadam
+      root: ~/Projects/FrrCode/clients/tadam/
       layout: main-vertical
       focused_pane: term
       panes:

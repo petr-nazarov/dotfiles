@@ -11,3 +11,4 @@ windows:
         - claude:
             - clauded
         - term:
+            vim index.md
