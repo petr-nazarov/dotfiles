@@ -4,18 +4,18 @@
 # and Ferdium on workspace 9. Anything already running is left alone.
 set -euo pipefail
 
-vault=~/Projects/FrrCode
-
-# Ghostty's systemd service PATH lacks ~/.local/bin, where mount-work lives.
+# The Hyprland session PATH lacks ~/.local/bin, where mount-work lives.
 PATH="$HOME/.local/bin:$PATH"
 
-# gocryptfs prompts for the vault password, so it needs a terminal. When started
-# without one (scripts-menu, a keybind), rerun in Ghostty.
-if ! mountpoint -q "$vault" && [ ! -t 0 ]; then
-	exec ghostty -e "$0"
-fi
+# Started from a menu there is no terminal to show errors, so send them to the
+# journal (journalctl --user -t start-day).
+[ -t 2 ] || exec 2> >(systemd-cat -t start-day)
 
-mountpoint -q "$vault" || mount-work
+# mount-work opens its own password window when there is no terminal.
+if ! mount-work; then
+	notify-send -u critical "start-day" "Vault not mounted, day not started"
+	exit 1
+fi
 
 # A broken project config shouldn't stop the rest of the day from starting.
 for project in tadam tetrisponse cardbook tlv-agency frrcode personal dotfiles secrets; do

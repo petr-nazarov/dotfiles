@@ -1,2 +1,21 @@
 #!/usr/bin/env zsh
-gocryptfs -allow_other /home/nazarov/.vault/frrcode-encrypted /home/nazarov/Projects/FrrCode
+# Mount the FrrCode vault. Exits 0 once it is mounted.
+vault=~/Projects/FrrCode
+
+mountpoint -q $vault && exit 0
+
+# gocryptfs prompts for the password, so it needs a terminal. When started
+# without one (scripts-menu, power menu, a keybind), rerun in Ghostty and wait.
+if [[ ! -t 0 ]]; then
+	MOUNT_WORK_WINDOW=1 ghostty -e $0 2>/dev/null
+	mountpoint -q $vault
+	exit
+fi
+
+for _ in 1 2 3; do
+	gocryptfs -allow_other ~/.vault/frrcode-encrypted $vault && exit 0
+done
+
+# Keep our own window open so the error can be read.
+[[ -n $MOUNT_WORK_WINDOW ]] && read -rs '?mount-work failed. Press Enter to close.'
+exit 1
