@@ -18,7 +18,7 @@ if ! mount-work; then
 fi
 
 # A broken project config shouldn't stop the rest of the day from starting.
-for project in tadam tetrisponse cardbook tlv-agency frrcode personal dotfiles secrets; do
+for project in tadam tetrisponse cardbook tlv-agency frrcode personal infrastructure notes dotfiles secrets; do
 	tmuxinator start "$project" --no-attach || echo "start-day: tmuxinator $project failed" >&2
 done
 
