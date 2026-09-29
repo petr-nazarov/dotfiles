@@ -4,6 +4,8 @@
 hs.autoLaunch(true)
 hs.menuIcon(false)
 
+require("jk")
+
 local voxtype = "/opt/homebrew/bin/voxtype"
 local recording = false
 local function record(action)
