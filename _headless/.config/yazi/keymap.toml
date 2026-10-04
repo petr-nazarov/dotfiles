@@ -389,16 +389,24 @@ keymap = [
   ], run = "cd ~", desc = "Go to the home directory" },
   { on = [
     "g",
-    "c",
-  ], run = "cd ~/.config", desc = "Go to the config directory" },
-  { on = [
-    "g",
     "d",
   ], run = "cd ~/Downloads", desc = "Go to the downloads directory" },
   { on = [
     "g",
+    "f",
+  ], run = "cd ~/Projects/FrrCode", desc = "Go to FrrCode projects" },
+  { on = [
+    "g",
+    "p",
+  ], run = "cd ~/Projects/Personal", desc = "Go to personal projects" },
+  { on = [
+    "g",
     "t",
-  ], run = "cd /tmp", desc = "Go to the temporary directory" },
+  ], run = "cd ~/Projects/FrrCode/clients/tadam/tadam-monorepo", desc = "Go to the tadam monorepo" },
+  { on = [
+    "g",
+    "c",
+  ], run = "cd ~/Projects/FrrCode/clients/cardbook/cardbook-monorepo", desc = "Go to the cardbook monorepo" },
   { on = [
     "g",
     "<Space>",
