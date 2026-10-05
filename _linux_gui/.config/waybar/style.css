@@ -39,6 +39,7 @@
 #custom-tailscale,
 #custom-netbird,
 #custom-update,
+#custom-desk-mic,
 #custom-voxtype,
 #custom-voxtype-cleanup {
   min-width: 12px;
@@ -79,6 +80,18 @@
 
 #custom-netbird.alt-profile {
   color: #f9e2af;
+}
+
+#custom-desk-mic.live {
+  color: #f38ba8;
+}
+
+#custom-desk-mic.unknown {
+  color: #f9e2af;
+}
+
+#custom-desk-mic.off {
+  opacity: 0.25;
 }
 
 #custom-voxtype.idle,

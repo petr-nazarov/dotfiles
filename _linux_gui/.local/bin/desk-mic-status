@@ -1,0 +1,101 @@
+#!/usr/bin/python3
+"""Waybar module: whether the desk mic's physical switch is on, so the room can be heard.
+
+The switch only cuts the analog signal: the USB device, its mute control and its HID
+interface report nothing when it flips. What changes is the noise floor: switched on, the
+capture idles around RMS 30-60 even in a quiet room; switched off it is near digital silence
+(RMS ~1.5, peak ~6). So status records a fraction of a second and compares the level.
+Prints an empty module (waybar hides it) when the mic is not plugged in, so other machines
+sharing this config show nothing.
+"""
+
+import json
+import math
+import signal
+import subprocess
+
+SOURCE_MATCH = "USB_XLR_Dynamic_Microphone"
+RATE = 48000
+SKIP_SECONDS = 0.1  # the first samples after opening the stream can be a pop
+SAMPLE_SECONDS = 0.3
+# Off measures RMS ~1.5 / peak ~6, on never below RMS ~30 / peak ~90
+LIVE_RMS = 8
+LIVE_PEAK = 20
+
+LIVE = "\U000f036c"  # nf-md-microphone
+OFF = "\U000f036d"  # nf-md-microphone_off
+
+
+def report(text, css, tooltip):
+    print(json.dumps({"text": text, "class": css, "tooltip": tooltip}, ensure_ascii=False))
+
+
+def find_source():
+    """The desk mic's PipeWire source, or None on machines without it (or without PipeWire)."""
+    try:
+        out = subprocess.run(["pactl", "list", "sources", "short"], capture_output=True, text=True, timeout=3).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    for line in out.splitlines():
+        fields = line.split("\t")
+        if len(fields) > 1 and SOURCE_MATCH in fields[1] and not fields[1].endswith(".monitor"):
+            return fields[1]
+    return None
+
+
+def measure(source):
+    """(rms, peak) of a short mono capture, or None when nothing could be recorded."""
+    skip = int(RATE * SKIP_SECONDS) * 2
+    want = int(RATE * SAMPLE_SECONDS) * 2
+    try:
+        proc = subprocess.Popen(
+            ["pw-record", "--target", source, "--format", "s16", "--channels", "1", "--rate", str(RATE), "-"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return None
+    data = b""
+    signal.alarm(3)  # a source that sends nothing would block the read forever
+    try:
+        while len(data) < skip + want:
+            chunk = proc.stdout.read1(skip + want - len(data))
+            if not chunk:
+                break
+            data += chunk
+    except TimeoutError:
+        return None
+    finally:
+        signal.alarm(0)
+        proc.kill()
+        proc.wait()
+    samples = memoryview(data[skip : skip + want]).cast("h")
+    if len(samples) < RATE * SAMPLE_SECONDS / 2:
+        return None
+    rms = math.sqrt(sum(s * s for s in samples) / len(samples))
+    return rms, max(abs(s) for s in samples)
+
+
+def status():
+    source = find_source()
+    if source is None:
+        report("", "", "")
+        return
+    level = measure(source)
+    if level is None:
+        report(LIVE, "unknown", "Desk mic: couldn't read the level, the switch may be on")
+        return
+    rms, peak = level
+    if rms >= LIVE_RMS or peak >= LIVE_PEAK:
+        report(LIVE, "live", f"Desk mic switch is ON: the room can be heard\nLevel: RMS {rms:.0f}, peak {peak}")
+    else:
+        report(OFF, "off", f"Desk mic switch is off\nLevel: RMS {rms:.1f}, peak {peak}")
+
+
+def on_alarm(signum, frame):
+    raise TimeoutError
+
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGALRM, on_alarm)
+    status()

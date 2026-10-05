@@ -19,6 +19,7 @@
   ],
   "modules-right": [
     "group/tray-expander",
+    "custom/desk-mic",
     "custom/voxtype",
     "custom/voxtype-cleanup",
     "pulseaudio",
@@ -145,16 +146,23 @@
       "critical": 10
     }
   },
+  // Desk mic's physical switch, read from the capture noise floor (the switch reports nothing
+  // to the system); each check opens the mic for under half a second
+  "custom/desk-mic": {
+    "exec": "$HOME/.local/bin/desk-mic-status",
+    "return-type": "json",
+    "interval": 10
+  },
   // Voxtype dictation state; the tooltip names the speech model. --follow streams changes.
   "custom/voxtype": {
     "exec": "voxtype status --follow --format json --extended",
     "return-type": "json",
     "format": "{icon}",
     "format-icons": {
-      "idle": "󰍬",
-      "recording": "󰍬",
+      "idle": "󰗋",
+      "recording": "󰗋",
       "transcribing": "󰔟",
-      "stopped": "󰍭"
+      "stopped": "󰻔"
     },
     "restart-interval": 10
   },
