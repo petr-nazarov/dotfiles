@@ -95,6 +95,12 @@ cmd - return : open -n /Applications/Ghostty.app
 # so the binding lives here. No `open -g`: Raycast has to come to the front to take input.
 cmd + shift - v : open raycast://extensions/raycast/clipboard-history/clipboard-history
 
+# Screenshot of a region, like hyprshot on Hyprland: saved under ~/Pictures and copied to the
+# clipboard. Escape cancels and leaves neither; screencapture exits 0 either way, hence the file
+# test. The system cmd+shift+s shortcut is switched off (infrastructure repo, darwin/preferences).
+# skhd needs Screen Recording access for this.
+cmd + shift - s : f="$HOME/Pictures/$(date +%Y-%m-%d-%H%M%S)_screenshot.png"; screencapture -i "$f"; [ -f "$f" ] && osascript -e "set the clipboard to (read POSIX file \"$f\" as «class PNGf»)"
+
 cmd - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | /opt/homebrew/bin/ifne awk '{print \$NF}' | xargs /Applications/Zen.app/Contents/MacOS/zen --new-tab " 
 cmd + shift - e: zsh -c "cat ~/.secrets/bookmarks.txt | /opt/homebrew/bin/choose | awk '{print \$NF}'  |  pbcopy"
 
