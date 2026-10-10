@@ -1,0 +1,903 @@
+#!/usr/bin/python3
+"""Waybar's Wi-Fi and Bluetooth panels: a macOS-style card under the bar icon.
+
+`net-popover wifi` / `net-popover bluetooth` shows that panel, or hides it when it is already
+showing. The first call starts a resident GTK app; later calls only send it a D-Bus message, so
+a click opens the card at once. Wi-Fi talks to iwd and Bluetooth to bluez over the system bus;
+impala and bluetui stay one click away in each panel's footer.
+
+The card sits on a transparent layer that covers the screen below the bar, so a click anywhere
+outside it (or Escape) closes it, and clicking the bar icon again toggles it.
+"""
+
+import ctypes
+import json
+import os
+import subprocess
+import sys
+
+import gi
+
+gi.require_version("Gio", "2.0")
+from gi.repository import Gio, GLib  # noqa: E402
+
+APP_ID = "dev.nazarov.NetPopover"
+APP_PATH = "/dev/nazarov/NetPopover"
+VIEWS = ("wifi", "bluetooth")
+
+
+def forward_to_running(view):
+    """Toggle the panel in an already running instance; False when none is running."""
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION)
+        bus.call_sync(
+            APP_ID,
+            APP_PATH,
+            "org.freedesktop.Application",
+            "ActivateAction",
+            GLib.Variant("(sava{sv})", ("toggle", [GLib.Variant("s", view)], {})),
+            None,
+            Gio.DBusCallFlags.NO_AUTO_START,
+            1000,
+            None,
+        )
+        return True
+    except GLib.Error:
+        return False
+
+
+if __name__ == "__main__":
+    VIEW = sys.argv[1] if len(sys.argv) > 1 else "wifi"
+    if VIEW not in VIEWS:
+        sys.exit(f"usage: net-popover {{{'|'.join(VIEWS)}}}")
+    if forward_to_running(VIEW):
+        sys.exit(0)
+
+# gtk4-layer-shell has to be loaded before libwayland-client, which GTK pulls in
+ctypes.CDLL("libgtk4-layer-shell.so", mode=ctypes.RTLD_GLOBAL)
+gi.require_version("Gtk", "4.0")
+gi.require_version("Gdk", "4.0")
+gi.require_version("Gtk4LayerShell", "1.0")
+gi.require_version("Graphene", "1.0")
+from gi.repository import Gdk, Graphene, Gtk  # noqa: E402
+from gi.repository import Gtk4LayerShell as LayerShell  # noqa: E402
+
+BIN = os.path.expanduser("~/.local/bin")
+CARD_WIDTH = 320
+EDGE_GAP = 8  # the card never comes closer than this to the screen's right edge
+ERROR_SECONDS = 5
+
+IWD = "net.connman.iwd"
+BLUEZ = "org.bluez"
+AGENT_PATH = APP_PATH + "/iwd_agent"
+AGENT_XML = """
+<node>
+  <interface name="net.connman.iwd.Agent">
+    <method name="Release"/>
+    <method name="RequestPassphrase"><arg type="o" direction="in"/><arg type="s" direction="out"/></method>
+    <method name="RequestPrivateKeyPassphrase"><arg type="o" direction="in"/><arg type="s" direction="out"/></method>
+    <method name="RequestUserNameAndPassword"><arg type="o" direction="in"/><arg type="s" direction="out"/><arg type="s" direction="out"/></method>
+    <method name="RequestUserPassword"><arg type="o" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="out"/></method>
+    <method name="Cancel"><arg type="s" direction="in"/></method>
+  </interface>
+</node>
+"""
+
+# Nerd Font glyphs (JetBrainsMono Nerd Font, the bar's font)
+WIFI_BARS = ["\U000f091f", "\U000f0922", "\U000f0925", "\U000f0928"]  # nf-md-wifi_strength_1..4
+LOCK = "\U000f033e"  # nf-md-lock
+BT_ICONS = {
+    "audio-headset": "\U000f02cb",  # nf-md-headphones
+    "audio-headphones": "\U000f02cb",
+    "audio-card": "\U000f04c3",  # nf-md-speaker
+    "input-mouse": "\U000f037d",  # nf-md-mouse
+    "input-keyboard": "\U000f030c",  # nf-md-keyboard
+    "input-gaming": "\U000f0296",  # nf-md-gamepad
+    "phone": "\U000f011c",  # nf-md-cellphone
+    "computer": "\U000f0322",  # nf-md-laptop
+}
+BT_DEFAULT = "\U000f00af"  # nf-md-bluetooth
+BATTERY = ["\U000f007a", "\U000f007b", "\U000f007c", "\U000f007d", "\U000f007e",
+           "\U000f007f", "\U000f0080", "\U000f0081", "\U000f0082", "\U000f0079"]  # nf-md-battery_10..100
+
+CSS = """
+window.net-popover { background: transparent; }
+.card {
+  background: #1e1e2e; color: #cdd6f4;
+  border: 1px solid #313244; border-radius: 14px; padding: 6px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+  font-size: 13px;
+}
+.title { font-weight: 600; font-size: 14px; }
+.section { font-size: 11px; font-weight: 600; color: #a6adc8; }
+.sub { font-size: 11px; color: #a6adc8; }
+.sub.error { color: #f38ba8; }
+.dim { color: #a6adc8; }
+.mono { font-family: "JetBrainsMono Nerd Font"; font-size: 11px; color: #a6adc8; }
+.glyph { font-family: "JetBrainsMono Nerd Font"; }
+.icon {
+  font-family: "JetBrainsMono Nerd Font"; font-size: 15px;
+  min-width: 28px; min-height: 28px; border-radius: 14px;
+  background: #313244; color: #cdd6f4;
+}
+.icon.active { background: #89b4fa; color: #11111b; }
+.empty { color: #a6adc8; padding: 14px 10px 18px 10px; }
+separator { background: #313244; min-height: 1px; margin: 4px 6px; }
+button.row, button.menu, button.fold {
+  background: transparent; border: none; box-shadow: none; outline: none;
+  color: #cdd6f4; border-radius: 8px;
+}
+button.row { padding: 6px 8px; min-height: 30px; }
+button.menu { padding: 0 10px; min-height: 32px; border-radius: 6px; }
+button.fold { padding: 4px 10px; min-height: 22px; border-radius: 6px; }
+button.row:hover, button.menu:hover, button.fold:hover { background: #313244; }
+button.pill {
+  background: #313244; color: #cdd6f4; border: none; box-shadow: none;
+  border-radius: 6px; padding: 0 12px; min-height: 28px; font-size: 12px; font-weight: 500;
+}
+button.pill:hover { background: #45475a; }
+button.pill.accent { background: #89b4fa; color: #11111b; }
+button.pill.accent:hover { background: #b4befe; }
+entry {
+  background: #11111b; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px;
+  min-height: 28px; box-shadow: none; outline: none;
+}
+entry:focus-within { border-color: #89b4fa; }
+switch { background: #45475a; border: none; border-radius: 12px; }
+switch:checked { background: #89b4fa; }
+switch slider { background: #f5f5f7; border: none; box-shadow: none; min-width: 20px; min-height: 20px; }
+.details { font-size: 12px; }
+"""
+
+
+def unpack(variant):
+    return variant.unpack() if variant is not None else None
+
+
+def label(text, *classes, xalign=0.0, hexpand=False):
+    widget = Gtk.Label(label=text, xalign=xalign, hexpand=hexpand)
+    widget.set_ellipsize(3)  # Pango.EllipsizeMode.END
+    for css in classes:
+        widget.add_css_class(css)
+    return widget
+
+
+def hbox(spacing=10, *children):
+    box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=spacing)
+    for child in children:
+        box.append(child)
+    return box
+
+
+def vbox(spacing=0, *children):
+    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=spacing)
+    for child in children:
+        box.append(child)
+    return box
+
+
+def icon(glyph, active=False):
+    widget = Gtk.Label(label=glyph, xalign=0.5, yalign=0.5, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+    widget.add_css_class("icon")
+    if active:
+        widget.add_css_class("active")
+    return widget
+
+
+def spinner():
+    widget = Gtk.Spinner(spinning=True)
+    widget.set_size_request(14, 14)
+    return widget
+
+
+def row(children, on_click, tooltip=None):
+    button = Gtk.Button(child=hbox(10, *children))
+    button.add_css_class("row")
+    button.connect("clicked", lambda _b: on_click())
+    if tooltip:
+        button.set_tooltip_text(tooltip)
+    return button
+
+
+def title_block(title, subtitle=None, error=False):
+    box = vbox(0, label(title, hexpand=True))
+    box.set_hexpand(True)
+    box.set_valign(Gtk.Align.CENTER)
+    if subtitle:
+        sub = label(subtitle, "sub")
+        if error:
+            sub.add_css_class("error")
+        box.append(sub)
+    return box
+
+
+def pill(text, on_click, accent=False):
+    button = Gtk.Button(label=text, valign=Gtk.Align.CENTER)
+    button.add_css_class("pill")
+    if accent:
+        button.add_css_class("accent")
+    button.connect("clicked", lambda _b: on_click())
+    return button
+
+
+def section(text, extra=None):
+    box = hbox(6, label(text, "section", hexpand=True))
+    if extra:
+        box.append(extra)
+    box.set_margin_start(10)
+    box.set_margin_end(10)
+    box.set_margin_top(6)
+    box.set_margin_bottom(2)
+    return box
+
+
+def run_tui(command):
+    subprocess.Popen([os.path.join(BIN, "run-in-new-term"), command], start_new_session=True)
+
+
+def band(mhz):
+    if not mhz:
+        return ""
+    return "6 GHz" if mhz >= 5925 else "5 GHz" if mhz >= 4900 else "2.4 GHz"
+
+
+def wifi_bars(dbm):
+    if dbm is None:
+        return WIFI_BARS[0]
+    return WIFI_BARS[3 if dbm >= -55 else 2 if dbm >= -65 else 1 if dbm >= -75 else 0]
+
+
+def first_line(command):
+    try:
+        out = subprocess.run(command, capture_output=True, text=True, timeout=2).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return out.splitlines()[0] if out.strip() else ""
+
+
+def ip_details(ifname):
+    """(IPv4 address, default router) of an interface, empty strings when unknown."""
+    addr = first_line(["ip", "-4", "-o", "addr", "show", "dev", ifname]).split()
+    address = addr[3].split("/")[0] if len(addr) > 3 else ""
+    route = first_line(["ip", "-4", "route", "show", "default", "dev", ifname]).split()
+    router = route[2] if len(route) > 2 and route[1] == "via" else ""
+    return address, router
+
+
+class Bus:
+    """Thin helpers over the system bus."""
+
+    def __init__(self):
+        self.conn = Gio.bus_get_sync(Gio.BusType.SYSTEM)
+
+    def objects(self, service):
+        try:
+            reply = self.conn.call_sync(service, "/", "org.freedesktop.DBus.ObjectManager", "GetManagedObjects",
+                                        None, None, Gio.DBusCallFlags.NONE, 2000, None)
+        except GLib.Error:
+            return {}
+        return reply.unpack()[0]
+
+    def call_sync(self, service, path, iface, method, params=None):
+        try:
+            return unpack(self.conn.call_sync(service, path, iface, method, params, None,
+                                              Gio.DBusCallFlags.NONE, 2000, None))
+        except GLib.Error:
+            return None
+
+    def call(self, service, path, iface, method, params=None, done=None, timeout=60000):
+        """Async call; done(error_message_or_None) runs when it returns."""
+
+        def finish(conn, result):
+            try:
+                conn.call_finish(result)
+                error = None
+            except GLib.Error as err:
+                Gio.DBusError.strip_remote_error(err)
+                error = err.message or "Failed"
+            if done:
+                done(error)
+
+        self.conn.call(service, path, iface, method, params, None, Gio.DBusCallFlags.NONE, timeout, None, finish)
+
+    def set_prop(self, service, path, iface, prop, value, done=None):
+        self.call(service, path, "org.freedesktop.DBus.Properties", "Set",
+                  GLib.Variant("(ssv)", (iface, prop, value)), done, timeout=10000)
+
+    def watch(self, service, callback):
+        self.conn.signal_subscribe(service, None, None, None, None, Gio.DBusSignalFlags.NONE,
+                                   lambda *_args: callback())
+
+
+class Wifi:
+    """iwd state and actions for the first Wi-Fi device."""
+
+    def __init__(self, bus):
+        self.bus = bus
+        self.pending_passphrase = {}  # network path -> passphrase typed in the card
+        self.agent_id = None
+        self.agent_info = Gio.DBusNodeInfo.new_for_xml(AGENT_XML).interfaces[0]
+
+    def state(self):
+        objects = self.bus.objects(IWD)
+        device_path = next((p for p, ifaces in objects.items() if f"{IWD}.Device" in ifaces), None)
+        if device_path is None:
+            return None
+        device = objects[device_path][f"{IWD}.Device"]
+        station = objects[device_path].get(f"{IWD}.Station")
+        info = {"device": device_path, "ifname": device.get("Name", ""), "adapter": device.get("Adapter"),
+                "powered": bool(device.get("Powered")) and station is not None, "networks": [],
+                "scanning": False, "state": "", "current": None}
+        if not info["powered"]:
+            return info
+        info["scanning"] = bool(station.get("Scanning"))
+        info["state"] = station.get("State", "")
+        info["current"] = station.get("ConnectedNetwork")
+        ordered = self.bus.call_sync(IWD, device_path, f"{IWD}.Station", "GetOrderedNetworks") or ([],)
+        for path, signal in ordered[0]:
+            props = objects.get(path, {}).get(f"{IWD}.Network")
+            if not props:
+                continue
+            info["networks"].append({
+                "path": path, "name": props.get("Name", ""), "type": props.get("Type", ""),
+                "known": props.get("KnownNetwork"), "connected": bool(props.get("Connected")),
+                "dbm": signal / 100,
+            })
+        return info
+
+    def diagnostics(self, device_path):
+        reply = self.bus.call_sync(IWD, device_path, f"{IWD}.StationDiagnostic", "GetDiagnostics")
+        return reply[0] if reply else {}
+
+    def set_powered(self, info, on, done):
+        def power_device(_error=None):
+            self.bus.set_prop(IWD, info["device"], f"{IWD}.Device", "Powered", GLib.Variant("b", on), done)
+
+        if on and info.get("adapter"):
+            # an adapter switched off (rfkill) keeps the device off: power it first
+            self.bus.set_prop(IWD, info["adapter"], f"{IWD}.Adapter", "Powered", GLib.Variant("b", True),
+                              power_device)
+        else:
+            power_device()
+
+    def scan(self, device_path):
+        self.bus.call(IWD, device_path, f"{IWD}.Station", "Scan")
+
+    def disconnect(self, device_path, done):
+        self.bus.call(IWD, device_path, f"{IWD}.Station", "Disconnect", done=done)
+
+    def forget(self, known_path, done):
+        self.bus.call(IWD, known_path, f"{IWD}.KnownNetwork", "Forget", done=done)
+
+    def connect(self, network_path, passphrase, done):
+        """Connect, answering iwd's passphrase request with the given one (None for known/open networks).
+
+        iwd allows a single agent and impala registers its own while it runs, so ours only exists
+        for the length of a connection attempt.
+        """
+        if passphrase is not None:
+            self.pending_passphrase[network_path] = passphrase
+        self._register_agent()
+
+        def finished(error):
+            self.pending_passphrase.pop(network_path, None)
+            self._unregister_agent()
+            done(error)
+
+        self.bus.call(IWD, network_path, f"{IWD}.Network", "Connect", done=finished)
+
+    def _register_agent(self):
+        if self.agent_id is not None:
+            return
+        try:
+            self.agent_id = self.bus.conn.register_object(AGENT_PATH, self.agent_info, self._agent_call, None, None)
+        except GLib.Error:
+            return
+        self.bus.call(IWD, "/net/connman/iwd", f"{IWD}.AgentManager", "RegisterAgent",
+                      GLib.Variant("(o)", (AGENT_PATH,)))
+
+    def _unregister_agent(self):
+        if self.agent_id is None:
+            return
+        self.bus.call(IWD, "/net/connman/iwd", f"{IWD}.AgentManager", "UnregisterAgent",
+                      GLib.Variant("(o)", (AGENT_PATH,)))
+        self.bus.conn.unregister_object(self.agent_id)
+        self.agent_id = None
+
+    def _agent_call(self, _conn, _sender, _path, _iface, method, params, invocation):
+        if method == "RequestPassphrase":
+            passphrase = self.pending_passphrase.get(params.unpack()[0])
+            if passphrase is not None:
+                invocation.return_value(GLib.Variant("(s)", (passphrase,)))
+                return
+        if method in ("Release", "Cancel"):
+            invocation.return_value(None)
+            return
+        # no passphrase typed (a known network whose password changed) or enterprise Wi-Fi
+        invocation.return_dbus_error(f"{IWD}.Agent.Error.Canceled", "Password needed")
+
+
+class Bluetooth:
+    """bluez state and actions for the first adapter."""
+
+    def __init__(self, bus):
+        self.bus = bus
+        self.discovering = None  # adapter path we started discovery on
+
+    def state(self):
+        objects = self.bus.objects(BLUEZ)
+        adapter_path = next((p for p, ifaces in objects.items() if f"{BLUEZ}.Adapter1" in ifaces), None)
+        if adapter_path is None:
+            return None
+        adapter = objects[adapter_path][f"{BLUEZ}.Adapter1"]
+        info = {"adapter": adapter_path, "powered": bool(adapter.get("Powered")), "devices": []}
+        for path, ifaces in objects.items():
+            device = ifaces.get(f"{BLUEZ}.Device1")
+            if not device or device.get("Adapter") != adapter_path:
+                continue
+            battery = ifaces.get(f"{BLUEZ}.Battery1", {}).get("Percentage")
+            info["devices"].append({
+                "path": path, "name": device.get("Alias") or device.get("Name") or device.get("Address", ""),
+                "named": "Name" in device, "paired": bool(device.get("Paired") or device.get("Bonded")),
+                "connected": bool(device.get("Connected")), "icon": device.get("Icon", ""),
+                "rssi": device.get("RSSI"), "battery": battery,
+            })
+        return info
+
+    def set_powered(self, adapter_path, on, done):
+        self.bus.set_prop(BLUEZ, adapter_path, f"{BLUEZ}.Adapter1", "Powered", GLib.Variant("b", on), done)
+
+    def start_discovery(self, adapter_path):
+        if self.discovering:
+            return
+        self.discovering = adapter_path
+        self.bus.call(BLUEZ, adapter_path, f"{BLUEZ}.Adapter1", "StartDiscovery")
+
+    def stop_discovery(self):
+        if self.discovering:
+            self.bus.call(BLUEZ, self.discovering, f"{BLUEZ}.Adapter1", "StopDiscovery")
+            self.discovering = None
+
+    def toggle_connection(self, device, done):
+        method = "Disconnect" if device["connected"] else "Connect"
+        self.bus.call(BLUEZ, device["path"], f"{BLUEZ}.Device1", method, done=done)
+
+    def pair_and_connect(self, device, done):
+        def paired(error):
+            if error:
+                done(error)
+                return
+            self.bus.set_prop(BLUEZ, device["path"], f"{BLUEZ}.Device1", "Trusted", GLib.Variant("b", True))
+            self.bus.call(BLUEZ, device["path"], f"{BLUEZ}.Device1", "Connect", done=done)
+
+        self.bus.call(BLUEZ, device["path"], f"{BLUEZ}.Device1", "Pair", done=paired)
+
+
+class Popover(Gtk.Application):
+    def __init__(self, view):
+        super().__init__(application_id=APP_ID)
+        self.view = view
+        self.window = None
+        self.busy = set()  # paths with a connect/pair/disconnect in flight
+        self.errors = {}  # path -> message shown under the row for a few seconds
+        self.expanded = None  # Wi-Fi network path whose password box is open
+        self.details_open = False
+        self.other_open = True
+        self.password = Gtk.PasswordEntry(show_peek_icon=True, hexpand=True)
+        self.password.connect("activate", lambda _e: self._join_expanded())
+        self.refresh_pending = False
+        toggle = Gio.SimpleAction.new("toggle", GLib.VariantType.new("s"))
+        toggle.connect("activate", lambda _a, param: self.toggle(param.unpack()))
+        self.add_action(toggle)
+
+    # lifecycle
+
+    def do_activate(self):
+        if self.window is not None:
+            return
+        self.hold()
+        self.bus = Bus()
+        self.wifi = Wifi(self.bus)
+        self.bt = Bluetooth(self.bus)
+        self.bus.watch(IWD, self.schedule_refresh)
+        self.bus.watch(BLUEZ, self.schedule_refresh)
+
+        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
+        provider = Gtk.CssProvider()
+        provider.load_from_string(CSS)
+        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), provider,
+                                                  Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        self.window = Gtk.ApplicationWindow(application=self)
+        self.window.add_css_class("net-popover")
+        LayerShell.init_for_window(self.window)
+        LayerShell.set_namespace(self.window, "net-popover")
+        LayerShell.set_layer(self.window, LayerShell.Layer.TOP)
+        for edge in (LayerShell.Edge.TOP, LayerShell.Edge.BOTTOM, LayerShell.Edge.LEFT, LayerShell.Edge.RIGHT):
+            LayerShell.set_anchor(self.window, edge, True)
+        LayerShell.set_keyboard_mode(self.window, LayerShell.KeyboardMode.EXCLUSIVE)
+
+        self.card = vbox(0)
+        self.card.add_css_class("card")
+        self.card.set_size_request(CARD_WIDTH, -1)
+        self.card.set_halign(Gtk.Align.END)
+        self.card.set_valign(Gtk.Align.START)
+        self.card.set_margin_top(6)
+        self.window.set_child(self.card)
+
+        click = Gtk.GestureClick(button=0)
+        click.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        click.connect("pressed", self._on_backdrop_click)
+        self.window.add_controller(click)
+        keys = Gtk.EventControllerKey()
+        keys.connect("key-pressed", self._on_key)
+        self.window.add_controller(keys)
+
+        self.show(self.view)
+
+    def toggle(self, view):
+        if view not in VIEWS:
+            return
+        if self.window.get_visible() and self.view == view:
+            self.hide()
+        else:
+            self.show(view)
+
+    def show(self, view):
+        if self.view != view:
+            self.expanded = None
+            self.details_open = False
+        self.view = view
+        self._place_under_cursor()
+        self.rebuild(rescan=True)
+        self.window.present()
+
+    def hide(self):
+        self.bt.stop_discovery()
+        self.expanded = None
+        self.details_open = False
+        self.password.set_text("")
+        self.window.set_visible(False)
+
+    def _on_backdrop_click(self, gesture, _n, x, y):
+        ok, bounds = self.card.compute_bounds(self.window)
+        if not ok or not bounds.contains_point(Graphene.Point().init(x, y)):
+            gesture.set_state(Gtk.EventSequenceState.CLAIMED)
+            self.hide()
+
+    def _on_key(self, _ctrl, keyval, _code, _state):
+        if keyval == Gdk.KEY_Escape:
+            if self.expanded:
+                self.expanded = None
+                self.rebuild()
+            else:
+                self.hide()
+            return True
+        return False
+
+    def _place_under_cursor(self):
+        """Put the card on the cursor's monitor, centred under the clicked bar icon."""
+        try:
+            cursor = json.loads(subprocess.run(["hyprctl", "cursorpos", "-j"], capture_output=True,
+                                               text=True, timeout=1).stdout)
+            monitors = json.loads(subprocess.run(["hyprctl", "monitors", "-j"], capture_output=True,
+                                                 text=True, timeout=1).stdout)
+        except (OSError, ValueError, subprocess.TimeoutExpired):
+            return
+        for mon in monitors:
+            width = mon["width"] / mon["scale"]
+            height = mon["height"] / mon["scale"]
+            if mon["transform"] % 2:
+                width, height = height, width
+            if mon["x"] <= cursor["x"] < mon["x"] + width and mon["y"] <= cursor["y"] < mon["y"] + height:
+                right = mon["x"] + width - cursor["x"] - CARD_WIDTH / 2
+                self.card.set_margin_end(int(max(EDGE_GAP, right)))
+                for gdk_mon in Gdk.Display.get_default().get_monitors():
+                    if gdk_mon.get_connector() == mon["name"]:
+                        LayerShell.set_monitor(self.window, gdk_mon)
+                return
+
+    # state changes
+
+    def schedule_refresh(self):
+        if self.refresh_pending or not self.window or not self.window.get_visible():
+            return
+        self.refresh_pending = True
+
+        def run():
+            self.refresh_pending = False
+            if self.window.get_visible():
+                self.rebuild()
+            return False
+
+        GLib.timeout_add(150, run)
+
+    def run_action(self, path, start):
+        """Mark path busy, start the action, then show its error (if any) under the row."""
+        self.busy.add(path)
+        self.errors.pop(path, None)
+
+        def done(error):
+            self.busy.discard(path)
+            if error:
+                self.errors[path] = error
+                GLib.timeout_add_seconds(ERROR_SECONDS, self._clear_error, path, error)
+            self.rebuild()
+
+        start(done)
+        self.rebuild()
+
+    def _clear_error(self, path, error):
+        if self.errors.get(path) == error:
+            del self.errors[path]
+            self.rebuild()
+        return False
+
+    # building the card
+
+    def rebuild(self, rescan=False):
+        if self.password.get_parent():
+            self.password.get_parent().remove(self.password)
+        while child := self.card.get_first_child():
+            self.card.remove(child)
+        if self.view == "wifi":
+            self._build_wifi(rescan)
+        else:
+            self._build_bluetooth(rescan)
+
+    def _header(self, title, active, on_toggle):
+        switch = Gtk.Switch(active=active, valign=Gtk.Align.CENTER)
+        switch.connect("state-set", lambda _s, on: (on_toggle(on), False)[1])
+        box = hbox(10, label(title, "title", hexpand=True), switch)
+        box.set_margin_start(10)
+        box.set_margin_end(8)
+        box.set_margin_top(6)
+        box.set_margin_bottom(6)
+        self.card.append(box)
+
+    def _footer(self, items):
+        self.card.append(Gtk.Separator())
+        for text, hint, action in items:
+            content = hbox(10, label(text, hexpand=True))
+            if hint:
+                content.append(label(hint, "mono"))
+            button = Gtk.Button(child=content)
+            button.add_css_class("menu")
+            button.connect("clicked", lambda _b, act=action: (self.hide(), act()))
+            self.card.append(button)
+
+    def _empty(self, text):
+        self.card.append(label(text, "empty"))
+
+    def _scrolled(self, box):
+        scroller = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, propagate_natural_height=True,
+                                      max_content_height=520)
+        scroller.set_child(box)
+        self.card.append(scroller)
+
+    # Wi-Fi
+
+    def _build_wifi(self, rescan):
+        info = self.wifi.state()
+        footer = [("Network Settings…", "impala", lambda: run_tui("impala")),
+                  ("Restart Network", "right-click", lambda: subprocess.Popen(
+                      [os.path.join(BIN, "network-restart-menu")], start_new_session=True))]
+        if info is None:
+            self._header("Wi-Fi", False, lambda _on: None)
+            self._empty("No Wi-Fi adapter found.")
+            self._footer(footer)
+            return
+        self._header("Wi-Fi", info["powered"], lambda on: self.run_action(
+            info["device"], lambda done: self.wifi.set_powered(info, on, done)))
+        if not info["powered"]:
+            self._empty("Wi-Fi is off.")
+            self._footer(footer)
+            return
+        if rescan and not info["scanning"]:
+            self.wifi.scan(info["device"])
+
+        body = vbox(0)
+        known = [n for n in info["networks"] if n["known"]]
+        known.sort(key=lambda n: not n["connected"])
+        other = [n for n in info["networks"] if not n["known"] and n["name"]]
+
+        body.append(Gtk.Separator())
+        if known:
+            body.append(section("Known Networks"))
+            for net in known:
+                self._wifi_row(body, info, net)
+
+        fold_label = hbox(6, label("Other Networks", "section", hexpand=True))
+        if info["scanning"]:
+            fold_label.append(spinner())
+        fold_label.append(label("\U000f0142" if not self.other_open else "\U000f0140", "glyph", "dim"))
+        fold = Gtk.Button(child=fold_label)
+        fold.add_css_class("fold")
+        fold.set_margin_top(4)
+        fold.connect("clicked", lambda _b: self._toggle_other())
+        body.append(fold)
+        if self.other_open:
+            for net in other:
+                self._wifi_row(body, info, net)
+            if not other:
+                body.append(label("Searching…" if info["scanning"] else "No other networks nearby.", "sub", "empty"))
+        self._scrolled(body)
+        self._footer(footer)
+
+    def _toggle_other(self):
+        self.other_open = not self.other_open
+        self.rebuild()
+
+    def _wifi_row(self, body, info, net):
+        path = net["path"]
+        current = net["connected"]
+        busy = path in self.busy or (current and info["state"] in ("connecting", "roaming"))
+        secured = net["type"] != "open"
+        if path in self.errors:
+            subtitle, error = self.errors[path], True
+        elif busy:
+            subtitle, error = "Connecting…", False
+        elif current:
+            mhz = self.wifi.diagnostics(info["device"]).get("Frequency")
+            subtitle, error = " · ".join(x for x in ("Connected", band(mhz)) if x), False
+        else:
+            subtitle, error = None, False
+
+        children = [icon(wifi_bars(net["dbm"]), active=current), title_block(net["name"], subtitle, error)]
+        if busy:
+            children.append(spinner())
+        if secured:
+            children.append(label(LOCK, "glyph", "dim"))
+        body.append(row(children, lambda: self._wifi_clicked(info, net)))
+
+        if current and self.details_open:
+            body.append(self._wifi_details(info, net))
+        if self.expanded == path:
+            join = pill("Join", self._join_expanded, accent=True)
+            box = hbox(6, self.password, join)
+            box.set_margin_start(46)
+            box.set_margin_end(8)
+            box.set_margin_bottom(8)
+            box.set_margin_top(2)
+            body.append(box)
+            GLib.idle_add(self.password.grab_focus)
+
+    def _wifi_clicked(self, info, net):
+        if net["connected"]:
+            self.details_open = not self.details_open
+            self.rebuild()
+        elif net["known"] or net["type"] == "open":
+            self._wifi_connect(net["path"], None, secured=net["type"] != "open")
+        elif net["type"] == "psk":
+            self.expanded = None if self.expanded == net["path"] else net["path"]
+            self.password.set_text("")
+            self.rebuild()
+        else:
+            # enterprise (802.1x) networks need a provisioning file: leave them to impala/iwctl
+            self.errors[net["path"]] = "Enterprise network: set it up in impala"
+            GLib.timeout_add_seconds(ERROR_SECONDS, self._clear_error, net["path"], self.errors[net["path"]])
+            self.rebuild()
+
+    def _join_expanded(self):
+        if self.expanded:
+            path, passphrase = self.expanded, self.password.get_text()
+            self.expanded = None
+            self.password.set_text("")
+            self._wifi_connect(path, passphrase)
+
+    def _wifi_connect(self, path, passphrase, secured=True):
+        self.details_open = False
+
+        def start(done):
+            def finished(error):
+                if error and secured:
+                    # usually a wrong or changed password: open the box so it can be retyped
+                    self.expanded = path
+                    error = "Couldn't connect, check the password"
+                done(error)
+
+            self.wifi.connect(path, passphrase, finished)
+
+        self.run_action(path, start)
+
+    def _wifi_details(self, info, net):
+        address, router = ip_details(info["ifname"])
+        diag = self.wifi.diagnostics(info["device"])
+        rssi = diag.get("RSSI", net["dbm"])
+        grid = Gtk.Grid(column_spacing=12, row_spacing=4)
+        grid.add_css_class("details")
+        rows = [("IP address", address or "—"), ("Router", router or "—"), ("Signal", f"{rssi:.0f} dBm")]
+        for i, (name, value) in enumerate(rows):
+            grid.attach(label(name, "dim"), 0, i, 1, 1)
+            value_label = label(value)
+            value_label.set_selectable(True)
+            grid.attach(value_label, 1, i, 1, 1)
+        buttons = hbox(6, pill("Disconnect", lambda: self.run_action(
+            net["path"], lambda done: self.wifi.disconnect(info["device"], done))))
+        if net["known"]:
+            buttons.append(pill("Forget", lambda: self.run_action(
+                net["path"], lambda done: self.wifi.forget(net["known"], done))))
+        buttons.set_margin_top(4)
+        grid.attach(buttons, 1, len(rows), 1, 1)
+        grid.set_margin_start(46)
+        grid.set_margin_end(8)
+        grid.set_margin_bottom(8)
+        grid.set_margin_top(2)
+        return grid
+
+    # Bluetooth
+
+    def _build_bluetooth(self, rescan):
+        info = self.bt.state()
+        footer = [("Bluetooth Settings…", "bluetui", lambda: run_tui("bluetui"))]
+        if info is None:
+            self._header("Bluetooth", False, lambda _on: None)
+            self._empty("No Bluetooth adapter found.")
+            self._footer(footer)
+            return
+        self._header("Bluetooth", info["powered"], lambda on: self.run_action(
+            info["adapter"], lambda done: self.bt.set_powered(info["adapter"], on, done)))
+        if not info["powered"]:
+            self.bt.discovering = None
+            self._empty("Bluetooth is off.")
+            self._footer(footer)
+            return
+        if rescan:
+            self.bt.start_discovery(info["adapter"])
+
+        body = vbox(0)
+        body.append(Gtk.Separator())
+        mine = sorted((d for d in info["devices"] if d["paired"]), key=lambda d: (not d["connected"], d["name"].lower()))
+        nearby = [d for d in info["devices"] if not d["paired"] and d["named"]]
+        nearby.sort(key=lambda d: -(d["rssi"] if d["rssi"] is not None else -999))
+
+        if mine:
+            body.append(section("My Devices"))
+            for device in mine:
+                body.append(self._bt_device_row(device))
+        body.append(section("Nearby Devices", hbox(5, spinner(), label("Searching", "sub"))))
+        for device in nearby[:8]:
+            body.append(self._bt_nearby_row(device))
+        if not nearby:
+            body.append(label("Put a device in pairing mode to see it here.", "sub", "empty"))
+        self._scrolled(body)
+        self._footer(footer)
+
+    def _bt_device_row(self, device):
+        path = device["path"]
+        busy = path in self.busy
+        if path in self.errors:
+            subtitle, error = self.errors[path], True
+        elif busy:
+            subtitle, error = ("Disconnecting…" if device["connected"] else "Connecting…"), False
+        else:
+            subtitle, error = ("Connected" if device["connected"] else "Not connected"), False
+        children = [icon(BT_ICONS.get(device["icon"], BT_DEFAULT), active=device["connected"]),
+                    title_block(device["name"], subtitle, error)]
+        if busy:
+            children.append(spinner())
+        elif device["connected"] and device["battery"] is not None:
+            level = BATTERY[min(9, max(0, (device["battery"] - 1) // 10))]
+            children.append(label(f"{device['battery']}% {level}", "mono"))
+        return row(children, lambda: self.run_action(path, lambda done: self.bt.toggle_connection(device, done)),
+                   tooltip="Click to connect or disconnect")
+
+    def _bt_nearby_row(self, device):
+        path = device["path"]
+        children = [icon(BT_ICONS.get(device["icon"], BT_DEFAULT)),
+                    title_block(device["name"], self.errors.get(path), path in self.errors)]
+        if path in self.busy:
+            children.append(hbox(6, spinner(), label("Pairing", "sub")))
+        else:
+            children.append(pill("Connect", lambda: self.run_action(
+                path, lambda done: self.bt.pair_and_connect(device, done))))
+        box = hbox(10, *children)
+        box.set_margin_start(8)
+        box.set_margin_end(8)
+        box.set_margin_top(6)
+        box.set_margin_bottom(6)
+        return box
+
+
+if __name__ == "__main__":
+    Popover(VIEW).run([sys.argv[0]])

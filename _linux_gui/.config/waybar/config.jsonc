@@ -101,7 +101,9 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "$HOME/.local/bin/run-in-new-term impala",
+    // left: the Wi-Fi panel (its footer opens impala); middle: impala directly
+    "on-click": "$HOME/.local/bin/net-popover wifi",
+    "on-click-middle": "$HOME/.local/bin/run-in-new-term impala",
     "on-click-right": "$HOME/.local/bin/network-restart-menu"
 
   },
@@ -203,7 +205,9 @@
     "format-connected": "󰂱",
     "format-no-controller": "",
     "tooltip-format": "Devices connected: {num_connections}",
-    "on-click": "$HOME/.local/bin/run-in-new-term bluetui"
+    // left: the Bluetooth panel (its footer opens bluetui); right: bluetui directly
+    "on-click": "$HOME/.local/bin/net-popover bluetooth",
+    "on-click-right": "$HOME/.local/bin/run-in-new-term bluetui"
   },
   "pulseaudio": {
     "format": "{volume}% {icon}",
