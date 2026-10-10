@@ -393,6 +393,10 @@ keymap = [
   ], run = "cd ~/Downloads", desc = "Go to the downloads directory" },
   { on = [
     "g",
+    "s",
+  ], run = "cd ~/Pictures", desc = "Go to the screenshots directory" },
+  { on = [
+    "g",
     "f",
   ], run = "cd ~/Projects/FrrCode", desc = "Go to FrrCode projects" },
   { on = [
