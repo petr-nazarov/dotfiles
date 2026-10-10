@@ -49,8 +49,8 @@ def clean(text, model, timeout):
         "model": model,
         "stream": False,
         "think": False,
-        # Stay loaded between dictations; a cold load costs seconds
-        "keep_alive": "24h",
+        # Stay loaded through a dictation burst, then free the ~4 GB; a cold load costs ~2 s
+        "keep_alive": "5m",
         "options": {"temperature": 0},
         "messages": [
             {"role": "system", "content": PROMPT},
