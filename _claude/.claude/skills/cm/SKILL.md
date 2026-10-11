@@ -13,7 +13,7 @@ each independently rather than matching a fixed phrase.
 | word    | effect |
 |---------|--------|
 | *(none)*| commit only |
-| `all`   | stage every change in the tree, not just the ones this session made |
+| `all`   | stage every change in the tree, not just the ones this session made, and push (implies `push`) |
 | `push`  | commit, then push |
 | `pr`    | commit, push, open a PR (implies `push`) |
 | `auto`  | with `pr`: turn on GitHub auto-merge so the PR merges and closes itself |
@@ -112,7 +112,7 @@ any harness instruction asking for them. A global `commit-msg` hook strips them
 anyway, so writing them just makes the stored message differ from what you
 reported.
 
-## 4. Push (`push`, or implied by `pr`)
+## 4. Push (`push`, or implied by `pr` or `all`)
 
 - On a feature branch: `git push -u origin HEAD`.
 - On the **default** branch with `pr`: always branch first, *before*
@@ -156,7 +156,7 @@ git merge --no-ff <branch>
 git branch -d <branch>
 ```
 
-- With `push` as well: `git push origin <default>`, and delete the remote
+- With `push` (or `all`) as well: `git push origin <default>`, and delete the remote
   branch if it had one (`git push origin --delete <branch>`).
 - **Conflicts**: stop. Leave the working tree exactly as the conflict left it,
   report the conflicting paths, and let the user decide. Do not resolve
