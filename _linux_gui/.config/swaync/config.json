@@ -19,9 +19,9 @@
   "timeout-low": 5,
   "timeout-critical": 0,
   "fit-to-screen": true,
-  "control-center-width": 500,
+  "control-center-width": 400,
   "control-center-height": 600,
-  "notification-window-width": 500,
+  "notification-window-width": 400,
   "keyboard-shortcuts": true,
   "image-visibility": "when-available",
   "transition-time": 200,
@@ -47,10 +47,9 @@
     }
   },
   "widgets": [
-    "buttons-grid",
-    "inhibitors",
     "title",
     "dnd",
+    "inhibitors",
     "mpris",
     "notifications"
   ],
@@ -71,26 +70,6 @@
     "mpris": {
       "image-size": 96,
       "image-radius": 12
-    },
-    "buttons-grid": {
-      "actions": [
-        {
-          "label": "",
-          "command": "$HOME/.local/bin/run-in-new-term impala"
-        },
-        {
-          "label": "",
-          "command": "$HOME/.local/bin/run-in-new-term bluetui"
-        },
-        {
-          "label": "󰖀",
-          "command": "$HOME/.local/bin/run-in-new-term wiremix"
-        },
-        {
-          "label": "⏻",
-          "command": "$HOME/.local/bin/powermenu"
-        }
-      ]
     }
   }
 }
