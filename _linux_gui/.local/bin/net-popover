@@ -1,20 +1,29 @@
 #!/usr/bin/python3
-"""Waybar's Wi-Fi and Bluetooth panels: a macOS-style card under the bar icon.
+"""Waybar's Wi-Fi, Bluetooth, Sound, VPN and Dictation panels: a macOS-style card under the bar icon.
 
-`net-popover wifi` / `net-popover bluetooth` shows that panel, or hides it when it is already
+`net-popover wifi|bluetooth|sound|vpn|dictation|system` shows that panel, or hides it when it is already
 showing. The first call starts a resident GTK app; later calls only send it a D-Bus message, so
-a click opens the card at once. Wi-Fi talks to iwd and Bluetooth to bluez over the system bus;
-impala and bluetui stay one click away in each panel's footer.
+a click opens the card at once. Wi-Fi talks to iwd and Bluetooth to bluez over the system bus,
+Sound to PipeWire through pactl; impala, bluetui and wiremix stay one click away in each panel's
+footer. VPN drives Tailscale and NetBird, and Dictation voxtype, through the same scripts the bar's
+icons use; their checks can take seconds (server health pings), so they load in the background.
+System shows live CPU and memory use, the auto-sleep switch (sleep-toggle) and the power actions.
 
 The card sits on a transparent layer that covers the screen below the bar, so a click anywhere
 outside it (or Escape) closes it, and clicking the bar icon again toggles it.
 """
 
 import ctypes
+import importlib.machinery
+import importlib.util
 import json
 import os
 import subprocess
 import sys
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urlparse
 
 import gi
 
@@ -23,7 +32,8 @@ from gi.repository import Gio, GLib  # noqa: E402
 
 APP_ID = "dev.nazarov.NetPopover"
 APP_PATH = "/dev/nazarov/NetPopover"
-VIEWS = ("wifi", "bluetooth")
+VIEWS = ("wifi", "bluetooth", "sound", "vpn", "dictation", "system")
+SLOW_VIEWS = ("vpn", "dictation", "system")  # state fetched off the main thread, then polled while open
 
 
 def forward_to_running(view):
@@ -99,6 +109,42 @@ BT_ICONS = {
 BT_DEFAULT = "\U000f00af"  # nf-md-bluetooth
 BATTERY = ["\U000f007a", "\U000f007b", "\U000f007c", "\U000f007d", "\U000f007e",
            "\U000f007f", "\U000f0080", "\U000f0081", "\U000f0082", "\U000f0079"]  # nf-md-battery_10..100
+VOLUME_ON = "\U000f057e"  # nf-md-volume_high
+VOLUME_OFF = "\U000f075f"  # nf-md-volume_mute
+MIC_ON = "\U000f036c"  # nf-md-microphone
+MIC_OFF = "\U000f036d"  # nf-md-microphone_off
+CHECK = "\U000f012c"  # nf-md-check
+TAILSCALE = "\U000f0582"  # nf-md-vpn, as on the bar
+NETBIRD = "\U000f15c6"  # as on the bar
+ACCOUNT = "\U000f0004"  # nf-md-account
+DICTATION = "\U000f05cb"  # as on the bar
+LOCAL = "\U000f061a"  # nf-md-chip
+SERVER = "\U000f048b"  # nf-md-server
+CLEANUP = "\U000f0068"  # nf-md-auto_fix
+POLL_SECONDS = 4
+USAGE_SECONDS = 2  # the System card's CPU and memory figures
+CONFIRM_SECONDS = 4  # a power action waits this long for its confirming second click
+SLEEP_ON = "\U000f04b2"  # as on the bar
+SLEEP_OFF = "\U000f04b3"
+CPU = "\U000f0edf"  # nf-md-cpu_64_bit
+MEMORY = "\U000f035b"  # nf-md-memory
+POWER_ACTIONS = [  # key, glyph, title, command, needs a confirming second click
+    ("start-day", "\U000f059c", "Start Day", [os.path.join(BIN, "start-day")], False),
+    ("lock", "\U000f033e", "Lock", ["hyprlock"], False),
+    ("suspend", "\U000f04b2", "Suspend", ["sh", "-c", "hyprlock & sleep 1 && systemctl suspend"], False),
+    ("logout", "\U000f0343", "Log Out", ["uwsm", "stop"], True),
+    ("reboot", "\U000f0709", "Restart", ["systemctl", "reboot"], True),
+    ("uefi", "\U000f061a", "Restart to UEFI", ["systemctl", "reboot", "--firmware-setup"], True),
+    ("poweroff", "\U000f0425", "Shut Down", ["systemctl", "poweroff"], True),
+]
+CHECK_SECONDS = 5  # a slow view's checks give up after this; DNS lookups ignore urllib's timeout
+SOUND_ICONS = {
+    "headphones": "\U000f02cb",  # nf-md-headphones
+    "speaker": "\U000f04c3",  # nf-md-speaker
+    "monitor": "\U000f0379",  # nf-md-monitor
+    "webcam": "\U000f05a0",  # nf-md-webcam
+    "mic": MIC_ON,
+}
 
 CSS = """
 window.net-popover { background: transparent; }
@@ -121,7 +167,7 @@ window.net-popover { background: transparent; }
   background: #313244; color: #cdd6f4;
 }
 .icon.active { background: #89b4fa; color: #11111b; }
-.empty { color: #a6adc8; padding: 14px 10px 18px 10px; }
+label.empty { color: #a6adc8; padding: 14px 10px 18px 10px; }
 separator { background: #313244; min-height: 1px; margin: 4px 6px; }
 button.row, button.menu, button.fold {
   background: transparent; border: none; box-shadow: none; outline: none;
@@ -147,6 +193,21 @@ switch { background: #45475a; border: none; border-radius: 12px; }
 switch:checked { background: #89b4fa; }
 switch slider { background: #f5f5f7; border: none; box-shadow: none; min-width: 20px; min-height: 20px; }
 .details { font-size: 12px; }
+.figure { font-family: "JetBrainsMono Nerd Font"; font-size: 12px; }
+levelbar, levelbar trough { min-height: 6px; }
+levelbar trough { background: transparent; border: none; padding: 0; margin: 0; }
+levelbar block { border: none; border-radius: 3px; min-height: 6px; margin: 0; }
+levelbar block.filled { background: #89b4fa; }
+levelbar.busy block.filled { background: #f9e2af; }
+levelbar block.empty { background: #45475a; }
+button.bare { background: transparent; border: none; box-shadow: none; padding: 0; min-width: 0; min-height: 0; }
+scale { padding: 0 4px; }
+scale trough { background: #45475a; border: none; border-radius: 3px; min-height: 6px; }
+scale highlight { background: #89b4fa; border: none; border-radius: 3px; margin: 0; min-height: 6px; }
+scale slider {
+  background: #f5f5f7; border: none; box-shadow: none; border-radius: 8px;
+  min-width: 16px; min-height: 16px; margin: -6px;
+}
 """
 
 
@@ -190,8 +251,16 @@ def spinner():
     return widget
 
 
+def unfocusable(widget):
+    """The card takes the keyboard while open (for the Wi-Fi password box); keep Space and Enter
+    typed into it from toggling switches or pressing rows."""
+    widget.set_focusable(False)
+    widget.set_focus_on_click(False)
+    return widget
+
+
 def row(children, on_click, tooltip=None):
-    button = Gtk.Button(child=hbox(10, *children))
+    button = unfocusable(Gtk.Button(child=hbox(10, *children)))
     button.add_css_class("row")
     button.connect("clicked", lambda _b: on_click())
     if tooltip:
@@ -212,7 +281,7 @@ def title_block(title, subtitle=None, error=False):
 
 
 def pill(text, on_click, accent=False):
-    button = Gtk.Button(label=text, valign=Gtk.Align.CENTER)
+    button = unfocusable(Gtk.Button(label=text, valign=Gtk.Align.CENTER))
     button.add_css_class("pill")
     if accent:
         button.add_css_class("accent")
@@ -473,6 +542,275 @@ class Bluetooth:
         self.bus.call(BLUEZ, device["path"], f"{BLUEZ}.Device1", "Pair", done=paired)
 
 
+class Sound:
+    """PipeWire outputs (sinks) and inputs (sources), through its PulseAudio interface with pactl."""
+
+    def __init__(self):
+        self.pending_volume = {}  # (kind, name) -> percent, sent in one go so a drag doesn't flood pactl
+
+    @staticmethod
+    def _glyph(kind, item):
+        props = item.get("properties", {})
+        form = props.get("device.form_factor", "")
+        if form in ("headset", "headphone", "hands-free") or (kind == "sink" and props.get("device.bus") == "bluetooth"):
+            return SOUND_ICONS["headphones"]
+        if form == "webcam":
+            return SOUND_ICONS["webcam"]
+        if kind == "source":
+            return SOUND_ICONS["mic"]
+        if "hdmi" in (item.get("active_port") or "") or form in ("tv", "monitor"):
+            return SOUND_ICONS["monitor"]
+        return SOUND_ICONS["speaker"]
+
+    def _devices(self, kind, default):
+        try:
+            items = json.loads(subprocess.run(["pactl", "-f", "json", "list", f"{kind}s"], capture_output=True,
+                                              text=True, timeout=2).stdout)
+        except (OSError, ValueError, subprocess.TimeoutExpired):
+            return []
+        devices = []
+        for item in items:
+            if item["name"].endswith(".monitor"):  # a sink's loopback, not a real input
+                continue
+            levels = [int(ch["value_percent"].rstrip("%")) for ch in item.get("volume", {}).values()]
+            devices.append({
+                "name": item["name"], "description": item.get("description") or item["name"],
+                "muted": bool(item.get("mute")), "volume": round(sum(levels) / len(levels)) if levels else 0,
+                "glyph": self._glyph(kind, item), "default": item["name"] == default,
+            })
+        return devices
+
+    def state(self):
+        return {"sink": self._devices("sink", first_line(["pactl", "get-default-sink"])),
+                "source": self._devices("source", first_line(["pactl", "get-default-source"]))}
+
+    @staticmethod
+    def signature(info):
+        """What the card's layout depends on; volume alone changes only the sliders."""
+        return tuple((kind, d["name"], d["description"], d["muted"], d["default"])
+                     for kind in ("sink", "source") for d in info[kind])
+
+    @staticmethod
+    def _pactl(*args):
+        subprocess.Popen(["pactl", *args], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def set_volume(self, kind, name, percent):
+        if not self.pending_volume:
+            GLib.timeout_add(40, self._flush_volume)
+        self.pending_volume[(kind, name)] = percent
+
+    def _flush_volume(self):
+        for (kind, name), percent in self.pending_volume.items():
+            self._pactl(f"set-{kind}-volume", name, f"{percent}%")
+        self.pending_volume.clear()
+        return False
+
+    def set_mute(self, kind, name, muted):
+        self._pactl(f"set-{kind}-mute", name, "1" if muted else "0")
+
+    def set_default(self, kind, name):
+        self._pactl(f"set-default-{kind}", name)
+
+
+def cli_json(command, timeout=3):
+    """A command's JSON output, or None when it is missing, fails or prints none."""
+    try:
+        out = subprocess.run(command, capture_output=True, text=True, timeout=timeout).stdout
+        return json.loads(out) if out.strip() else None
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return None
+
+
+def parallel(**calls):
+    """Run the (function, *args) calls at once; a call still running after CHECK_SECONDS gives
+    its default instead: {name: result}. Each value is (default, function, *args)."""
+    pool = ThreadPoolExecutor()
+    futures = {name: pool.submit(*call[1:]) for name, call in calls.items()}
+    deadline = time.monotonic() + CHECK_SECONDS
+    results = {}
+    for name, future in futures.items():
+        try:
+            results[name] = future.result(timeout=max(0, deadline - time.monotonic()))
+        except TimeoutError:
+            results[name] = calls[name][0]
+    pool.shutdown(wait=False, cancel_futures=True)
+    return results
+
+
+def load_script(name):
+    """One of the bar's Python status scripts in ~/.local/bin as a module, to reuse its checks."""
+    sys.dont_write_bytecode = True  # no __pycache__ in ~/.local/bin
+    path = os.path.join(BIN, name)
+    loader = importlib.machinery.SourceFileLoader(name.replace("-", "_"), path)
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
+
+
+class Vpn:
+    """Tailscale and NetBird; switching goes through tailscale-status / netbird-status."""
+
+    def state(self):
+        return parallel(tailscale=(None, self._tailscale), netbird=(None, self._netbird))
+
+    @staticmethod
+    def _tailscale():
+        data = cli_json(["tailscale", "status", "--json"])
+        if data is None:
+            return None
+        backend = data.get("BackendState", "")
+        state = {"Running": "connected", "Starting": "connecting",
+                 "NeedsLogin": "login", "NeedsMachineAuth": "login"}.get(backend, "disconnected")
+        ips = [ip for ip in data.get("TailscaleIPs") or [] if ":" not in ip]
+        return {"state": state, "ip": ips[0] if ips else "",
+                "network": (data.get("CurrentTailnet") or {}).get("Name", "")}
+
+    @staticmethod
+    def _netbird():
+        data = cli_json(["netbird", "status", "--json"])
+        if data is None:
+            return None
+        daemon = data.get("daemonStatus", "")
+        state = {"Connected": "connected", "Connecting": "connecting", "NeedsLogin": "login",
+                 "LoginFailed": "login", "SessionExpired": "login"}.get(daemon, "disconnected")
+        try:
+            listing = subprocess.run(["netbird", "profile", "list"], capture_output=True, text=True,
+                                     timeout=2).stdout.splitlines()[1:]  # NAME / ACTIVE table
+        except (OSError, subprocess.TimeoutExpired):
+            listing = []
+        return {"state": state, "ip": (data.get("netbirdIp") or "").split("/")[0],
+                "network": data.get("fqdn", ""), "profile": data.get("profileName", ""),
+                "profiles": [line.split()[0] for line in listing if line.split()]}
+
+    @staticmethod
+    def toggle(name):
+        return [os.path.join(BIN, f"{name}-status"), "toggle"]
+
+    @staticmethod
+    def select_profile(profile):
+        return [os.path.join(BIN, "netbird-status"), "select", profile]
+
+
+class Dictation:
+    """voxtype: the service, where speech is transcribed, LLM cleanup and the desk mic switch.
+
+    Reuses voxtype-target's and voxtype-cleanup-status's own checks, so the card and the bar's
+    icons always agree; switching goes through those scripts too.
+    """
+
+    def state(self):
+        target = load_script("voxtype-target")
+        cleanup = load_script("voxtype-cleanup-status")
+        text = target.read()
+        if text is None:
+            return {}  # not set up
+        settings = target.whisper_settings(text)
+        endpoint = settings.get("remote_endpoint")
+        config = cleanup.read_config()
+        llm = config[1] if config else None
+        llm_on = bool(llm) and not cleanup.OFF_SWITCH.exists()
+        running = first_line(["systemctl", "--user", "is-active", "voxtype"]) == "active"
+
+        checks = {"mic": (None, cli_json, [os.path.join(BIN, "desk-mic-status")], CHECK_SECONDS)}
+        if endpoint:
+            checks["server"] = ("it is unreachable (asleep?)", target.healthy, settings)
+        if llm_on:
+            checks["models"] = (None, cleanup.ollama_models, config[0])
+        if running:
+            checks["status"] = (None, cli_json, ["voxtype", "status", "--format", "json", "--extended"])
+        found = parallel(**checks)
+
+        llm_problem = None
+        if llm_on:
+            served = found["models"]
+            if served is None:
+                llm_problem = "the voxtype server is not reachable" if settings.get("mode") == "remote" \
+                    else "the local Ollama is not reachable"
+            elif llm not in served and f"{llm}:latest" not in served:
+                llm_problem = f"{llm} is not pulled"
+        return {
+            "running": running, "status": found.get("status") or {},
+            "model": settings.get("model", "?"), "remote": settings.get("mode") == "remote",
+            "endpoint": endpoint, "server_problem": found.get("server"),
+            "llm": llm, "llm_on": llm_on, "llm_problem": llm_problem,
+            "mic": found["mic"] or {},
+        }
+
+    @staticmethod
+    def switch_target(mode):
+        return [os.path.join(BIN, "voxtype-target"), mode]
+
+    @staticmethod
+    def toggle_cleanup():
+        return [os.path.join(BIN, "voxtype-cleanup-status"), "toggle"]
+
+    @staticmethod
+    def service(action):
+        return ["systemctl", "--user", action, "voxtype"]
+
+
+class System:
+    """CPU and memory use from /proc, the auto-sleep daemon (hypridle) and the power actions."""
+
+    def __init__(self):
+        self.last_cpu = None  # (busy, total) jiffies at the previous reading
+
+    def state(self):
+        """What the card's layout depends on; the figures update in place (usage())."""
+        return {"sleep": subprocess.run(["pgrep", "-x", "hypridle"], capture_output=True).returncode == 0}
+
+    def _cpu_times(self):
+        with open("/proc/stat") as f:
+            fields = [int(x) for x in f.readline().split()[1:]]
+        idle = fields[3] + fields[4]  # idle + iowait
+        return sum(fields) - idle, sum(fields)
+
+    @staticmethod
+    def _temperature():
+        for hwmon in os.listdir("/sys/class/hwmon"):
+            base = os.path.join("/sys/class/hwmon", hwmon)
+            try:
+                with open(os.path.join(base, "name")) as f:
+                    if f.read().strip() not in ("k10temp", "coretemp", "zenpower"):
+                        continue
+                with open(os.path.join(base, "temp1_input")) as f:
+                    return int(f.read()) / 1000
+            except (OSError, ValueError):
+                continue
+        return None
+
+    def usage(self):
+        busy, total = self._cpu_times()
+        if self.last_cpu is None:  # first reading: measure over a short moment
+            self.last_cpu = (busy, total)
+            time.sleep(0.15)
+            busy, total = self._cpu_times()
+        last_busy, last_total = self.last_cpu
+        self.last_cpu = (busy, total)
+        cpu = (busy - last_busy) / (total - last_total) if total > last_total else 0.0
+
+        mem = {}
+        with open("/proc/meminfo") as f:
+            for line in f:
+                key, value = line.split(":")
+                mem[key] = int(value.split()[0]) * 1024
+        with open("/proc/loadavg") as f:
+            load = f.read().split()[0]
+        used = mem["MemTotal"] - mem["MemAvailable"]
+        return {"cpu": cpu, "load": load, "cores": os.cpu_count(), "temp": self._temperature(),
+                "mem_used": used, "mem_total": mem["MemTotal"],
+                "swap_used": mem.get("SwapTotal", 0) - mem.get("SwapFree", 0)}
+
+    @staticmethod
+    def toggle_sleep():
+        return [os.path.join(BIN, "sleep-toggle"), "toggle"]
+
+
+def gib(size):
+    return f"{size / 2**30:.1f} GB"
+
+
 class Popover(Gtk.Application):
     def __init__(self, view):
         super().__init__(application_id=APP_ID)
@@ -486,6 +824,15 @@ class Popover(Gtk.Application):
         self.password = Gtk.PasswordEntry(show_peek_icon=True, hexpand=True)
         self.password.connect("activate", lambda _e: self._join_expanded())
         self.refresh_pending = False
+        self.sound_signature = None
+        self.sliders = {}  # "sink"/"source" -> (scale, percent label) of the default device
+        self.updating_sliders = False
+        self.volume_set_at = 0.0  # last time a slider was moved here; pactl's echo of it is ignored
+        self.slow = {}  # SLOW_VIEWS view -> last fetched state
+        self.fetching = set()
+        self.poll_id = None
+        self.wanted = {}  # busy key -> the on/off its switch was flipped to, shown until confirmed
+        self.action_done_at = 0.0  # a fetch started before this carries state from before the action
         toggle = Gio.SimpleAction.new("toggle", GLib.VariantType.new("s"))
         toggle.connect("activate", lambda _a, param: self.toggle(param.unpack()))
         self.add_action(toggle)
@@ -499,8 +846,17 @@ class Popover(Gtk.Application):
         self.bus = Bus()
         self.wifi = Wifi(self.bus)
         self.bt = Bluetooth(self.bus)
+        self.sound = Sound()
+        self.vpn = Vpn()
+        self.dictation = Dictation()
+        self.system = System()
+        self.sources = {"vpn": self.vpn, "dictation": self.dictation, "system": self.system}
+        self.usage_widgets = None  # the System card's figures, updated in place
+        self.usage_id = None
+        self.confirming = None  # power action waiting for its second click
         self.bus.watch(IWD, self.schedule_refresh)
         self.bus.watch(BLUEZ, self.schedule_refresh)
+        self._watch_sound()
 
         Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
         provider = Gtk.CssProvider()
@@ -551,8 +907,15 @@ class Popover(Gtk.Application):
         self._place_under_cursor()
         self.rebuild(rescan=True)
         self.window.present()
+        if view == "system" and self.usage_id is None:
+            self.usage_id = GLib.timeout_add_seconds(USAGE_SECONDS, self._tick_usage)
+        if view in SLOW_VIEWS:
+            self.fetch(view)
+            if self.poll_id is None:
+                self.poll_id = GLib.timeout_add_seconds(POLL_SECONDS, self._poll)
 
     def hide(self):
+        self.confirming = None
         self.bt.stop_discovery()
         self.expanded = None
         self.details_open = False
@@ -606,11 +969,110 @@ class Popover(Gtk.Application):
 
         def run():
             self.refresh_pending = False
-            if self.window.get_visible():
-                self.rebuild()
+            # the slow views poll instead
+            if self.window.get_visible() and self.view not in SLOW_VIEWS:
+                self._refresh_sound() if self.view == "sound" else self.rebuild()
             return False
 
         GLib.timeout_add(150, run)
+
+    def fetch(self, view):
+        """Fetch a slow view's state in a thread; the card rebuilds when it arrives and changed."""
+        if view in self.fetching:
+            return
+        self.fetching.add(view)
+        source = self.sources[view]
+
+        started = time.monotonic()
+
+        def work():
+            GLib.idle_add(arrived, self._read_state(source))
+
+        def arrived(result):
+            self.fetching.discard(view)
+            if started < self.action_done_at:
+                return False  # from before an action: the action brought its own fresh state
+            changed = self.slow.get(view, ...) != result
+            self.slow[view] = result
+            if changed and self.window.get_visible() and self.view == view:
+                self.rebuild()
+            return False
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _poll(self):
+        if not self.window.get_visible() or self.view not in SLOW_VIEWS:
+            self.poll_id = None
+            return False
+        self.fetch(self.view)
+        return True
+
+    @staticmethod
+    def _read_state(source):
+        try:
+            return source.state()
+        except Exception as err:  # noqa: BLE001 - a broken script must not kill the panel
+            return {"error": str(err) or type(err).__name__}
+
+    def run_command(self, key, command, want=None):
+        """run_action for a command that may block (pkexec, service restarts): run it in a thread.
+
+        The row stays busy (spinner, its switch held at `want`) until the command has run and the
+        view's state has been read again, so the switch never flips back to the old state meanwhile.
+        """
+        view = self.view
+        source = self.sources[view]
+        if want is not None:
+            self.wanted[key] = want
+
+        def start(done):
+            def work():
+                try:
+                    proc = subprocess.run(command, capture_output=True, text=True, timeout=120)
+                    output = (proc.stderr or proc.stdout).strip().splitlines()
+                    error = None if proc.returncode == 0 else (output[-1] if output else "Failed")
+                except (OSError, subprocess.TimeoutExpired):
+                    error = "Failed"
+                GLib.idle_add(finished, error, self._read_state(source))
+
+            def finished(error, state):
+                self.wanted.pop(key, None)
+                self.slow[view] = state
+                self.action_done_at = time.monotonic()
+                done(error)
+                return False
+
+            threading.Thread(target=work, daemon=True).start()
+
+        self.run_action(key, start)
+
+    def shown(self, key, actual):
+        """A switch's position: where it was flipped to while that change runs, else the real state."""
+        return self.wanted.get(key, actual) if key in self.busy else actual
+
+    def _watch_sound(self):
+        """Refresh the Sound card on PipeWire device, volume and default changes (pactl subscribe)."""
+        try:
+            proc = Gio.Subprocess.new(["pactl", "subscribe"], Gio.SubprocessFlags.STDOUT_PIPE)
+        except GLib.Error:
+            return
+        stream = Gio.DataInputStream.new(proc.get_stdout_pipe())
+
+        def on_line(source, result):
+            try:
+                line, _length = source.read_line_finish_utf8(result)
+            except GLib.Error:
+                line = None
+            if line is None:
+                # pactl exits when the audio server restarts: subscribe again once it is back
+                GLib.timeout_add_seconds(2, lambda: (self._watch_sound(), False)[1])
+                return
+            words = line.split()  # Event 'change' on sink #65
+            if self.view == "sound" and len(words) > 3 and words[3] in ("sink", "source", "server", "card"):
+                self.schedule_refresh()
+            source.read_line_async(GLib.PRIORITY_DEFAULT, None, on_line)
+
+        stream.read_line_async(GLib.PRIORITY_DEFAULT, None, on_line)
 
     def run_action(self, path, start):
         """Mark path busy, start the action, then show its error (if any) under the row."""
@@ -640,15 +1102,30 @@ class Popover(Gtk.Application):
             self.password.get_parent().remove(self.password)
         while child := self.card.get_first_child():
             self.card.remove(child)
+        self.sliders = {}
         if self.view == "wifi":
             self._build_wifi(rescan)
-        else:
+        elif self.view == "bluetooth":
             self._build_bluetooth(rescan)
+        elif self.view == "sound":
+            self._build_sound()
+        elif self.view == "vpn":
+            self._build_vpn()
+        elif self.view == "dictation":
+            self._build_dictation()
+        else:
+            self._build_system()
 
-    def _header(self, title, active, on_toggle):
-        switch = Gtk.Switch(active=active, valign=Gtk.Align.CENTER)
-        switch.connect("state-set", lambda _s, on: (on_toggle(on), False)[1])
-        box = hbox(10, label(title, "title", hexpand=True), switch)
+    def _header(self, title, active=False, on_toggle=None, busy=False):
+        box = hbox(10, label(title, "title", hexpand=True))
+        if busy:
+            box.append(spinner())
+        if on_toggle:
+            switch = unfocusable(Gtk.Switch(active=active, valign=Gtk.Align.CENTER, sensitive=not busy))
+            switch.connect("state-set", lambda _s, on: (on_toggle(on), False)[1])
+            box.append(switch)
+        else:
+            box.set_size_request(-1, 36)  # same height as the headers with a switch
         box.set_margin_start(10)
         box.set_margin_end(8)
         box.set_margin_top(6)
@@ -661,7 +1138,7 @@ class Popover(Gtk.Application):
             content = hbox(10, label(text, hexpand=True))
             if hint:
                 content.append(label(hint, "mono"))
-            button = Gtk.Button(child=content)
+            button = unfocusable(Gtk.Button(child=content))
             button.add_css_class("menu")
             button.connect("clicked", lambda _b, act=action: (self.hide(), act()))
             self.card.append(button)
@@ -669,9 +1146,9 @@ class Popover(Gtk.Application):
     def _empty(self, text):
         self.card.append(label(text, "empty"))
 
-    def _scrolled(self, box):
+    def _scrolled(self, box, max_height=520):
         scroller = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, propagate_natural_height=True,
-                                      max_content_height=520)
+                                      max_content_height=max_height)
         scroller.set_child(box)
         self.card.append(scroller)
 
@@ -711,7 +1188,7 @@ class Popover(Gtk.Application):
         if info["scanning"]:
             fold_label.append(spinner())
         fold_label.append(label("\U000f0142" if not self.other_open else "\U000f0140", "glyph", "dim"))
-        fold = Gtk.Button(child=fold_label)
+        fold = unfocusable(Gtk.Button(child=fold_label))
         fold.add_css_class("fold")
         fold.set_margin_top(4)
         fold.connect("clicked", lambda _b: self._toggle_other())
@@ -897,6 +1374,354 @@ class Popover(Gtk.Application):
         box.set_margin_top(6)
         box.set_margin_bottom(6)
         return box
+
+    def _slow_state(self, title):
+        """The fetched state of the current slow view, or None after showing a placeholder card."""
+        info = self.slow.get(self.view, ...)
+        if info is ... or (isinstance(info, dict) and "error" in info):
+            self._header(title)
+            if info is ...:
+                loading = hbox(8, spinner(), label("Loading…", "dim"))
+                loading.set_margin_start(10)
+                loading.set_margin_top(10)
+                loading.set_margin_bottom(14)
+                self.card.append(loading)
+            else:
+                self._empty(f"Couldn't read the state: {info['error']}")
+            return None
+        return info
+
+    def _switch_row(self, glyph, title, subtitle, active, on_toggle, error=False, sensitive=True, busy=False):
+        children = [icon(glyph, active=active), title_block(title, subtitle, error)]
+        if busy:
+            children.append(spinner())
+        switch = unfocusable(Gtk.Switch(active=active, valign=Gtk.Align.CENTER, sensitive=sensitive and not busy))
+        switch.connect("state-set", lambda _s, on: (on_toggle(on), False)[1])
+        children.append(switch)
+        box = hbox(10, *children)
+        box.set_margin_start(8)
+        box.set_margin_end(8)
+        box.set_margin_top(6)
+        box.set_margin_bottom(6)
+        return box
+
+    def _info_row(self, glyph, title, subtitle=None, active=False, error=False):
+        box = hbox(10, icon(glyph, active=active), title_block(title, subtitle, error))
+        box.set_margin_start(8)
+        box.set_margin_end(8)
+        box.set_margin_top(6)
+        box.set_margin_bottom(6)
+        return box
+
+    # System
+
+    def _build_system(self):
+        self.usage_widgets = None
+        info = self._slow_state("System")
+        if info is None:
+            return
+        self._header("System")
+        body = vbox(0)
+        body.append(Gtk.Separator())
+
+        body.append(section("Usage"))
+        self.usage_widgets = {"cpu": self._usage_row(body, CPU, "CPU"),
+                              "mem": self._usage_row(body, MEMORY, "Memory")}
+        self._fill_usage()
+
+        body.append(section("Sleep"))
+        # on = hypridle stopped: the switch reads as "keep awake", the exception, not "auto-sleep"
+        awake = self.shown("awake", not info["sleep"])
+        if "awake" in self.busy:
+            sub = "Turning on…" if awake else "Turning off…"
+        else:
+            sub = "Never locks or sleeps when idle" if awake else "Off: locks and sleeps when idle"
+        body.append(self._switch_row(SLEEP_OFF if awake else SLEEP_ON, "Keep awake", sub, awake,
+                                     lambda want: self.run_command("awake", System.toggle_sleep(), want=want),
+                                     busy="awake" in self.busy))
+
+        body.append(section("Power"))
+        for key, glyph, title, command, confirm in POWER_ACTIONS:
+            asking = self.confirming == key
+            body.append(row([icon(glyph, active=asking),
+                             title_block(title, f"Click again to {title.lower()}" if asking else None, asking)],
+                            lambda k=key, c=command, ask=confirm: self._power(k, c, ask)))
+        self._scrolled(body, max_height=760)  # fixed content: show all of it
+        self._footer([("Applications…", "tofi", lambda: subprocess.Popen(
+                          ["sh", "-c", "tofi-drun | ifne xargs uwsm app --"], start_new_session=True)),
+                      ("Activity Monitor…", "btop", lambda: run_tui("btop")),
+                      ("Power Menu…", None, lambda: subprocess.Popen(
+                          [os.path.join(BIN, "powermenu")], start_new_session=True))])
+
+    def _usage_row(self, body, glyph, title):
+        figure = label("", "figure", xalign=1.0)
+        bar = Gtk.LevelBar(min_value=0, max_value=1, hexpand=True)
+        bar.set_size_request(-1, 6)
+        for offset in ("low", "high", "full"):
+            bar.remove_offset_value(offset)
+        detail = label("", "sub")
+        text = vbox(4, hbox(8, label(title, hexpand=True), figure), bar, detail)
+        text.set_hexpand(True)
+        box = hbox(10, icon(glyph), text)
+        box.set_margin_start(8)
+        box.set_margin_end(10)
+        box.set_margin_top(6)
+        box.set_margin_bottom(6)
+        body.append(box)
+        return figure, bar, detail
+
+    def _fill_usage(self):
+        if not self.usage_widgets:
+            return
+        try:
+            use = self.system.usage()
+        except (OSError, ValueError, KeyError):
+            return
+        figure, bar, detail = self.usage_widgets["cpu"]
+        figure.set_text(f"{use['cpu']:.0%}")
+        bar.set_value(use["cpu"])
+        (bar.add_css_class if use["cpu"] >= 0.85 else bar.remove_css_class)("busy")
+        temp = f" · {use['temp']:.0f}°C" if use["temp"] is not None else ""
+        detail.set_text(f"Load {use['load']} on {use['cores']} cores{temp}")
+
+        figure, bar, detail = self.usage_widgets["mem"]
+        share = use["mem_used"] / use["mem_total"]
+        figure.set_text(f"{share:.0%}")
+        bar.set_value(share)
+        (bar.add_css_class if share >= 0.85 else bar.remove_css_class)("busy")
+        swap = f" · swap {gib(use['swap_used'])}" if use["swap_used"] > 2**26 else ""
+        detail.set_text(f"{gib(use['mem_used'])} of {gib(use['mem_total'])} used{swap}")
+
+    def _tick_usage(self):
+        if not self.window.get_visible() or self.view != "system":
+            self.usage_id = None
+            return False
+        self._fill_usage()
+        return True
+
+    def _power(self, key, command, confirm):
+        if confirm and self.confirming != key:
+            self.confirming = key
+            GLib.timeout_add_seconds(CONFIRM_SECONDS, self._end_confirm, key)
+            self.rebuild()
+            return
+        self.hide()
+        subprocess.Popen(command, start_new_session=True)
+
+    def _end_confirm(self, key):
+        if self.confirming == key:
+            self.confirming = None
+            if self.window.get_visible() and self.view == "system":
+                self.rebuild()
+        return False
+
+    # VPN
+
+    def _build_vpn(self):
+        info = self._slow_state("VPN")
+        if info is None:
+            return
+        self._header("VPN")
+        body = vbox(0)
+        body.append(Gtk.Separator())
+        found = False
+        for key, name, glyph in (("tailscale", "Tailscale", TAILSCALE), ("netbird", "NetBird", NETBIRD)):
+            vpn = info.get(key)
+            if vpn is None:
+                continue
+            found = True
+            body.append(self._vpn_row(key, name, glyph, vpn))
+            if key == "netbird" and vpn["profiles"]:  # shown even with one, to see which is active
+                body.append(section("NetBird Profile"))
+                for profile in vpn["profiles"]:
+                    current = profile == vpn["profile"]
+                    busy = f"profile:{profile}" in self.busy
+                    children = [icon(ACCOUNT, active=current), title_block(profile, self.errors.get(f"profile:{profile}"),
+                                                                          f"profile:{profile}" in self.errors)]
+                    if busy:
+                        children.append(spinner())
+                    elif current:
+                        children.append(label(CHECK, "glyph"))
+                    body.append(row(children, lambda p=profile, cur=current: None if cur else self.run_command(
+                        f"profile:{p}", Vpn.select_profile(p))))
+        if not found:
+            body.append(label("Neither Tailscale nor NetBird is installed.", "empty"))
+        self._scrolled(body)
+
+    def _vpn_row(self, key, name, glyph, vpn):
+        busy = key in self.busy
+        connected = vpn["state"] == "connected"
+        if key in self.errors:
+            subtitle, error = self.errors[key], True
+        elif busy:
+            subtitle, error = "Connecting…" if self.shown(key, not connected) else "Disconnecting…", False
+        elif vpn["state"] == "connecting":
+            subtitle, error = "Connecting…", False
+        elif connected:
+            subtitle, error = " · ".join(x for x in (vpn["ip"], vpn["network"]) if x) or "Connected", False
+        elif vpn["state"] == "login":
+            subtitle, error = "Needs login: turn on to sign in", False
+        else:
+            subtitle, error = "Off", False
+        return self._switch_row(glyph, name, subtitle, self.shown(key, connected),
+                                lambda on: self.run_command(key, Vpn.toggle(key), want=on), error, busy=busy)
+
+    # Dictation
+
+    def _build_dictation(self):
+        info = self._slow_state("Dictation")
+        if info is None:
+            return
+        if not info:
+            self._header("Dictation")
+            self._empty("Voxtype is not set up.")
+            return
+        self._header("Dictation", self.shown("service", info["running"]), lambda on: self.run_command(
+            "service", Dictation.service("start" if on else "stop"), want=on), busy="service" in self.busy)
+        body = vbox(0)
+        body.append(Gtk.Separator())
+
+        status = info["status"]
+        state = status.get("class") or status.get("alt") or ""
+        if "service" in self.busy:
+            title = "Starting…" if self.shown("service", not info["running"]) else "Stopping…"
+        elif not info["running"]:
+            title = "Off"
+        else:
+            title = {"recording": "Recording…", "transcribing": "Transcribing…"}.get(state, "Ready: hold the hotkey to dictate")
+        detail = " · ".join(x for x in (status.get("model"), status.get("backend")) if x)
+        body.append(self._info_row(DICTATION, title, detail or None, active=state == "recording"))
+
+        body.append(section("Transcribe On"))
+        body.append(self._target_row("local", LOCAL, "This computer", info["model"], not info["remote"]))
+        if not info["endpoint"]:
+            server_sub, server_error = "Not set up (voxtype_server_url)", False
+        elif info["server_problem"]:
+            server_sub, server_error = f"Server: {info['server_problem']}", True
+        else:
+            server_sub, server_error = urlparse(info["endpoint"]).netloc or info["endpoint"], False
+        body.append(self._target_row("remote", SERVER, "Voxtype server", server_sub, info["remote"],
+                                     error=server_error, enabled=bool(info["endpoint"])))
+
+        body.append(section("Cleanup"))
+        if not info["llm"]:
+            sub, error = "No LLM set up (arch_voxtype_llm_enabled)", False
+        elif "cleanup" in self.errors:
+            sub, error = self.errors["cleanup"], True
+        elif "cleanup" in self.busy:
+            sub, error = "Turning on…" if self.shown("cleanup", not info["llm_on"]) else "Turning off…", False
+        elif info["llm_problem"]:
+            sub, error = f"{info['llm_problem']}: typing raw transcripts", True
+        else:
+            sub, error = f"{info['llm']} on {'the voxtype server' if info['remote'] else 'this computer'}", False
+        body.append(self._switch_row(CLEANUP, "LLM cleanup", sub, self.shown("cleanup", info["llm_on"]),
+                                     lambda on: self.run_command("cleanup", Dictation.toggle_cleanup(), want=on),
+                                     error, sensitive=bool(info["llm"]), busy="cleanup" in self.busy))
+
+        mic = info["mic"]
+        if mic.get("text"):
+            body.append(section("Desk Mic"))
+            title = {"live": "Switch is on: the room can be heard", "off": "Switch is off"}.get(
+                mic.get("class"), "Couldn't read the level")
+            body.append(self._info_row(mic["text"], title, None, active=mic.get("class") == "live",
+                                       error=mic.get("class") == "unknown"))
+        self._scrolled(body)
+        self._footer([("Restart Voxtype", None, lambda: subprocess.Popen(
+            Dictation.service("restart"), start_new_session=True))])
+
+    def _target_row(self, mode, glyph, title, subtitle, current, error=False, enabled=True):
+        key = f"target:{mode}"
+        busy = key in self.busy
+        if key in self.errors:
+            subtitle, error = self.errors[key], True
+        children = [icon(glyph, active=current), title_block(title, "Switching…" if busy else subtitle, error)]
+        if busy:
+            children.append(spinner())
+        elif current:
+            children.append(label(CHECK, "glyph"))
+        button = row(children, lambda: None if current or not enabled else self.run_command(
+            key, Dictation.switch_target(mode)))
+        button.set_sensitive(enabled or current)
+        return button
+
+    # Sound
+
+    def _build_sound(self, info=None):
+        info = info or self.sound.state()
+        self.sound_signature = Sound.signature(info)
+        self._header("Sound")
+        body = vbox(0)
+        body.append(Gtk.Separator())
+        for kind, title in (("sink", "Output"), ("source", "Input")):
+            body.append(section(title))
+            devices = info[kind]
+            current = next((d for d in devices if d["default"]), None)
+            if current:
+                body.append(self._volume_row(kind, current))
+            for device in devices:
+                body.append(self._sound_device_row(kind, device))
+            if not devices:
+                body.append(label(f"No {title.lower()} devices.", "sub", "empty"))
+        self._scrolled(body)
+        self._footer([("Sound Settings…", "wiremix", lambda: run_tui("wiremix")),
+                      ("Restart Audio", "right-click", lambda: subprocess.Popen(
+                          ["systemctl", "--user", "restart", "wireplumber"], start_new_session=True))])
+
+    def _refresh_sound(self):
+        """Rebuild when devices, defaults or mutes changed; otherwise only move the sliders."""
+        info = self.sound.state()
+        if Sound.signature(info) != self.sound_signature or not self.sliders:
+            self.rebuild()
+            return
+        if time.monotonic() - self.volume_set_at < 1:
+            return  # our own drag is still echoing back
+        self.updating_sliders = True
+        for kind, (scale, percent) in self.sliders.items():
+            current = next((d for d in info[kind] if d["default"]), None)
+            if current:
+                scale.set_value(min(100, current["volume"]))
+                percent.set_text(f"{current['volume']}%")
+        self.updating_sliders = False
+
+    def _volume_row(self, kind, device):
+        on, off = (VOLUME_ON, VOLUME_OFF) if kind == "sink" else (MIC_ON, MIC_OFF)
+        mute = unfocusable(Gtk.Button(child=icon(off if device["muted"] else on, active=not device["muted"]),
+                                      valign=Gtk.Align.CENTER))
+        mute.add_css_class("bare")
+        mute.set_tooltip_text("Unmute" if device["muted"] else "Mute")
+        mute.connect("clicked", lambda _b: self.sound.set_mute(kind, device["name"], not device["muted"]))
+
+        scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 100, 1)
+        unfocusable(scale)
+        scale.set_draw_value(False)
+        scale.set_hexpand(True)
+        scale.set_value(min(100, device["volume"]))
+        percent = label(f"{device['volume']}%", "mono", xalign=1.0)
+        percent.set_size_request(36, -1)
+
+        def changed(_scale):
+            if self.updating_sliders:
+                return
+            value = int(scale.get_value())
+            percent.set_text(f"{value}%")
+            self.volume_set_at = time.monotonic()
+            self.sound.set_volume(kind, device["name"], value)
+
+        scale.connect("value-changed", changed)
+        self.sliders[kind] = (scale, percent)
+        box = hbox(8, mute, scale, percent)
+        box.set_margin_start(8)
+        box.set_margin_end(10)
+        box.set_margin_top(2)
+        box.set_margin_bottom(4)
+        return box
+
+    def _sound_device_row(self, kind, device):
+        children = [icon(device["glyph"], active=device["default"]),
+                    title_block(device["description"], "Muted" if device["muted"] else None)]
+        if device["default"]:
+            children.append(label(CHECK, "glyph"))
+        return row(children, lambda: self.sound.set_default(kind, device["name"]))
 
 
 if __name__ == "__main__":

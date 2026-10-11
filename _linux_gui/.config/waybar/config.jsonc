@@ -20,19 +20,14 @@
   "modules-right": [
     "group/tray-expander",
     "custom/desk-mic",
-    "custom/voxtype",
-    "custom/voxtype-target",
-    "custom/voxtype-cleanup",
-    "pulseaudio",
+    "custom/dictation",
     "backlight",
+    "custom/vpn",
+    "battery",
+    "custom/system",
+    "pulseaudio",
     "bluetooth",
     "network",
-    "custom/tailscale",
-    "custom/netbird",
-    "custom/sleep",
-    "battery",
-    "memory",
-    "cpu",
     "clock"
   ],
   "hyprland/workspaces": {
@@ -68,17 +63,6 @@
     "on-click": "activate",
     "on-click-middle": "close",
 },
-  "cpu": {
-    "interval": 5,
-    "format": "󰍛",
-    "on-click": "$HOME/.local/bin/powermenu"
-  },
-  "memory": {
-    "interval": 30,
-    "format": "",
-    "max-length": 10,
-    "on-click": "tofi-drun | ifne xargs uwsm app --"
-  },
   "clock": {
     "format": "{:%d.%m.%Y %H:%M %a}",
     // "format-alt": "{:%Y-%m-%d %H:%M:%S}",
@@ -154,60 +138,35 @@
   "custom/desk-mic": {
     "exec": "$HOME/.local/bin/desk-mic-status",
     "return-type": "json",
-    "interval": 10
+    "interval": 10,
+    "on-click": "$HOME/.local/bin/net-popover dictation"
   },
-  // Voxtype dictation state; the tooltip names the speech model. --follow streams changes.
-  "custom/voxtype": {
-    "exec": "voxtype status --follow --format json --extended",
+  // Dictation as one button: voxtype's state, where speech is transcribed (locally or on the
+  // desktop's voxtype server, voxtype_server_url in infrastructure) and whether LLM cleanup is on
+  // (arch_voxtype_llm_enabled). dictation-bar streams changes; a click opens the Dictation panel.
+  "custom/dictation": {
+    "exec": "$HOME/.local/bin/dictation-bar",
     "return-type": "json",
-    "format": "{icon}",
-    "format-icons": {
-      "idle": "󰗋",
-      "recording": "󰗋",
-      "transcribing": "󰔟",
-      "stopped": "󰻔"
-    },
-    "restart-interval": 10
+    "restart-interval": 10,
+    "on-click": "$HOME/.local/bin/net-popover dictation"
   },
-  // Where dictations are transcribed and cleaned up: locally or on the desktop's voxtype
-  // server (voxtype_server_url in infrastructure); click to switch
-  "custom/voxtype-target": {
-    "exec": "$HOME/.local/bin/voxtype-target status",
-    "return-type": "json",
-    "interval": 30,
-    "signal": 12,
-    "on-click": "$HOME/.local/bin/voxtype-target toggle"
-  },
-  // LLM cleanup of dictations on or off; click to switch (arch_voxtype_llm_enabled in
-  // infrastructure decides whether the LLM is set up at all)
-  "custom/voxtype-cleanup": {
-    "exec": "$HOME/.local/bin/voxtype-cleanup-status status",
-    "return-type": "json",
-    "interval": 30,
-    "signal": 11,
-    "on-click": "$HOME/.local/bin/voxtype-cleanup-status toggle"
-  },
-  "custom/tailscale": {
-    "exec": "$HOME/.local/bin/tailscale-status status",
+  // Tailscale and NetBird as one button; a click opens the VPN panel. Their scripts send
+  // signal 9 after switching.
+  "custom/vpn": {
+    "exec": "$HOME/.local/bin/vpn-bar",
     "return-type": "json",
     "interval": 10,
     "signal": 9,
-    "on-click": "$HOME/.local/bin/tailscale-status toggle"
+    "on-click": "$HOME/.local/bin/net-popover vpn"
   },
-  "custom/netbird": {
-    "exec": "$HOME/.local/bin/netbird-status status",
-    "return-type": "json",
-    "interval": 10,
-    "signal": 10,
-    "on-click": "$HOME/.local/bin/netbird-status toggle",
-    "on-click-right": "$HOME/.local/bin/netbird-status profile"
-  },
-  "custom/sleep": {
-    "exec": "$HOME/.local/bin/sleep-toggle status",
+  // Auto-sleep, the app menu and the chip as one button; a click opens the System panel (live
+  // CPU and memory, the auto-sleep switch, power actions). sleep-toggle sends signal 8.
+  "custom/system": {
+    "exec": "$HOME/.local/bin/system-bar",
     "return-type": "json",
     "interval": 5,
     "signal": 8,
-    "on-click": "$HOME/.local/bin/sleep-toggle toggle"
+    "on-click": "$HOME/.local/bin/net-popover system"
   },
   "bluetooth": {
     "format": "",
@@ -237,7 +196,9 @@
         "󰕾"
       ]
     },
-    "on-click": "$HOME/.local/bin/run-in-new-term wiremix",
+    // left: the Sound panel, output and input (its footer opens wiremix); middle: wiremix directly
+    "on-click": "$HOME/.local/bin/net-popover sound",
+    "on-click-middle": "$HOME/.local/bin/run-in-new-term wiremix",
     "on-click-right": "systemctl --user restart wireplumber",
     "tooltip-format": "Playing at {volume}%",
     "scroll-step": 5,

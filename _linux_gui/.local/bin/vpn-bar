@@ -1,0 +1,57 @@
+#!/usr/bin/python3
+"""Waybar module: the Tailscale and NetBird icons as one button.
+
+Runs tailscale-status and netbird-status and shows both icons side by side, each in its own
+colour; a click anywhere on them opens net-popover's VPN panel. A VPN that is not installed
+drops out; with neither, the module is empty (waybar hides it).
+"""
+
+import html
+import json
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+BIN = Path.home() / ".local/bin"
+SCRIPTS = ("tailscale-status", "netbird-status")
+CONNECTED = {"tailscale-status": "#f38ba8", "netbird-status": "#a6e3a1"}
+CONNECTING = "#f9e2af"  # also NetBird on a non-default profile
+
+
+def script_json(name):
+    try:
+        out = subprocess.run([BIN / name, "status"], capture_output=True, text=True, timeout=5).stdout
+        return json.loads(out) if out.strip() else {}
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return {}
+
+
+def icon(name, part):
+    classes = part.get("class", [])
+    classes = [classes] if isinstance(classes, str) else classes
+    text = html.escape(part["text"])
+    if "connecting" in classes or "alt-profile" in classes:
+        return f'<span color="{CONNECTING}">{text}</span>'
+    if "connected" in classes:
+        return f'<span color="{CONNECTED[name]}">{text}</span>'
+    return f'<span alpha="45%">{text}</span>'
+
+
+def tooltip(part):
+    """A script's tooltip without its click hints: clicks now all open the panel."""
+    lines = part.get("tooltip", "").split("\n")
+    return "\n".join(line for line in lines if line and not line.startswith(("Click", "Middle-click", "Right-click")))
+
+
+if __name__ == "__main__":
+    with ThreadPoolExecutor() as pool:
+        parts = dict(zip(SCRIPTS, pool.map(script_json, SCRIPTS)))
+    shown = [(name, part) for name, part in parts.items() if part.get("text")]
+    if not shown:
+        print(json.dumps({"text": ""}))
+    else:
+        tips = [tooltip(part) for _name, part in shown] + ["Click for the VPN panel"]
+        print(json.dumps({
+            "text": "  ".join(icon(name, part) for name, part in shown),
+            "tooltip": html.escape("\n\n".join(tip for tip in tips if tip)),
+        }, ensure_ascii=False))

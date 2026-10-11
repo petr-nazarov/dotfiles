@@ -30,57 +30,17 @@
   opacity: 0.5;
 }
 
-#cpu,
 #battery,
 #pulseaudio,
 #custom-omarchy,
 #custom-screenrecording-indicator,
-#custom-sleep,
-#custom-tailscale,
-#custom-netbird,
+#custom-system,
 #custom-update,
 #custom-desk-mic,
-#custom-voxtype,
-#custom-voxtype-target,
-#custom-voxtype-cleanup {
+#custom-dictation,
+#custom-vpn {
   min-width: 12px;
-  margin: 0 7.5px;
-}
-
-#custom-sleep.enabled {
-  opacity: 0.45;
-}
-
-#custom-sleep.inhibited {
-  color: #f9e2af;
-}
-
-#custom-tailscale.connected {
-  color: #f38ba8;
-}
-
-#custom-tailscale.disconnected {
-  opacity: 0.45;
-}
-
-#custom-tailscale.connecting {
-  color: #f9e2af;
-}
-
-#custom-netbird.connected {
-  color: #a6e3a1;
-}
-
-#custom-netbird.disconnected {
-  opacity: 0.45;
-}
-
-#custom-netbird.connecting {
-  color: #f9e2af;
-}
-
-#custom-netbird.alt-profile {
-  color: #f9e2af;
+  padding: 0 7.5px;
 }
 
 #custom-desk-mic.live {
@@ -95,40 +55,24 @@
   opacity: 0.25;
 }
 
-#custom-voxtype.idle,
-#custom-voxtype-target.local,
-#custom-voxtype-cleanup.raw {
-  opacity: 0.45;
-}
-
-#custom-voxtype.recording {
-  color: #f38ba8;
-}
-
-#custom-voxtype.transcribing,
-#custom-voxtype-target.degraded,
-#custom-voxtype-cleanup.degraded {
-  color: #f9e2af;
-}
-
-#custom-voxtype.stopped {
-  opacity: 0.25;
-}
-
 #tray {
   margin-right: 16px;
 }
 
 #bluetooth {
-  margin-right: 17px;
+  padding: 0 8.5px;
 }
 
 #network {
-  margin-right: 13px;
+  padding: 0 6.5px;
+}
+
+#backlight {
+  padding: 0 4px;
 }
 
 #custom-expand-icon {
-  margin-right: 18px;
+  padding: 0 9px;
 }
 
 tooltip {
@@ -140,7 +84,8 @@ tooltip {
 }
 
 #clock {
-  margin-left: 8.75px;
+  margin-left: 2.75px;
+  padding: 0 6px;
 }
 
 .hidden {
@@ -149,10 +94,47 @@ tooltip {
 
 #custom-screenrecording-indicator {
   min-width: 12px;
-  margin-left: 8.75px;
+  padding: 0 4.375px;
+  margin-left: 4.375px;
   font-size: 10px;
 }
 
 #custom-screenrecording-indicator.active {
   color: #a55555;
+}
+
+/* Hover: highlight whatever the cursor is on, so it's clear what a click will hit.
+   The trailing "*" rules clear the bar-wide background on the labels inside buttons. */
+#workspaces button,
+#taskbar button,
+#tray > widget,
+#battery, #backlight, #pulseaudio, #bluetooth, #network, #clock,
+#custom-expand-icon,
+#custom-update,
+#custom-screenrecording-indicator,
+#custom-desk-mic,
+#custom-dictation,
+#custom-vpn,
+#custom-system {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-radius: 6px;
+}
+
+#workspaces button:hover,
+#workspaces button:hover *,
+#taskbar button:hover,
+#taskbar button:hover *,
+#tray > widget:hover,
+#tray > widget:hover *,
+#battery:hover, #backlight:hover, #pulseaudio:hover,
+#bluetooth:hover, #network:hover, #clock:hover,
+#custom-expand-icon:hover,
+#custom-update:hover,
+#custom-screenrecording-indicator:hover,
+#custom-desk-mic:hover,
+#custom-dictation:hover,
+#custom-vpn:hover,
+#custom-system:hover {
+  background-color: #313244;
 }

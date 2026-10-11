@@ -1,0 +1,129 @@
+#!/usr/bin/python3
+"""Waybar module: voxtype's three dictation icons as one button.
+
+Side by side: the dictation state (voxtype status --follow), where speech is transcribed
+(voxtype-target) and whether LLM cleanup is on (voxtype-cleanup-status). Each icon keeps its
+own colour; a click anywhere on them opens net-popover's Dictation panel.
+
+Streams waybar JSON, a line whenever one of the three changes. voxtype's state streams; the
+other two are re-checked when their settings change (looked at every second) and every 30 s,
+since their server and Ollama health checks can take seconds. Prints an empty module (waybar
+hides it) when voxtype is not set up.
+"""
+
+import html
+import json
+import os
+import subprocess
+import threading
+import time
+from pathlib import Path
+
+BIN = Path.home() / ".local/bin"
+CONFIG = Path.home() / ".config/voxtype/config.toml"
+# voxtype-cleanup-status's off switch
+OFF_SWITCH = Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state") / "voxtype/llm-off"
+RECHECK_SECONDS = 30
+RESTART_SECONDS = 10  # voxtype status --follow exits when the daemon restarts
+
+VOXTYPE_ICONS = {
+    "idle": "\U000f05cb",
+    "recording": "\U000f05cb",
+    "transcribing": "\U000f051f",
+    "stopped": "\U000f0ed4",
+}
+# by each script's class; the rest show in the bar's text colour
+COLOURS = {"recording": "#f38ba8", "transcribing": "#f9e2af", "degraded": "#f9e2af"}
+FADED = {"idle": "45%", "local": "45%", "raw": "45%", "stopped": "25%"}
+
+parts = {"voxtype": {}, "target": {}, "cleanup": {}}
+lock = threading.Lock()
+last = None
+
+
+def icon(part):
+    css = part.get("class", "")
+    text = html.escape(part.get("text", ""))
+    if css in COLOURS:
+        return f'<span color="{COLOURS[css]}">{text}</span>'
+    if css in FADED:
+        return f'<span alpha="{FADED[css]}">{text}</span>'
+    return text
+
+
+def tooltip(part):
+    """A script's tooltip without its click hints: clicks now all open the panel."""
+    lines = part.get("tooltip", "").split("\n")
+    return "\n".join(line for line in lines if line and not line.startswith(("Click", "Middle-click")))
+
+
+def emit():
+    global last
+    with lock:
+        shown = [parts[name] for name in ("voxtype", "target", "cleanup") if parts[name].get("text")]
+        if not shown:
+            line = json.dumps({"text": ""})
+        else:
+            tips = [tooltip(part) for part in shown] + ["Click for dictation settings"]
+            line = json.dumps({
+                "text": "  ".join(icon(part) for part in shown),
+                "tooltip": html.escape("\n\n".join(tip for tip in tips if tip)),
+                "class": parts["voxtype"].get("class", ""),
+            }, ensure_ascii=False)
+        if line != last:
+            last = line
+            print(line, flush=True)
+
+
+def script_json(name):
+    try:
+        out = subprocess.run([BIN / name, "status"], capture_output=True, text=True, timeout=10).stdout
+        return json.loads(out) if out.strip() else {}
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return {}
+
+
+def follow_voxtype():
+    while True:
+        try:
+            proc = subprocess.Popen(["voxtype", "status", "--follow", "--format", "json", "--extended"],
+                                    stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        except OSError:
+            return  # voxtype is not installed
+        for line in proc.stdout:
+            try:
+                status = json.loads(line)
+            except ValueError:
+                continue
+            state = status.get("alt") or status.get("class") or "idle"
+            with lock:
+                parts["voxtype"] = {"text": VOXTYPE_ICONS.get(state, VOXTYPE_ICONS["idle"]), "class": state,
+                                    "tooltip": status.get("tooltip", "")}
+            emit()
+        proc.wait()
+        time.sleep(RESTART_SECONDS)
+
+
+def settings_key():
+    try:
+        mtime = CONFIG.stat().st_mtime
+    except OSError:
+        mtime = None
+    return mtime, OFF_SWITCH.exists()
+
+
+def watch_settings():
+    key, checked = None, 0.0
+    while True:
+        if settings_key() != key or time.monotonic() - checked >= RECHECK_SECONDS:
+            key, checked = settings_key(), time.monotonic()
+            target, cleanup = script_json("voxtype-target"), script_json("voxtype-cleanup-status")
+            with lock:
+                parts["target"], parts["cleanup"] = target, cleanup
+            emit()
+        time.sleep(1)
+
+
+if __name__ == "__main__":
+    threading.Thread(target=follow_voxtype, daemon=True).start()
+    watch_settings()

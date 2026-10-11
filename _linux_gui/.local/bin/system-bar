@@ -1,0 +1,72 @@
+#!/usr/bin/python3
+"""Waybar module: the auto-sleep, menu and chip icons as one System button.
+
+The sleep icon is faded normally and yellow while Keep awake is on (sleep-toggle has stopped
+hypridle); the chip turns yellow when the CPU or memory is above 85%. The tooltip gives the figures,
+and a click anywhere on the icons opens net-popover's System panel.
+"""
+
+import html
+import json
+import os
+import subprocess
+import time
+
+BIN = os.path.expanduser("~/.local/bin")
+MENU = ""  # nf-fa-bars
+CHIP = "\U000f035b"  # nf-md-memory
+WARN = "#f9e2af"
+HIGH = 0.85
+
+
+def cpu_times():
+    with open("/proc/stat") as f:
+        fields = [int(x) for x in f.readline().split()[1:]]
+    idle = fields[3] + fields[4]
+    return sum(fields) - idle, sum(fields)
+
+
+def cpu_share():
+    busy, total = cpu_times()
+    time.sleep(0.25)
+    busy2, total2 = cpu_times()
+    return (busy2 - busy) / (total2 - total) if total2 > total else 0.0
+
+
+def memory():
+    mem = {}
+    with open("/proc/meminfo") as f:
+        for line in f:
+            key, value = line.split(":")
+            mem[key] = int(value.split()[0]) * 1024
+    return mem["MemTotal"] - mem["MemAvailable"], mem["MemTotal"]
+
+
+def sleep_status():
+    try:
+        out = subprocess.run([os.path.join(BIN, "sleep-toggle"), "status"], capture_output=True, text=True,
+                             timeout=3).stdout
+        return json.loads(out)
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return {}
+
+
+if __name__ == "__main__":
+    sleep = sleep_status()
+    cpu = cpu_share()
+    used, total = memory()
+    if sleep.get("class") == "inhibited":
+        sleep_icon = f'<span color="{WARN}">{html.escape(sleep.get("text", ""))}</span>'
+    else:
+        sleep_icon = f'<span alpha="45%">{html.escape(sleep.get("text", ""))}</span>'
+    busy = cpu >= HIGH or used / total >= HIGH
+    chip = f'<span color="{WARN}">{CHIP}</span>' if busy else CHIP
+    tooltip = "\n".join([
+        f"CPU {cpu:.0%}",
+        f"Memory {used / 2**30:.1f} of {total / 2**30:.1f} GB",
+        "Keep awake: on" if sleep.get("class") == "inhibited" else "Keep awake: off",
+        "",
+        "Click for the System panel",
+    ])
+    print(json.dumps({"text": "  ".join(x for x in (sleep_icon, MENU, chip) if x),
+                      "tooltip": html.escape(tooltip), "class": "busy" if busy else ""}, ensure_ascii=False))

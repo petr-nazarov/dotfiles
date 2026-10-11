@@ -4,6 +4,7 @@
 ##   status  print waybar JSON (default)
 ##   toggle  bring netbird up/down and refresh waybar
 ##   profile pick a profile with tofi, switch to it and reconnect
+##   select NAME  switch to that profile and reconnect (net-popover's VPN panel)
 ##   default switch back to the default profile (run at login)
 ##
 ## Prints an empty module (waybar hides it) when netbird is not installed
@@ -70,7 +71,7 @@ switch_profile() {
 	out=$(run_netbird profile select "$1") &&
 		out+=$'\n'$(run_netbird up)
 	notify-send "NetBird ($1)" "$out"
-	pkill -RTMIN+10 waybar
+	pkill -RTMIN+9 waybar  ## waybar's VPN module, shared with tailscale-status
 }
 
 case "${1:-status}" in
@@ -85,7 +86,7 @@ toggle)
 	## surface auth URLs and failures, which are otherwise invisible
 	profile=$(active_profile "$(status_json)")
 	notify-send "NetBird${profile:+ ($profile)}" "${out:-done}"
-	pkill -RTMIN+10 waybar
+	pkill -RTMIN+9 waybar  ## waybar's VPN module, shared with tailscale-status
 	;;
 profile)
 	json=$(status_json) || exit 0
@@ -97,6 +98,11 @@ profile)
 	choice=${choice#??}
 	[[ -z "$choice" ]] && exit 0
 	switch_profile "$choice" "$state"
+	;;
+select)
+	json=$(status_json) || exit 0
+	[[ -n "$2" ]] || exit 1
+	switch_profile "$2" "$(daemon_status "$json")"
 	;;
 default)
 	command -v netbird >/dev/null || exit 0
