@@ -31,13 +31,73 @@ The following must exist on the host before starting the container:
 | Path | Purpose |
 | :--- | :--- |
 | `$HOME/dotfiles/` | Dotfiles repo — mounted and applied inside the container via `install.sh`. |
-| `$HOME/.claude/` | Claude config directory — mounted into `/home/vscode/.claude/`. |
-| `$HOME/.claude.json` | Claude auth file — mounted into `/home/vscode/.claude.json`. |
 | `$HOME/.config/ccstatusline/` | Statusline widget layout — mounted into `/home/vscode/.config/ccstatusline/`. |
 | SSH agent socket | Forwarded via `$SSH_AUTH_SOCK` for git/SSH operations inside the container. |
 
-The `initializeCommand` in `devcontainer.json` creates `$HOME/dotfiles`, `$HOME/.claude` and
+The `initializeCommand` in `devcontainer.json` creates `$HOME/dotfiles` and
 `$HOME/.config/ccstatusline` automatically if they are missing.
+
+The host's `~/.claude` is **not** mounted: each container logs in to Claude on its own (often a
+client's account) and keeps its own settings. Your Claude skills reach it through the dotfiles
+mount instead — see [Updating a running container](#updating-a-running-container).
+
+## Persistent home
+
+`/home/vscode` is a named Docker volume, `devcontainer-home-<devcontainerId>`, one per project
+folder. Everything written there — Claude, `gh`, `gcloud` and other logins, shell history, mise
+installs — survives `--recreate`, so recreating after a `Dockerfile` or `mounts` change no longer
+means logging in again. The bind mounts (dotfiles, ssh config, ccstatusline) sit on top of the
+volume and still come from the host.
+
+Docker seeds a new, empty volume from the image's `/home/vscode`. After that the image's home is
+no longer looked at, so changes to the base image's home directory don't reach an existing volume.
+
+To start a project from a clean home, remove the container and then the volume
+(`docker volume ls | grep devcontainer-home`, `docker volume rm …`).
+
+### Moving an existing container onto the volume
+
+A container created before this mount existed has its logins only inside the container. Once:
+
+1. Update the base: `npx degit petr-nazarov/dotfiles/.devcontainer/base .devcontainer/base`.
+2. Copy the `devcontainer-home-${devcontainerId}` line from `base/devcontainer.json` into the
+   project's `.devcontainer/devcontainer.json` `mounts`, and remove any `~/.claude` /
+   `~/.claude.json` mount lines.
+3. Run `.devcontainer/base/host-scripts/migrate-home.sh`.
+
+It copies `/home/vscode` out of the old container (skipping bind-mounted paths) into a private
+temp directory, recreates the container with the volume, copies the files back in, runs a refresh
+and deletes the temp copy.
+
+## Updating a running container
+
+`scripts/refresh.sh` brings a container up to date with the dotfiles without recreating it. It runs
+on every container start (from `post-start.sh`) and on demand:
+
+```bash
+.devcontainer/base/host-scripts/update.sh
+```
+
+Both callers run the copy at `~/dotfiles/.devcontainer/base/scripts/refresh.sh` when the dotfiles
+are mounted, so the newest version runs even in a project whose `.devcontainer/base` is old. Every
+step is safe to repeat:
+
+| Step | What it does |
+| :--- | :--- |
+| System packages | Installs anything in `packages.txt` that is missing. The `Dockerfile` reads the same file, so adding a tool there reaches running containers too. |
+| Dotfiles links | `stow --restow _headless`: links new files, drops links to deleted ones. Edits to already-linked files are live anyway. |
+| Claude skills | Links each folder in `_claude/.claude/skills` into `~/.claude/skills`. A skill folder is a single link, so edits inside it are live; new skills appear on the next refresh, and links to deleted ones are removed. |
+| Claude settings | Merges `dotfiles/claude-settings.json` into `~/.claude/settings.json`: the template's keys (hooks, statusline, …) win, anything else the container set is kept. |
+| ccstatusline | Installs it if missing; seeds the layout if the mount is omitted. |
+| Plugins | Updates the official marketplace and installs or updates superpowers. |
+
+The host's `~/.claude/skills` is deliberately not mounted: that folder also holds `synced/`, where
+Claude stores the claude.ai skills of the logged-in account, and the containers use other
+accounts. When `~/.claude` *is* a mount (this repo's own container), the skills and settings steps
+are skipped, because writing there would change the host.
+
+What still needs `--recreate` (or `migrate-home.sh` the first time): new `mounts`, `runArgs`,
+`features` and base image changes — Docker only applies those when a container is created.
 
 ## SSH Agent Forwarding
 
@@ -87,7 +147,7 @@ with `npx -y ccstatusline@latest`. Two pieces have to reach the container: the *
 ### The binary
 
 `ccstatusline` ships as an npm package only (no standalone release artifacts), so `devcontainer.json`
-declares the `ghcr.io/devcontainers/features/node` feature and `post-create.sh` runs
+declares the `ghcr.io/devcontainers/features/node` feature and `refresh.sh` runs
 `npm i -g ccstatusline@latest`.
 
 The node feature is used deliberately instead of the mise-managed node that the dotfiles install.
@@ -121,17 +181,15 @@ Note this config deliberately lives in the `_claude` package, **not** `_headless
 would see the bind-mounted `settings.json` as a foreign regular file, report a conflict, and abort
 the entire `_headless` run. The container never stows `_claude`, so there is nothing to collide with.
 
-### Running without the `~/.claude` mount
+### Claude settings in the container
 
-To keep host Claude credentials out of a container, drop the `.claude/` and `.claude.json` mount
-lines from the project's `devcontainer.json`. `post-create.sh` then generates
-`~/.claude/settings.json` from `dotfiles/claude-settings.json`, preserving the parts of the host
-setup that aren't auth: statusline, `editorMode: vim`, `remoteControlAtStartup`, the default TUI
-renderer and the attention hooks (see below). It only writes when the file is absent — a mounted
-`~/.claude` is always authoritative.
+The container's `~/.claude/settings.json` comes from `dotfiles/claude-settings.json`, which keeps
+the parts of the host setup that aren't auth: statusline, `editorMode: vim`,
+`remoteControlAtStartup`, the default TUI renderer and the attention hooks (see below).
+`refresh.sh` merges it in on every start.
 
-The same fallback applies to the layout: if the `ccstatusline` mount is omitted, `post-create.sh`
-seeds it from `~/dotfiles/_claude/.config/ccstatusline/settings.json` instead.
+If the `ccstatusline` mount is omitted, `refresh.sh` seeds the layout from
+`~/dotfiles/_claude/.config/ccstatusline/settings.json` instead.
 
 ### `~/.config` ownership
 
@@ -200,6 +258,8 @@ The repo must be cloned as a **non-bare** repository. Worktrees are expected to 
 | `.devcontainer/base/host-scripts/init.sh` | First-time setup: copies `devcontainer.json` into the project and installs `devcontainer-cli`. |
 | `.devcontainer/base/host-scripts/base.sh` | Starts SSH agent and brings the container up (`devcontainer up`). |
 | `.devcontainer/base/host-scripts/shell.sh` | Opens a `zsh` shell inside the running container. |
+| `.devcontainer/base/host-scripts/update.sh` | Refreshes the running container from the dotfiles without recreating it. |
+| `.devcontainer/base/host-scripts/migrate-home.sh` | One-time: moves an existing container's home onto the persistent volume. |
 | `.devcontainer/base/host-scripts/claude.sh` | Runs Claude CLI inside the container with `--dangerously-skip-permissions`. |
 | `.devcontainer/base/host-scripts/down.sh` | Stops and removes a running container (interactive picker via fzf). |
 
@@ -214,14 +274,13 @@ The repo must be cloned as a **non-bare** repository. Worktrees are expected to 
 This runs `devcontainer up --remove-existing-container` instead of a plain `devcontainer up`, so the
 container is torn down and rebuilt from scratch — use it after changing the `Dockerfile`, `features`,
 `mounts`, or anything else that only takes effect on creation (`postCreateCommand` included). The
-workspace and every bind mount live on the host, so nothing there is lost; anything written *only*
-to the container filesystem is.
-
-To force-recreate the container, pass `--recreate` (see below).
+workspace and every bind mount live on the host and `/home/vscode` lives in its volume, so neither
+is lost; anything written elsewhere in the container filesystem is.
 
 ## Lifecycle Scripts
 
 | Script | When it runs | What it does |
 | :--- | :--- | :--- |
-| `scripts/post-create.sh` | On container creation | Fixes `~/.ssh` and `~/.config` ownership, applies dotfiles via `apply-dotfiles.sh`, installs Claude CLI, installs `ccstatusline`, and seeds `notify-attention` / Claude / ccstatusline settings if they aren't mounted. |
-| `scripts/post-start.sh` | On every container start | Repairs worktree paths, runs `mise install` for project deps. |
+| `scripts/post-create.sh` | On container creation | Fixes `~/.ssh` and `~/.config` ownership, applies dotfiles via `apply-dotfiles.sh`, installs Claude CLI, and seeds the fallback `notify-attention` if the dotfiles aren't mounted. |
+| `scripts/post-start.sh` | On every container start | Runs `mise install` for project deps, then `refresh.sh`. |
+| `scripts/refresh.sh` | On every start, and via `update.sh` | See [Updating a running container](#updating-a-running-container). |

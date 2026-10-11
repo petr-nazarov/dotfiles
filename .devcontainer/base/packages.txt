@@ -1,0 +1,7 @@
+stow
+neovim
+jq
+rclone
+fzf
+btop
+tmuxinator

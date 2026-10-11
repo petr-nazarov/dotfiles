@@ -24,29 +24,6 @@ echo "🔧 Applying dotfiles..."
 echo "🤖 Installing Claude CLI..."
 curl -fsSL https://claude.ai/install.sh | bash
 
-echo "📊 Setting up ccstatusline..."
-# The statusline binary is npm-only (no standalone release artifacts), so it
-# needs the node feature declared in devcontainer.json. Installing it globally
-# puts it on the feature's PATH, which `devcontainer exec zsh -c` inherits —
-# mise's node only activates in interactive shells, so it can't be used here.
-if command -v npm >/dev/null 2>&1; then
-	npm i -g ccstatusline@latest
-else
-	echo "⚠️  npm not found — add ghcr.io/devcontainers/features/node to devcontainer.json"
-fi
-
-# ~/.config/ccstatusline is normally bind-mounted from the host so the widget
-# layout stays in sync. When that mount is omitted, seed it from the dotfiles
-# repo copy instead.
-if [ ! -f ~/.config/ccstatusline/settings.json ]; then
-	CCSL_SRC="$HOME/dotfiles/_claude/.config/ccstatusline/settings.json"
-	if [ -f "$CCSL_SRC" ]; then
-		echo "  ↳ seeding ccstatusline settings from dotfiles"
-		mkdir -p ~/.config/ccstatusline
-		cp "$CCSL_SRC" ~/.config/ccstatusline/settings.json
-	fi
-fi
-
 # The Claude hooks ring the pane so tmux on the host flags the window. The hook
 # script normally arrives via the ~/dotfiles mount (stowed to ~/.local/bin by
 # install.sh). Without that mount there is nothing at ~/.local/bin, so drop in
@@ -60,17 +37,5 @@ if [ ! -e ~/.local/bin/notify-attention ] && [ ! -L ~/.local/bin/notify-attentio
 	chmod +x ~/.local/bin/notify-attention
 fi
 
-# ~/.claude is normally bind-mounted from the host, which brings the real
-# settings.json with it. When that mount is omitted (e.g. to keep host auth
-# out of the container), generate a minimal settings.json so the statusline,
-# vim mode, remote control and TUI still match the host setup. Never overwrite
-# an existing file — a mounted ~/.claude is authoritative.
-if [ ! -f ~/.claude/settings.json ]; then
-	echo "  ↳ ~/.claude/settings.json not mounted, generating defaults"
-	mkdir -p ~/.claude
-	cp .devcontainer/base/dotfiles/claude-settings.json ~/.claude/settings.json
-fi
-
-# Installing superpowers:
-claude plugin marketplace add anthropics/claude-plugins-official
-claude plugin install superpowers@claude-plugins-official
+# ccstatusline, Claude settings, skills and plugins are set up by
+# refresh.sh, which post-start.sh runs right after this and on every start.
