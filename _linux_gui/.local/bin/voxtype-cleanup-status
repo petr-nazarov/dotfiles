@@ -8,7 +8,8 @@ The infrastructure repo (arch_voxtype_llm_enabled / arch_voxtype_llm_model) deci
 the LLM is set up at all: it passes --llm to voxtype-postprocess in voxtype's config. The
 toggle only flips voxtype-postprocess's runtime off switch, so it applies from the next
 dictation without a restart and survives Ansible runs. Status also checks that Ollama serves
-the model, since voxtype-postprocess types the raw transcript whenever it is unreachable.
+the model, since voxtype-postprocess types the raw transcript whenever it is unreachable:
+the local Ollama, or the desktop's voxtype server while voxtype-target has voxtype remote.
 Prints an empty module (waybar hides it) when voxtype is not set up.
 """
 
@@ -22,7 +23,7 @@ import urllib.request
 from pathlib import Path
 
 CONFIG = Path.home() / ".config/voxtype/config.toml"
-OLLAMA = "http://127.0.0.1:11434/api/tags"
+OLLAMA = "http://127.0.0.1:11434"
 # Same path voxtype-postprocess reads
 OFF_SWITCH = Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state") / "voxtype/llm-off"
 SIGNAL = 11
@@ -35,21 +36,29 @@ def report(text, css, tooltip):
     print(json.dumps({"text": text, "class": css, "tooltip": tooltip}, ensure_ascii=False))
 
 
-def ollama_models():
+def ollama_models(whisper):
+    """Models the Ollama voxtype-postprocess would use serves, or None when it is unreachable."""
+    if whisper.get("mode") == "remote" and whisper.get("remote_endpoint"):
+        req = urllib.request.Request(
+            whisper["remote_endpoint"].rstrip("/") + "/api/tags",
+            headers={"Authorization": "Bearer " + whisper.get("remote_api_key", "")},
+        )
+    else:
+        req = urllib.request.Request(OLLAMA + "/api/tags")
     try:
-        with urllib.request.urlopen(OLLAMA, timeout=1) as resp:
+        with urllib.request.urlopen(req, timeout=2) as resp:
             return {m["name"] for m in json.load(resp)["models"]}
     except Exception:  # noqa: BLE001 - any failure means the model can't be used
         return None
 
 
 def read_config():
-    """(whisper model, llm model or None), or None when voxtype is not set up."""
+    """(whisper table, llm model or None), or None when voxtype is not set up."""
     try:
         config = tomllib.loads(CONFIG.read_text())
     except (OSError, tomllib.TOMLDecodeError):
         return None
-    whisper = config.get("whisper", {}).get("model", "?")
+    whisper = config.get("whisper", {})
     command = config.get("output", {}).get("post_process", {}).get("command", "")
     match = re.search(r"--llm\s+(\S+)", command)
     return whisper, match and match.group(1)
@@ -60,7 +69,10 @@ def status():
     if config is None:
         report("", "", "")
         return
-    whisper, llm = config
+    whisper_table, llm = config
+    remote = whisper_table.get("mode") == "remote"
+    whisper = whisper_table.get("model", "?") + (", on the voxtype server" if remote else "")
+    where = "the voxtype server" if remote else "the local Ollama"
 
     if not llm:
         report(RAW, "raw", f"Raw transcript: typed as spoken\nSpeech: {whisper}\nLLM: not set up (arch_voxtype_llm_enabled)")
@@ -68,13 +80,13 @@ def status():
     if OFF_SWITCH.exists():
         report(RAW, "raw", f"Raw transcript: typed as spoken\nSpeech: {whisper}\nLLM: {llm}, off\nClick to turn LLM cleanup on")
         return
-    models = ollama_models()
+    models = ollama_models(whisper_table)
     if models is None:
-        problem = "Ollama is not running"
+        problem = f"{where} is not reachable"
     elif llm not in models and f"{llm}:latest" not in models:
         problem = f"{llm} is not pulled"
     else:
-        report(CLEANUP, "cleanup", f"LLM cleanup: on\nSpeech: {whisper}\nLLM: {llm}\nClick to type raw transcripts")
+        report(CLEANUP, "cleanup", f"LLM cleanup: on\nSpeech: {whisper}\nLLM: {llm}, on {where}\nClick to type raw transcripts")
         return
     report(CLEANUP, "degraded", f"LLM cleanup: on, but {problem}, so the raw transcript is typed\nSpeech: {whisper}\nLLM: {llm}\nClick to type raw transcripts")
 

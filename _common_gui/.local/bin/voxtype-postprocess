@@ -2,8 +2,10 @@
 """voxtype post-process hook: transcript on stdin, text to type on stdout.
 
 The raw transcript always goes to the clipboard first. With --llm MODEL it is then
-cleaned up by a local Ollama model, and the cleaned text replaces it on the clipboard
-and is what voxtype types. Any failure falls back to the raw transcript.
+cleaned up by an Ollama model, and the cleaned text replaces it on the clipboard and is
+what voxtype types. Any failure falls back to the raw transcript. The model runs where
+voxtype transcribes: the local Ollama, or the desktop's voxtype server while voxtype's
+[whisper] mode is "remote" (voxtype-target switches it).
 
 Wired up by the infrastructure repo (arch/gui_apps, darwin/gui_apps), which adds --llm
 when *_voxtype_llm_enabled is on. The switch file below turns the cleanup off at runtime
@@ -13,11 +15,15 @@ when *_voxtype_llm_enabled is on. The switch file below turns the cleanup off at
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.request
 
-OLLAMA = "http://127.0.0.1:11434/api/chat"
+OLLAMA = "http://127.0.0.1:11434"
+CONFIG = os.path.expanduser(
+    "~/Library/Application Support/voxtype/config.toml" if sys.platform == "darwin" else "~/.config/voxtype/config.toml"
+)
 # Present: type the raw transcript even with --llm
 OFF_SWITCH = os.path.join(os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "voxtype/llm-off")
 
@@ -44,6 +50,21 @@ def copy(text):
         print(f"voxtype-postprocess: clipboard: {e}", file=sys.stderr)
 
 
+def ollama():
+    """Base URL and headers of the Ollama to clean up with: the voxtype server's gateway while
+    voxtype transcribes there, else the local one. Same parsing as voxtype-target."""
+    try:
+        with open(CONFIG) as f:
+            config = f.read()
+    except OSError:
+        return OLLAMA, {}
+    section = re.search(r"^\[whisper\]\s*$(.*?)(?=^\[|\Z)", config, re.M | re.S)
+    settings = dict(re.findall(r'^(\w+)\s*=\s*"([^"]*)"', section.group(1) if section else "", re.M))
+    if settings.get("mode") == "remote" and settings.get("remote_endpoint"):
+        return settings["remote_endpoint"].rstrip("/"), {"Authorization": "Bearer " + settings.get("remote_api_key", "")}
+    return OLLAMA, {}
+
+
 def clean(text, model, timeout):
     body = {
         "model": model,
@@ -57,7 +78,8 @@ def clean(text, model, timeout):
             {"role": "user", "content": f"<transcript>\n{text}\n</transcript>"},
         ],
     }
-    req = urllib.request.Request(OLLAMA, json.dumps(body).encode(), {"Content-Type": "application/json"})
+    base, headers = ollama()
+    req = urllib.request.Request(base + "/api/chat", json.dumps(body).encode(), {"Content-Type": "application/json", **headers})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         out = json.load(resp)["message"]["content"].strip()
     # A model that answers or rewrites instead of cleaning up drifts far from the input length

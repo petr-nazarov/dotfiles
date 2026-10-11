@@ -1,0 +1,157 @@
+#!/usr/bin/python3
+"""Switch voxtype between the local model and the desktop's voxtype server.
+
+  status          print waybar JSON (default); the Hammerspoon menu bar item shows the same
+  toggle          switch local <-> remote
+  local | remote  switch to that one
+
+The state is voxtype's own `mode` under [whisper]: "remote" sends the audio to
+remote_endpoint, and voxtype-postprocess sends the LLM cleanup there too. The
+infrastructure repo (voxtype_server_url, arch/voxtype_server) writes remote_endpoint and
+remote_api_key and never touches mode, so the choice survives Ansible runs. The daemon
+reads its config only on start, so switching restarts it.
+
+Remote also needs `language = "auto"`: given a list, voxtype sends the server only its first
+language. The local list waits in a comment Ansible writes, and comes back on switching local.
+
+Runs on the macs' /usr/bin/python3 (3.9): no tomllib, the config is read with regexes.
+"""
+
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.error
+import urllib.request
+
+MAC = sys.platform == "darwin"
+CONFIG = os.path.expanduser("~/Library/Application Support/voxtype/config.toml" if MAC else "~/.config/voxtype/config.toml")
+SIGNAL = 12
+# voxtype-cleanup-status's: its Ollama check follows the switch
+CLEANUP_SIGNAL = 11
+
+LOCAL = "\U000f061a"  # nf-md-chip
+REMOTE = "\U000f048b"  # nf-md-server
+
+
+def read():
+    try:
+        with open(CONFIG) as f:
+            return f.read()
+    except OSError:
+        return None
+
+
+def whisper_section(text):
+    """(start, end) of the [whisper] table's body in the config text."""
+    header = re.search(r"^\[whisper\]\s*$", text, re.M)
+    if not header:
+        return None
+    following = re.compile(r"^\[", re.M).search(text, header.end())
+    return header.end(), following.start() if following else len(text)
+
+
+def whisper_settings(text):
+    section = whisper_section(text)
+    body = text[section[0] : section[1]] if section else ""
+    return dict(re.findall(r'^(\w+)\s*=\s*"([^"]*)"', body, re.M))
+
+
+def healthy(settings):
+    """None when the server answers, else what is wrong."""
+    req = urllib.request.Request(
+        settings["remote_endpoint"].rstrip("/") + "/health",
+        headers={"Authorization": "Bearer " + settings.get("remote_api_key", "")},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=2):
+            return None
+    except urllib.error.HTTPError as e:
+        return "the token is refused" if e.code == 401 else f"it answers {e.code}"
+    except Exception:  # noqa: BLE001 - asleep, off or NetBird down
+        return "it is unreachable (asleep?)"
+
+
+def report(text, css, tooltip):
+    print(json.dumps({"text": text, "class": css, "tooltip": tooltip}, ensure_ascii=False))
+
+
+def status():
+    text = read()
+    if text is None:
+        report("", "", "")
+        return
+    settings = whisper_settings(text)
+    model = settings.get("model", "?")
+    endpoint = settings.get("remote_endpoint")
+    if settings.get("mode") != "remote":
+        hint = "Click to transcribe on the voxtype server" if endpoint else "No voxtype server set up (voxtype_server_url)"
+        report(LOCAL, "local", f"Speech: local, {model}\n{hint}")
+        return
+    problem = healthy(settings) if endpoint else "no remote_endpoint is set"
+    if problem:
+        report(REMOTE, "degraded", f"Speech: voxtype server, but {problem}\n{endpoint}\nClick to transcribe locally")
+    else:
+        report(REMOTE, "remote", f"Speech: voxtype server\n{endpoint}\nClick to transcribe locally")
+
+
+def restart():
+    if MAC:
+        subprocess.run(["pkill", "-f", "/Applications/Voxtype.app/Contents/MacOS/"], check=False)
+        subprocess.run(["sleep", "1"], check=False)
+        subprocess.run(["open", "-g", "/Applications/Voxtype.app"], check=False)
+    else:
+        subprocess.run(["systemctl", "--user", "restart", "voxtype"], check=False)
+        for signal in (SIGNAL, CLEANUP_SIGNAL):
+            subprocess.run(["pkill", f"-RTMIN+{signal}", "waybar"], check=False)
+
+
+def notify(message):
+    # Hammerspoon shows its own alert on the macs
+    if not MAC:
+        subprocess.run(["notify-send", "Voxtype", message], check=False)
+
+
+def set_line(body, key, value):
+    """The [whisper] body with `key = value`, replaced in place or added under the header."""
+    line = f"{key} = {value}"
+    if re.search(rf"^{key}\s*=", body, re.M):
+        return re.sub(rf"^{key}\s*=.*$", lambda _: line, body, count=1, flags=re.M)
+    return "\n" + line + body
+
+
+def switch(mode):
+    text = read()
+    if text is None:
+        notify("Voxtype is not set up")
+        sys.exit(1)
+    settings = whisper_settings(text)
+    if mode is None:
+        mode = "local" if settings.get("mode") == "remote" else "remote"
+    if mode == "remote" and not settings.get("remote_endpoint"):
+        notify("No voxtype server set up: set voxtype_server_url and run the playbook")
+        sys.exit(1)
+
+    start, end = whisper_section(text)
+    body = set_line(text[start:end], "mode", f'"{mode}"')
+    if mode == "remote":
+        body = set_line(body, "language", '"auto"')
+    else:
+        local = re.search(r"^# local language \(voxtype-target\): (.+)$", body, re.M)
+        if local:
+            body = set_line(body, "language", local.group(1))
+    # Write in place: the file keeps its 0600 (it holds the token)
+    with open(CONFIG, "w") as f:
+        f.write(text[:start] + body + text[end:])
+    restart()
+
+
+if __name__ == "__main__":
+    command = sys.argv[1] if len(sys.argv) > 1 else "status"
+    if command == "status":
+        status()
+    elif command in ("toggle", "local", "remote"):
+        switch(None if command == "toggle" else command)
+    else:
+        sys.exit(__doc__)

@@ -21,6 +21,7 @@
     "group/tray-expander",
     "custom/desk-mic",
     "custom/voxtype",
+    "custom/voxtype-target",
     "custom/voxtype-cleanup",
     "pulseaudio",
     "backlight",
@@ -167,6 +168,15 @@
       "stopped": "󰻔"
     },
     "restart-interval": 10
+  },
+  // Where dictations are transcribed and cleaned up: locally or on the desktop's voxtype
+  // server (voxtype_server_url in infrastructure); click to switch
+  "custom/voxtype-target": {
+    "exec": "$HOME/.local/bin/voxtype-target status",
+    "return-type": "json",
+    "interval": 30,
+    "signal": 12,
+    "on-click": "$HOME/.local/bin/voxtype-target toggle"
   },
   // LLM cleanup of dictations on or off; click to switch (arch_voxtype_llm_enabled in
   // infrastructure decides whether the LLM is set up at all)

@@ -41,6 +41,7 @@
 #custom-update,
 #custom-desk-mic,
 #custom-voxtype,
+#custom-voxtype-target,
 #custom-voxtype-cleanup {
   min-width: 12px;
   margin: 0 7.5px;
@@ -95,6 +96,7 @@
 }
 
 #custom-voxtype.idle,
+#custom-voxtype-target.local,
 #custom-voxtype-cleanup.raw {
   opacity: 0.45;
 }
@@ -104,6 +106,7 @@
 }
 
 #custom-voxtype.transcribing,
+#custom-voxtype-target.degraded,
 #custom-voxtype-cleanup.degraded {
   color: #f9e2af;
 }
