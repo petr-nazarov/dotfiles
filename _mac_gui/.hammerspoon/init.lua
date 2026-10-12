@@ -226,17 +226,20 @@ dictation:setMenu(function()
     server = server .. ": " .. where.problem
   end
   local cleanupOn = llm ~= nil and not hs.fs.attributes(llmOff)
+  -- Where each half runs right now. The server doesn't say which speech model it runs.
+  local place = remote and "on the voxtype server" or "on this Mac"
+  local speechLine = remote and "Speech: " .. place or "Speech: " .. model .. ", " .. place
   local llmLine
   if not llm then
-    llmLine = "No LLM set up (darwin_voxtype_llm_enabled)"
-  elseif cleanupOn and cleanup.problem then
-    llmLine = cleanup.problem .. ": typing raw transcripts"
+    llmLine = "LLM: not set up (darwin_voxtype_llm_enabled)"
+  elseif not cleanupOn then
+    llmLine = "LLM: off, the raw transcript is typed"
+  elseif cleanup.problem then
+    llmLine = "LLM: " .. cleanup.problem .. ", typing raw transcripts"
   else
-    llmLine = llm .. (remote and " on the voxtype server" or " on this Mac")
+    llmLine = "LLM: " .. llm .. ", " .. place
   end
   return {
-    { title = "Speech model: " .. model, disabled = true },
-    { title = "-" },
     { title = "Transcribe On", disabled = true },
     { title = "This Mac", checked = not remote, fn = function()
       if remote then switchTarget("local") end
@@ -246,6 +249,9 @@ dictation:setMenu(function()
     end },
     { title = "-" },
     { title = "LLM Cleanup", checked = cleanupOn, disabled = not llm, fn = toggleCleanup },
+    { title = "-" },
+    { title = "Running Now", disabled = true },
+    { title = speechLine, disabled = true, indent = 1 },
     { title = llmLine, disabled = true, indent = 1 },
     { title = "-" },
     { title = "Restart Voxtype", fn = restartVoxtype },

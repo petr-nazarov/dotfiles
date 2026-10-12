@@ -4,12 +4,18 @@
   status          print waybar JSON (default); the Hammerspoon menu bar item shows the same
   toggle          switch local <-> remote
   local | remote  switch to that one
+  ollama          (macs) start or stop the local Ollama to match the current mode
 
 The state is voxtype's own `mode` under [whisper]: "remote" sends the audio to
 remote_endpoint, and voxtype-postprocess sends the LLM cleanup there too. The
 infrastructure repo (voxtype_server_url, arch/voxtype_server) writes remote_endpoint and
 remote_api_key and never touches mode, so the choice survives Ansible runs. The daemon
 reads its config only on start, so switching restarts it.
+
+On the macs the local Ollama only runs while it has work: voxtype is local and the LLM
+cleanup is on. Remote cleans up on the server, so switching there stops it and frees its
+memory. `brew services start` also starts it at login and `stop` drops that, so a restart
+keeps what the last switch chose.
 
 Remote also needs `language = "auto"`: given a list, voxtype sends the server only its first
 language. The local list waits in a comment Ansible writes, and comes back on switching local.
@@ -33,6 +39,8 @@ CLEANUP_SIGNAL = 11
 
 LOCAL = "\U000f061a"  # nf-md-chip
 REMOTE = "\U000f048b"  # nf-md-server
+
+BREW = "/opt/homebrew/bin/brew"
 
 
 def read():
@@ -71,6 +79,23 @@ def healthy(settings):
         return "the token is refused" if e.code == 401 else f"it answers {e.code}"
     except Exception:  # noqa: BLE001 - asleep, off or NetBird down
         return "it is unreachable (asleep?)"
+
+
+def sync_ollama(text):
+    """Start or stop the macs' local Ollama to match the config; True when it changed."""
+    if not MAC or not os.path.exists(BREW):
+        return False
+    llm = re.search(r"^command = .*voxtype-postprocess --llm ", text, re.M)
+    want = bool(llm) and whisper_settings(text).get("mode") != "remote"
+    try:
+        info = subprocess.run([BREW, "services", "info", "ollama", "--json"], capture_output=True, text=True, check=True)
+        service = json.loads(info.stdout)[0]
+    except (subprocess.CalledProcessError, ValueError, IndexError):
+        return False  # Ollama is not installed
+    if want == bool(service.get("running")) == bool(service.get("registered")):
+        return False
+    subprocess.run([BREW, "services", "start" if want else "stop", "ollama"], capture_output=True, check=False)
+    return True
 
 
 def report(text, css, tooltip):
@@ -142,8 +167,10 @@ def switch(mode):
         if local:
             body = set_line(body, "language", local.group(1))
     # Write in place: the file keeps its 0600 (it holds the token)
+    text = text[:start] + body + text[end:]
     with open(CONFIG, "w") as f:
-        f.write(text[:start] + body + text[end:])
+        f.write(text)
+    sync_ollama(text)
     restart()
 
 
@@ -151,6 +178,10 @@ if __name__ == "__main__":
     command = sys.argv[1] if len(sys.argv) > 1 else "status"
     if command == "status":
         status()
+    elif command == "ollama":
+        # "changed" is what the Ansible task looks for
+        if sync_ollama(read() or ""):
+            print("changed")
     elif command in ("toggle", "local", "remote"):
         switch(None if command == "toggle" else command)
     else:
