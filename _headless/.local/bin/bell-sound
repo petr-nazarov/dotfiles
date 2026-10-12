@@ -1,0 +1,17 @@
+#!/bin/sh
+# bell-sound — the terminal bell's sound, run by kitty on every BEL
+# (command_on_bell in ~/.config/kitty/kitty.conf). A BEL from tmux,
+# ssh, a devcontainer or Claude's notify-attention hook all end up here.
+#
+# The file carries 2s of leading silence on purpose: pipewire suspends idle
+# sinks and the default one is bluetooth, so a bare 0.14s bell plays entirely
+# into an A2DP link that hasn't woken up yet and is never heard.
+snd=$HOME/.config/kitty/bell-attention.wav
+[ -f "$snd" ] || exit 0
+
+# volume 0.4, as ghostty's bell-audio-volume had it
+if command -v afplay >/dev/null 2>&1; then
+	exec afplay -v 0.4 "$snd"
+elif command -v paplay >/dev/null 2>&1; then
+	exec paplay --volume=26214 "$snd"
+fi

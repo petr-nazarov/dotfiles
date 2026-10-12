@@ -160,7 +160,7 @@ hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 local mainMod = "SUPER"
 
-hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd("uwsm app -- ghostty"))
+hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd("uwsm app -- kitty"))
 hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
 

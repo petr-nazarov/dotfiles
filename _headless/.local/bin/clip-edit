@@ -28,7 +28,7 @@ before=$(sha256sum <"$tmp")
 
 # nofixeol: nvim would otherwise append a trailing newline to an entry that had
 # none, which is enough to submit a form when the result is later pasted.
-ghostty --title="clip-edit" -e nvim -c 'setlocal nofixeol' "$tmp"
+kitty --title "clip-edit" nvim -c 'setlocal nofixeol' "$tmp"
 
 [ "$before" = "$(sha256sum <"$tmp")" ] && exit 0
 

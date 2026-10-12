@@ -1,0 +1,4 @@
+# Terminal for xdg-terminal-exec, which uwsm uses for Terminal=true apps
+# (tofi-drun | uwsm app). Without this it falls back to the system list and
+# picks Alacritty.
+kitty.desktop

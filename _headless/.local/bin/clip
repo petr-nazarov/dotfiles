@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # clip — put text on the host clipboard from anywhere in the
-# ghostty -> tmux -> devcontainer -> program stack.
+# terminal -> tmux -> devcontainer -> program stack.
 #
 # Why this exists: Claude Code's renderer hard-wraps its own output. It writes
 # a real newline at the pane edge and indents the continuation, so a long URL

@@ -5,9 +5,9 @@ vault=~/Projects/FrrCode
 mountpoint -q $vault && exit 0
 
 # gocryptfs prompts for the password, so it needs a terminal. When started
-# without one (scripts-menu, power menu, a keybind), rerun in Ghostty and wait.
+# without one (scripts-menu, power menu, a keybind), rerun in kitty and wait.
 if [[ ! -t 0 ]]; then
-	MOUNT_WORK_WINDOW=1 ghostty -e $0 2>/dev/null
+	MOUNT_WORK_WINDOW=1 kitty $0 2>/dev/null
 	mountpoint -q $vault
 	exit
 fi

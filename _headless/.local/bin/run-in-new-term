@@ -13,4 +13,4 @@ export XDG_SESSION_TYPE=wayland
 export WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
 
 # Launch terminal and run command
-ghostty -e sh -lc "$CMD"
+kitty sh -lc "$CMD"

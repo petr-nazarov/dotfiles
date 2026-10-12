@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Start the work day on Hyprland: mount the vault and start the tmux sessions,
-# then open Zen on workspace 1, Ghostty (FrrCode tmux session) on workspace 2
+# then open Zen on workspace 1, kitty (FrrCode tmux session) on workspace 2
 # and Ferdium on workspace 9. Anything already running is left alone.
 set -euo pipefail
 
@@ -47,5 +47,5 @@ open_on() {
 
 [ -n "$(addresses zen)" ] || open_on 1 zen zen-browser
 tmux list-clients -t FrrCode 2>/dev/null | grep -q . ||
-	open_on 2 com.mitchellh.ghostty ghostty -e tmux attach -t FrrCode
+	open_on 2 kitty kitty tmux attach -t FrrCode
 [ -n "$(addresses ferdium)" ] || open_on 9 ferdium ferdium
