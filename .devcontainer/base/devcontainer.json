@@ -5,9 +5,11 @@
   },
   // The whole home directory lives in a named volume, one per project, so
   // every login made inside the container (Claude, gh, gcloud, ...) survives
-  // --recreate. The bind mounts below are layered on top of it.
+  // --recreate. Its files are stored in .devcontainer-home/ next to the
+  // project (prepare-home.sh creates it), so a project in an encrypted folder
+  // keeps them encrypted. The bind mounts below are layered on top of it.
   "mounts": [
-    "source=devcontainer-home-${devcontainerId},target=/home/vscode,type=volume",
+    "source=devcontainer-homedir-${devcontainerId},target=/home/vscode,type=volume,volume-opt=type=none,volume-opt=o=bind,volume-opt=device=${localWorkspaceFolder}/../.devcontainer-home/${localWorkspaceFolderBasename}",
     "source=${localWorkspaceFolder}/.devcontainer/configs/ssh.config,target=/home/vscode/.ssh/config,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.secrets/home/.ssh/KEY.pub,target=/home/vscode/.ssh/KEY.pub,type=bind,consistency=cached",
     "source=${localEnv:HOME}/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached",
@@ -32,7 +34,7 @@
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {  "moby": false },
     "ghcr.io/devcontainers/features/node:1": { "version": "lts" }
   },
-  "initializeCommand": "mkdir -p $HOME/dotfiles $HOME/.config/ccstatusline",
+  "initializeCommand": "mkdir -p $HOME/dotfiles $HOME/.config/ccstatusline && \"${localWorkspaceFolder}/.devcontainer/base/host-scripts/prepare-home.sh\" \"${localWorkspaceFolder}\"",
   "postStartCommand": ".devcontainer/base/scripts/post-start.sh",
   "postCreateCommand": ".devcontainer/base/scripts/post-create.sh"
 }

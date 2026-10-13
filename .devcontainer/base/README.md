@@ -43,31 +43,56 @@ mount instead — see [Updating a running container](#updating-a-running-contain
 
 ## Persistent home
 
-`/home/vscode` is a named Docker volume, `devcontainer-home-<devcontainerId>`, one per project
+`/home/vscode` is a named Docker volume, `devcontainer-homedir-<devcontainerId>`, one per project
 folder. Everything written there — Claude, `gh`, `gcloud` and other logins, shell history, mise
 installs — survives `--recreate`, so recreating after a `Dockerfile` or `mounts` change no longer
 means logging in again. The bind mounts (dotfiles, ssh config, ccstatusline) sit on top of the
 volume and still come from the host.
 
-Docker seeds a new, empty volume from the image's `/home/vscode`. After that the image's home is
-no longer looked at, so changes to the base image's home directory don't reach an existing volume.
+The volume's files are not kept in Docker's own storage (`/var/lib/docker`) but in a folder next
+to the project:
 
-To start a project from a clean home, remove the container and then the volume
-(`docker volume ls | grep devcontainer-home`, `docker volume rm …`).
+```
+~/Projects/FrrCode/clients/acme/repos                          the project
+~/Projects/FrrCode/clients/acme/.devcontainer-home/repos       its container's /home/vscode
+```
 
-### Moving an existing container onto the volume
+So a project inside an encrypted folder (the gocryptfs vault that `mount-work` mounts) keeps the
+client's logins encrypted too, and while the vault is unmounted the container can't start and the
+logins can't be read. The volume is a `local` volume with `o=bind`, which Docker still fills from
+the image the first time, like any named volume.
 
-A container created before this mount existed has its logins only inside the container. Once:
+`initializeCommand` runs `host-scripts/prepare-home.sh`, which creates the folder (mode `700`) and
+refuses to go on when the project's parent folder is on another filesystem than the project. That
+happens when the project *is* the root of an encrypted mount (`~/Projects/FrrCode` itself): the
+home would land outside it, so keep projects at least one folder below the mount point. The folder
+is outside the project, so it is never in the image build context, the workspace or git.
 
-1. Update the base: `npx degit petr-nazarov/dotfiles/.devcontainer/base .devcontainer/base`.
-2. Copy the `devcontainer-home-${devcontainerId}` line from `base/devcontainer.json` into the
-   project's `.devcontainer/devcontainer.json` `mounts`, and remove any `~/.claude` /
-   `~/.claude.json` mount lines.
+Docker seeds the folder from the image's `/home/vscode` only while it is empty. After that the
+image's home is no longer looked at, so changes to the base image's home directory don't reach an
+existing project.
+
+To start a project from a clean home, remove the container, the volume
+(`docker volume ls | grep devcontainer-homedir`, `docker volume rm …`) and the folder. Removing
+only the volume leaves the files in the folder, and the next start uses them again.
+
+### Moving an existing container onto the home folder
+
+A container created before this mount existed has its logins inside the container, or in the
+older plain `devcontainer-home-<devcontainerId>` volume under `/var/lib/docker`, unencrypted.
+Once:
+
+1. Update the base: `npx degit petr-nazarov/dotfiles/.devcontainer/base .devcontainer/base --force`.
+2. In the project's `.devcontainer/devcontainer.json`, replace any older home mount with the
+   `devcontainer-homedir-${devcontainerId}` line from `base/devcontainer.json`, copy its
+   `initializeCommand`, and remove any `~/.claude` / `~/.claude.json` mount lines.
 3. Run `.devcontainer/base/host-scripts/migrate-home.sh`.
 
-It copies `/home/vscode` out of the old container (skipping bind-mounted paths) into a private
-temp directory, recreates the container with the volume, copies the files back in, runs a refresh
-and deletes the temp copy.
+It copies `/home/vscode` out of the old container (skipping bind-mounted paths) straight into the
+home folder, recreates the container on it, deletes the old plain volume if there was one, and
+runs a refresh. Nothing passes through a temp copy, and a failed recreate leaves the files in the
+folder: fix the cause and start the container with `shell.sh`. Deleting the old volume does not
+wipe its blocks on disk; they stay readable to root until they are overwritten.
 
 ## Updating a running container
 
@@ -259,7 +284,8 @@ The repo must be cloned as a **non-bare** repository. Worktrees are expected to 
 | `.devcontainer/base/host-scripts/base.sh` | Starts SSH agent and brings the container up (`devcontainer up`). |
 | `.devcontainer/base/host-scripts/shell.sh` | Opens a `zsh` shell inside the running container. |
 | `.devcontainer/base/host-scripts/update.sh` | Refreshes the running container from the dotfiles without recreating it. |
-| `.devcontainer/base/host-scripts/migrate-home.sh` | One-time: moves an existing container's home onto the persistent volume. |
+| `.devcontainer/base/host-scripts/migrate-home.sh` | One-time: moves an existing container's home into the project's home folder. |
+| `.devcontainer/base/host-scripts/prepare-home.sh` | Run by `initializeCommand`: creates the home folder and checks it stays on the project's filesystem. |
 | `.devcontainer/base/host-scripts/claude.sh` | Runs Claude CLI inside the container with `--dangerously-skip-permissions`. |
 | `.devcontainer/base/host-scripts/down.sh` | Stops and removes a running container (interactive picker via fzf). |
 
@@ -274,7 +300,7 @@ The repo must be cloned as a **non-bare** repository. Worktrees are expected to 
 This runs `devcontainer up --remove-existing-container` instead of a plain `devcontainer up`, so the
 container is torn down and rebuilt from scratch — use it after changing the `Dockerfile`, `features`,
 `mounts`, or anything else that only takes effect on creation (`postCreateCommand` included). The
-workspace and every bind mount live on the host and `/home/vscode` lives in its volume, so neither
+workspace and every bind mount live on the host and `/home/vscode` lives in its home folder, so neither
 is lost; anything written elsewhere in the container filesystem is.
 
 ## Lifecycle Scripts
