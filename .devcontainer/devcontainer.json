@@ -9,13 +9,19 @@
     "source=${localEnv:HOME}/.claude/,target=/home/vscode/.claude/,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/ccstatusline/,target=/home/vscode/.config/ccstatusline/,type=bind,consistency=cached",
-    "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
+    "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
+    // The host's runtime dir, for its Wayland socket: wl-paste in the
+    // container then reads the host clipboard, so a screenshot pastes into
+    // Claude. The whole dir rather than the socket file, so a compositor
+    // restart doesn't leave a stale socket behind.
+    "source=${localEnv:XDG_RUNTIME_DIR},target=/run/host-xdg,type=bind"
   ],
   "runArgs": [
     "--network=host"
   ],
   "containerEnv": {
-    "SSH_AUTH_SOCK": "/ssh-agent"
+    "SSH_AUTH_SOCK": "/ssh-agent",
+    "WAYLAND_DISPLAY": "/run/host-xdg/${localEnv:WAYLAND_DISPLAY}"
   },
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {  "moby": false },

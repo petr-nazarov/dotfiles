@@ -5,3 +5,4 @@ rclone
 fzf
 btop
 tmuxinator
+wl-clipboard

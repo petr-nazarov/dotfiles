@@ -14,13 +14,19 @@
     "source=${localEnv:HOME}/.secrets/home/.ssh/KEY.pub,target=/home/vscode/.ssh/KEY.pub,type=bind,consistency=cached",
     "source=${localEnv:HOME}/dotfiles,target=/home/vscode/dotfiles,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/ccstatusline/,target=/home/vscode/.config/ccstatusline/,type=bind,consistency=cached",
-    "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
+    "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
+    // The host's runtime dir, for its Wayland socket: wl-paste in the
+    // container then reads the host clipboard, so a screenshot pastes into
+    // Claude. The whole dir rather than the socket file, so a compositor
+    // restart doesn't leave a stale socket behind.
+    "source=${localEnv:XDG_RUNTIME_DIR},target=/run/host-xdg,type=bind"
   ],
   "runArgs": [
     "--network=host"
   ],
   "containerEnv": {
-    "SSH_AUTH_SOCK": "/ssh-agent"
+    "SSH_AUTH_SOCK": "/ssh-agent",
+    "WAYLAND_DISPLAY": "/run/host-xdg/${localEnv:WAYLAND_DISPLAY}"
   },
   // Claude's notification hooks run non-interactively, so they never source
   // ~/.secrets/secrets.zsh the way a login shell does. Hand the keys in

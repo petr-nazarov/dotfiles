@@ -128,6 +128,8 @@ What still needs `--recreate` (or `migrate-home.sh` the first time): new `mounts
 
 `host-scripts/base.sh` ensures an SSH agent is running on a fixed socket (`$XDG_RUNTIME_DIR/ssh-agent.socket`) before bringing the container up. Every private key under `~/.ssh/` (on the host) is added automatically, skipping any whose fingerprint is already loaded in the agent — so keys added in earlier sessions aren't re-prompted for their passphrase, but new keys still get picked up on the next start. The socket is then forwarded into the container as `/ssh-agent`; signing always happens on the host, so no private key material ever enters the container.
 
+The host's `$XDG_RUNTIME_DIR` is mounted at `/run/host-xdg` and `WAYLAND_DISPLAY` points at the Wayland socket in it, so `wl-paste` (from `wl-clipboard`) reads the host clipboard. That is what lets a screenshot on the host clipboard paste into Claude running in the container.
+
 ### Multiple SSH/GitHub identities
 
 Since only the agent socket is forwarded, `ssh` inside the container still needs *some* file
