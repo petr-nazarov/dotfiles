@@ -15,8 +15,18 @@ for arg in "$@"; do
     esac
 done
 
-# Ensure ssh-agent is running with a fixed socket
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+# Ensure ssh-agent is running with a fixed socket. On macOS launchd already runs
+# one; colima (forwardAgent: true) exposes it inside its VM, where the bind
+# mount source is resolved, at /run/host-services/ssh-auth.sock.
+if [[ "$(uname)" == Darwin ]]; then
+    CONTAINER_AUTH_SOCK=/run/host-services/ssh-auth.sock
+    # No Wayland here; the devcontainer still bind-mounts $XDG_RUNTIME_DIR, so give it a dir.
+    export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-$HOME/.cache/xdg-runtime}"
+    mkdir -p "$XDG_RUNTIME_DIR"
+else
+    export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+    CONTAINER_AUTH_SOCK="$SSH_AUTH_SOCK"
+fi
 
 if [[ ! -S "$SSH_AUTH_SOCK" ]]; then
     ssh-agent -D -a "$SSH_AUTH_SOCK" &
@@ -43,7 +53,12 @@ for key in ~/.ssh/*; do
 
     ssh-add "$key" 2>/dev/null || true
 done
-docker context use default
+if [[ "$(uname)" == Darwin ]]; then
+    docker context use colima
+else
+    docker context use default
+fi
+export SSH_AUTH_SOCK="$CONTAINER_AUTH_SOCK"
 if [[ "$RECREATE" -eq 1 ]]; then
     echo "♻️  Recreating devcontainer from scratch (existing container will be removed)..."
     devcontainer up --remove-existing-container --workspace-folder .
