@@ -69,3 +69,12 @@ just sync
 - **Tmux plugins**: After syncing, open tmux and press `Ctrl+a` then `I` (capital I) to fetch plugins.
 - **PATH**: Ensure `~/.local/bin` is in your `$PATH` to use the custom scripts.
 - **Monitor config (Linux)**: `just sync` auto-links the correct `monitors.conf` based on hostname (`home-desktop` or `matebook`).
+- **Karabiner (macOS)**: `_mac_gui/.config/karabiner/karabiner.json` turns Linux ctrl shortcuts
+  (ctrl+c/v/x/a/z/..., ctrl+arrows, home/end) into their mac versions on every external
+  keyboard, except in kitty and ghostty. In Raycast, ctrl+n/j and ctrl+p/k move down and up
+  instead. The built-in keyboard is ignored, so its macOS
+  modifier remaps (fn -> ctrl, caps lock -> escape) keep working. A keyboard that also reports
+  itself as a mouse (ZMK mouse keys, like the Glove80) is ignored by Karabiner by default and
+  needs its own `"ignore": false` entry under `devices`. Karabiner rewrites this file when you
+  change settings in its window; commit what it writes. Its approvals after a fresh install are
+  in the infrastructure README.

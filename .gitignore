@@ -8,3 +8,6 @@ env
 
 worktrees
 
+
+# Karabiner writes a backup of karabiner.json here on every change
+_mac_gui/.config/karabiner/automatic_backups
