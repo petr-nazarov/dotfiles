@@ -1,0 +1,17 @@
+# Remote machines Yazi can browse over SFTP, e.g. `yazi sftp://home-media`.
+# Authenticates through the SSH agent ($SSH_AUTH_SOCK), which holds the personal-server key.
+
+[sftp.home-media]
+host = "192.168.1.21"
+user = "user"
+port = 22
+
+[sftp.home-edge]
+host = "192.168.1.20"
+user = "user"
+port = 22
+
+[sftp.home-desktop]
+host = "home-desktop.netbird.cloud"
+user = "nazarov"
+port = 22

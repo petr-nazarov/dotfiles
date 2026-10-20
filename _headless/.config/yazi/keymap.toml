@@ -1,6 +1,3 @@
-# A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
-# If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
-"$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 [mgr]
 keymap = [
   { on = [
@@ -411,6 +408,21 @@ keymap = [
     "g",
     "c",
   ], run = "cd ~/Projects/FrrCode/clients/cardbook/cardbook-monorepo", desc = "Go to the cardbook monorepo" },
+  { on = [
+    "g",
+    "r",
+    "m",
+  ], run = "cd sftp://home-media", desc = "Go to home-media over SFTP" },
+  { on = [
+    "g",
+    "r",
+    "e",
+  ], run = "cd sftp://home-edge", desc = "Go to home-edge over SFTP" },
+  { on = [
+    "g",
+    "r",
+    "d",
+  ], run = "cd sftp://home-desktop", desc = "Go to home-desktop over SFTP" },
   { on = [
     "g",
     "<Space>",
