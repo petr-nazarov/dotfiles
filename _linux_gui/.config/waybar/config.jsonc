@@ -24,11 +24,11 @@
     "backlight",
     "custom/vpn",
     "battery",
-    "custom/system",
     "pulseaudio",
     "bluetooth",
     "network",
-    "clock"
+    "clock",
+    "custom/system"
   ],
   "hyprland/workspaces": {
     "on-click": "activate",
