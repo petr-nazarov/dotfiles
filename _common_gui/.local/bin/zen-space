@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Bring Zen up on one of its spaces: zen-space <name>. The spaces are the contexts in
+# infrastructure's vars/zen_contexts.sops.yml (common/zen). cmd+s / SUPER+S runs it for
+# Communication. With Zen running, --space goes to the open window; otherwise Zen starts on it.
+set -euo pipefail
+
+space=${1:?usage: zen-space <space name>}
+
+if [ "$(uname)" = Darwin ]; then
+	if pgrep -xq zen; then
+		open -a Zen
+		/Applications/Zen.app/Contents/MacOS/zen --space "$space"
+	else
+		open -a Zen --args --space "$space"
+	fi
+else
+	if pgrep -x zen-bin >/dev/null; then
+		zen-browser --space "$space"
+		hyprctl dispatch 'hl.dsp.focus({ window = "class:zen" })' >/dev/null
+	else
+		setsid -f uwsm app -- zen-browser --space "$space" >/dev/null 2>&1
+	fi
+fi
