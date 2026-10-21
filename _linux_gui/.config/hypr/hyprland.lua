@@ -175,7 +175,6 @@ hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd("uwsm app -- nemo"))
 
 -- Browser and bookmarks
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("uwsm app -- zen-browser"))
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(bin .. "/zen-space Communication"))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("uwsm app -- zen-browser"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(bin .. "/bookmarks-menu | ifne xargs zen-browser --new-tab"))
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(bin .. "/bookmarks-menu | ifne wl-copy"))
@@ -222,7 +221,7 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
     hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
 end
-hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = 9 }))
+hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd(bin .. "/zen-space Communication"))
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
@@ -250,7 +249,8 @@ for _, key in ipairs({ "C", "V" }) do
         hl.dispatch(hl.dsp.send_shortcut({ mods = mods, key = key }))
     end)
 end
-for _, key in ipairs({ "X", "Z", "R", "F" }) do
+-- B: Bitwarden in Zen (ctrl+b there)
+for _, key in ipairs({ "X", "Z", "R", "F", "B" }) do
     hl.bind(mainMod .. " + " .. key, hl.dsp.send_shortcut({ mods = "CTRL", key = key }))
 end
 -- SUPER + A is bound to align_workspaces above, so no CTRL+A passthrough here.

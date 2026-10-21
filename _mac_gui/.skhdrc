@@ -42,7 +42,7 @@ cmd - 7 : yabai -m space --focus 7
 cmd - 8 : yabai -m space --focus 8
 cmd - 9 : yabai -m space --focus 9
 cmd - 0 : yabai -m space --focus 10
-cmd - tab : yabai -m space --focus 9 
+cmd - tab : ~/.local/bin/zen-space Communication
 cmd - 0xC0 : yabai -m space --focus 11 # 0x0A is the hex value for the § key
 
 # move focused window to next/prev workspace
@@ -82,7 +82,6 @@ cmd + shift - q [
     *           : yabai -m window --close
 ]
 cmd - w : open -a /Applications/Zen.app
-cmd - s : ~/.local/bin/zen-space Communication
 cmd - q : # do nothing
 # cmd - m is voxtype push-to-talk in ~/.hammerspoon/init.lua. skhd must not bind it:
 # it would swallow the key before Hammerspoon sees it.

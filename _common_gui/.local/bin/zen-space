@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Bring Zen up on one of its spaces: zen-space <name>. The spaces are the contexts in
-# infrastructure's vars/zen_contexts.sops.yml (common/zen). cmd+s / SUPER+S runs it for
+# infrastructure's vars/zen_contexts.sops.yml (common/zen). cmd+tab / SUPER+TAB runs it for
 # Communication. With Zen running, --space goes to the open window; otherwise Zen starts on it.
 set -euo pipefail
 
