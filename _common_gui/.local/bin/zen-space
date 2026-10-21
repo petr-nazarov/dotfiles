@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Bring Zen up on one of its spaces: zen-space <name>. The spaces are the contexts in
-# infrastructure's vars/zen_contexts.sops.yml (common/zen). cmd+tab / SUPER+TAB runs it for
-# Communication. With Zen running, --space goes to the open window; otherwise Zen starts on it.
+# Bring Zen up on one of its spaces: zen-space <name> [<number>]. The spaces are the contexts
+# in infrastructure's vars/zen_contexts.sops.yml (common/zen), <number> is the space's place
+# in that list (its ctrl+number key). cmd+tab / SUPER+TAB runs it for Communication. With Zen
+# running, --space goes to the open window; otherwise Zen starts on it.
 set -euo pipefail
 
-space=${1:?usage: zen-space <space name>}
+space=${1:?usage: zen-space <space name> [<number>]}
+number=${2:-}
 
 if [ "$(uname)" = Darwin ]; then
 	if pgrep -xq zen; then
@@ -13,11 +15,23 @@ if [ "$(uname)" = Darwin ]; then
 	else
 		open -a Zen --args --space "$space"
 	fi
-else
-	if pgrep -x zen-bin >/dev/null; then
+	exit 0
+fi
+
+# --space came with Zen 1.23.3b; an older one takes it for a new window. Until the AUR
+# package has caught up, press the space's ctrl+number in the focused Zen window instead.
+version=$(sed -n 's/^Version=//p' /opt/zen-browser-bin/application.ini 2>/dev/null || true)
+has_space_flag() { printf '1.23.3b\n%s\n' "$version" | sort -V -C; }
+
+if pgrep -x zen-bin >/dev/null; then
+	hyprctl dispatch 'hl.dsp.focus({ window = "class:zen" })' >/dev/null
+	if has_space_flag; then
 		zen-browser --space "$space"
-		hyprctl dispatch 'hl.dsp.focus({ window = "class:zen" })' >/dev/null
-	else
-		setsid -f uwsm app -- zen-browser --space "$space" >/dev/null 2>&1
+	elif [ -n "$number" ]; then
+		hyprctl dispatch "hl.dsp.send_shortcut({ mods = \"CTRL\", key = \"$number\" })" >/dev/null
 	fi
+elif has_space_flag; then
+	setsid -f uwsm app -- zen-browser --space "$space" >/dev/null 2>&1
+else
+	setsid -f uwsm app -- zen-browser >/dev/null 2>&1
 fi
