@@ -175,7 +175,7 @@ hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd("uwsm app -- nemo"))
 
 -- Browser and bookmarks
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("uwsm app -- zen-browser"))
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("uwsm app -- ferdium"))
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(bin .. "/zen-space Communication"))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("uwsm app -- zen-browser"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(bin .. "/bookmarks-menu | ifne xargs zen-browser --new-tab"))
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(bin .. "/bookmarks-menu | ifne wl-copy"))
