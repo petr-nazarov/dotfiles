@@ -1,19 +1,29 @@
 #!/usr/bin/env bash
-# Bring Zen up on one of its spaces: zen-space <name> [<number>]. The spaces are the contexts
-# in infrastructure's vars/zen_contexts.sops.yml (common/zen), <number> is the space's place
-# in that list (its ctrl+number key). cmd+tab / SUPER+TAB runs it for Communication. With Zen
-# running, --space goes to the open window; otherwise Zen starts on it.
+# Bring Zen up on one of its spaces: zen-space <name> [<number>] [<desktop>]. The spaces are
+# the contexts in infrastructure's vars/zen_contexts.sops.yml (common/zen), <number> is the
+# space's place in that list (its ctrl+number key). With Zen running, --space goes to the open
+# window; otherwise Zen starts on it. With <desktop> the space keeps a window of its own on
+# that yabai space / Hyprland workspace: the Zen window there is focused, or a new one opened
+# there on the space. cmd+tab / SUPER+TAB runs it for Communication on desktop 9.
 set -euo pipefail
 
-space=${1:?usage: zen-space <space name> [<number>]}
+space=${1:?usage: zen-space <space name> [<number>] [<desktop>]}
 number=${2:-}
+desktop=${3:-}
 
 if [ "$(uname)" = Darwin ]; then
-	if pgrep -xq zen; then
-		open -a Zen
-		/Applications/Zen.app/Contents/MacOS/zen --space "$space"
-	else
+	zen=/Applications/Zen.app/Contents/MacOS/zen
+	if ! pgrep -xq zen; then
 		open -a Zen --args --space "$space"
+	elif [ -z "$desktop" ]; then
+		open -a Zen
+		"$zen" --space "$space"
+	elif yabai -m query --windows --space "$desktop" | jq -e 'any(.app | ascii_downcase == "zen")' >/dev/null; then
+		yabai -m space --focus "$desktop"
+	else
+		# A new window opens on the focused space
+		yabai -m space --focus "$desktop"
+		"$zen" --new-window --space "$space"
 	fi
 	exit 0
 fi
@@ -22,16 +32,33 @@ fi
 # package has caught up, press the space's ctrl+number in the focused Zen window instead.
 version=$(sed -n 's/^Version=//p' /opt/zen-browser-bin/application.ini 2>/dev/null || true)
 has_space_flag() { printf '1.23.3b\n%s\n' "$version" | sort -V -C; }
+zen_on_desktop() {
+	hyprctl clients -j | jq -e --argjson d "$desktop" 'any(.class == "zen" and .workspace.id == $d)' >/dev/null
+}
+press_number() {
+	[ -z "$number" ] || hyprctl dispatch "hl.dsp.send_shortcut({ mods = \"CTRL\", key = \"$number\" })" >/dev/null
+}
 
-if pgrep -x zen-bin >/dev/null; then
-	hyprctl dispatch 'hl.dsp.focus({ window = "class:zen" })' >/dev/null
+if ! pgrep -x zen-bin >/dev/null; then
 	if has_space_flag; then
-		zen-browser --space "$space"
-	elif [ -n "$number" ]; then
-		hyprctl dispatch "hl.dsp.send_shortcut({ mods = \"CTRL\", key = \"$number\" })" >/dev/null
+		setsid -f uwsm app -- zen-browser --space "$space" >/dev/null 2>&1
+	else
+		setsid -f uwsm app -- zen-browser >/dev/null 2>&1
 	fi
-elif has_space_flag; then
-	setsid -f uwsm app -- zen-browser --space "$space" >/dev/null 2>&1
+elif [ -z "$desktop" ]; then
+	hyprctl dispatch 'hl.dsp.focus({ window = "class:zen" })' >/dev/null
+	if has_space_flag; then zen-browser --space "$space"; else press_number; fi
+elif zen_on_desktop; then
+	hyprctl dispatch "hl.dsp.focus({ workspace = $desktop })" >/dev/null
 else
-	setsid -f uwsm app -- zen-browser >/dev/null 2>&1
+	# A new window opens on the focused workspace
+	hyprctl dispatch "hl.dsp.focus({ workspace = $desktop })" >/dev/null
+	if has_space_flag; then
+		zen-browser --new-window --space "$space"
+	else
+		zen-browser --new-window about:blank
+		for _ in $(seq 50); do zen_on_desktop && break; sleep 0.1; done
+		sleep 0.5 # the window shows before it takes keys
+		press_number
+	fi
 fi
