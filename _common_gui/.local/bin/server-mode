@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# Turn this machine into a box that is only reached over SSH: server-mode [on|off|status].
+#   on      (default) keep it awake and close the desktop apps: on macOS every Dock app but
+#           Finder, Simulator and Xcode; on Hyprland every window (Zen, kitty, Steam...) and the
+#           voxtype dictation client. tmux, simulators, docker, ollama and the voxtype
+#           whisper/gateway servers keep running.
+#   off     let it sleep again (the apps are left closed; start-day reopens them on Arch)
+#   status  print whether it is being kept awake
+# Run from a kitty window, the window closes under it, so it ignores SIGHUP and goes on.
+set -uo pipefail
+trap '' HUP
+
+mode=${1:-on}
+
+if [ "$(uname)" = Darwin ]; then
+	# Display may sleep, the system may not, on battery too (-s alone only holds on AC).
+	awake() { pgrep -qf '^caffeinate -ims$'; }
+	keep_awake() { awake || { nohup caffeinate -ims >/dev/null 2>&1 & disown; }; }
+	allow_sleep() { pkill -f '^caffeinate -ims$'; }
+	close_apps() {
+		# Regular activation policy is what gets a Dock icon; menu bar agents are left alone.
+		# terminate() is the app's own Quit, so Zen saves its session.
+		osascript -l JavaScript -e '
+			ObjC.import("AppKit");
+			const keep = ["com.apple.finder", "com.apple.iphonesimulator", "com.apple.dt.Xcode"];
+			const apps = $.NSWorkspace.sharedWorkspace.runningApplications;
+			const quit = [];
+			for (let i = 0; i < apps.count; i++) {
+				const app = apps.objectAtIndex(i);
+				const id = ObjC.unwrap(app.bundleIdentifier);
+				if (app.activationPolicy == 0 && !keep.includes(id)) quit.push(app);
+			}
+			// kitty last: it may be the terminal running this
+			quit.sort((a, b) => (ObjC.unwrap(a.bundleIdentifier) === "net.kovidgoyal.kitty") - (ObjC.unwrap(b.bundleIdentifier) === "net.kovidgoyal.kitty"));
+			quit.map(app => { app.terminate; return ObjC.unwrap(app.localizedName); }).join("\n");
+		' 2>/dev/null | sort -u | sed 's/^/closed: /'
+	}
+else
+	awake() { ! pgrep -x hypridle >/dev/null; }
+	keep_awake() {
+		pkill -x hypridle
+		pkill -RTMIN+8 waybar
+	}
+	allow_sleep() {
+		awake && setsid -f uwsm app -- hypridle >/dev/null 2>&1
+		sleep 0.3
+		pkill -RTMIN+8 waybar
+	}
+	close_apps() {
+		systemctl --user stop voxtype.service voxtype-ptt.service && echo "closed: voxtype"
+		# -i 0 reaches Hyprland from an SSH shell, which has no HYPRLAND_INSTANCE_SIGNATURE
+		local clients
+		clients=$(hyprctl -i 0 clients -j)
+		if pgrep -x steam >/dev/null; then
+			steam -shutdown >/dev/null 2>&1 &
+			echo "closed: steam"
+		fi
+		# One SIGTERM per program, kitty last: it may be the terminal running this
+		jq -r '[.[] | select(.class != "steam")] | unique_by(.pid) | sort_by(.class == "kitty") | .[] | "\(.pid) \(.class)"' <<<"$clients" |
+			while read -r pid class; do
+				echo "closed: $class"
+				kill -TERM "$pid"
+			done
+	}
+fi
+
+case $mode in
+on)
+	keep_awake
+	echo "kept awake"
+	close_apps
+	;;
+off)
+	allow_sleep
+	echo "may sleep again"
+	;;
+status)
+	if awake; then echo "kept awake"; else echo "may sleep"; fi
+	;;
+*)
+	echo "usage: server-mode [on|off|status]" >&2
+	exit 2
+	;;
+esac
