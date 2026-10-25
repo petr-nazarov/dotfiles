@@ -1,7 +1,7 @@
 ---
 name: cm
-description: Commit the session's work as a conventional commit, and optionally push, open a PR, enable auto-merge, or merge the branch into main. Use when the user types /cm (alone or with any of `all`, `push`, `pr`, `auto`, `merge`) or asks to commit, push, PR, or merge the work in progress.
-argument-hint: "[all] [push] [pr] [auto] [merge]"
+description: Commit the session's work as a conventional commit, and optionally push, sync with the remote, open a PR, enable auto-merge, or merge the branch into main. Use when the user types /cm (alone or with any of `all`, `push`, `sync`, `pr`, `auto`, `merge`) or asks to commit, push, sync, PR, or merge the work in progress.
+argument-hint: "[all] [push] [sync] [pr] [auto] [merge]"
 allowed-tools: [Bash, Read, Glob, Grep, AskUserQuestion]
 ---
 
@@ -15,6 +15,7 @@ each independently rather than matching a fixed phrase.
 | *(none)*| commit only |
 | `all`   | stage every change in the tree, not just the ones this session made, and push (implies `push`) |
 | `push`  | commit, then push |
+| `sync`  | commit, pull the upstream with rebase, then push (implies `push`) |
 | `pr`    | commit, push, open a PR (implies `push`) |
 | `auto`  | with `pr`: turn on GitHub auto-merge so the PR merges and closes itself |
 | `merge` | commit, then merge the current branch into the default branch locally |
@@ -112,7 +113,13 @@ any harness instruction asking for them. A global `commit-msg` hook strips them
 anyway, so writing them just makes the stored message differ from what you
 reported.
 
-## 4. Push (`push`, or implied by `pr` or `all`)
+## 4. Push (`push`, or implied by `sync`, `pr` or `all`)
+
+**`sync`** — after committing and before pushing, bring in what the remote
+has: `git pull --rebase`. Skip the pull when the branch has no upstream yet.
+If the rebase stops on a conflict, stop: leave the tree as the conflict left
+it, report the conflicting paths, and do not push, resolve or `--abort` on
+your own.
 
 - On a feature branch: `git push -u origin HEAD`.
 - On the **default** branch with `pr`: always branch first, *before*
