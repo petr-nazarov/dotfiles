@@ -7,7 +7,8 @@ a click opens the card at once. Wi-Fi talks to iwd and Bluetooth to bluez over t
 Sound to PipeWire through pactl; impala, bluetui and wiremix stay one click away in each panel's
 footer. VPN drives Tailscale and NetBird, and Dictation voxtype, through the same scripts the bar's
 icons use; their checks can take seconds (server health pings), so they load in the background.
-System shows live CPU and memory use, the auto-sleep switch (sleep-toggle) and the power actions.
+System shows live CPU and memory use, the auto-sleep switch (sleep-toggle), the power actions and a
+screen-sharing restart.
 
 The card sits on a transparent layer that covers the screen below the bar, so a click anywhere
 outside it (or Escape) closes it, and clicking the bar icon again toggles it.
@@ -1450,6 +1451,10 @@ class Popover(Gtk.Application):
         self._footer([("Applications…", "tofi", lambda: subprocess.Popen(
                           ["sh", "-c", "tofi-drun | ifne xargs uwsm app --"], start_new_session=True)),
                       ("Activity Monitor…", "btop", lambda: run_tui("btop")),
+                      # the portal loses PipeWire for good when PipeWire restarts under it
+                      ("Restart Screen Sharing", None, lambda: subprocess.Popen(
+                          ["systemctl", "--user", "restart", "xdg-desktop-portal-hyprland", "xdg-desktop-portal"],
+                          start_new_session=True)),
                       ("Power Menu…", None, lambda: subprocess.Popen(
                           [os.path.join(BIN, "powermenu")], start_new_session=True))])
 
