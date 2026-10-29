@@ -425,6 +425,11 @@ keymap = [
   ], run = "cd sftp://home-desktop", desc = "Go to home-desktop over SFTP" },
   { on = [
     "g",
+    "r",
+    "M",
+  ], run = "cd sftp://macmom", desc = "Go to macmom over SFTP" },
+  { on = [
+    "g",
     "<Space>",
   ], run = "cd --interactive", desc = "Go to a directory interactively" },
 
