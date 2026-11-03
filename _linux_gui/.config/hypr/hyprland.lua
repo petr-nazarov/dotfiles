@@ -222,6 +222,7 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
 end
 hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd(bin .. "/zen-space Communication 6 9"))
+hl.bind(mainMod .. " + SHIFT + TAB", hl.dsp.window.move({ workspace = 9, follow = false }))
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
