@@ -74,7 +74,7 @@ just sync
   keyboard, except in kitty and ghostty. In Raycast, ctrl+n/j and ctrl+p/k move down and up
   instead. The built-in keyboard is ignored, so its macOS
   modifier remaps (fn -> ctrl, caps lock -> escape) keep working. A keyboard that also reports
-  itself as a mouse (ZMK mouse keys, like the Glove80) is ignored by Karabiner by default and
+  itself as a mouse (ZMK mouse keys, like the Glove80 and the Cradio) is ignored by Karabiner by default and
   needs its own `"ignore": false` entry under `devices`. Karabiner rewrites this file when you
   change settings in its window; commit what it writes. Its approvals after a fresh install are
   in the infrastructure README.
